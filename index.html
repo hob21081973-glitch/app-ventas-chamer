@@ -61,7 +61,7 @@
     <!-- CONTENIDO DE LAS PESTAÑAS -->
     <main class="container mx-auto p-4 flex-grow max-w-6xl">
 
-        <!-- 1. CREAR PEDIDO (CON ESTRUCTURA HORIZONTAL) -->
+        <!-- 1. CREAR PEDIDO -->
         <div id="panel-crear" class="tab-panel active space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <!-- 2. HISTORIAL DE PEDIDOS -->
+        <!-- 2. HISTORIAL DE PEDIDOS (LIMPIO SIN COMENTARIOS NI ESTADOS) -->
         <div id="panel-historial" class="tab-panel space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
             <div class="overflow-x-auto bg-white rounded-lg shadow p-2">
@@ -132,7 +132,7 @@
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente (Más reciente a más antiguo)</div>
                     <div class="overflow-x-auto">
-                        <div id="resumen-venta-cliente" class="text-sm text-gray-800 space-y-1 min-w-[280px] max-h-40 overflow-y-auto">Sin ventas registradas</div>
+                        <div id="resumen-venta-cliente" class="text-sm text-gray-800 space-y-2 min-w-[340px] max-h-40 overflow-y-auto">Sin ventas registradas</div>
                     </div>
                 </div>
             </div>
@@ -641,6 +641,7 @@
             document.getElementById('panel-historial').classList.add('active');
         }
 
+        // --- HISTORIAL DE PEDIDOS LIMPIO (SIN CAJA DE COMENTARIOS) ---
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(historialPedidos.length === 0) {
@@ -668,32 +669,16 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t items-center">
-                        <div class="flex items-center gap-2">
-                            <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia o comentario..." onchange="actualizarComentarioHistorial('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded text-sm">
-                        </div>
-                        <div class="flex justify-between md:justify-end items-center gap-4">
-                            <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
-                            <div class="flex gap-2">
-                                <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
-                                <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
-                                <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
-                            </div>
+                    <div class="flex justify-between items-center pt-2 border-t">
+                        <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
+                        <div class="flex gap-2">
+                            <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
+                            <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
+                            <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
                         </div>
                     </div>
                 </div>
             `).join('');
-        }
-
-        function actualizarComentarioHistorial(id, val) {
-            let p = historialPedidos.find(item => item.id === id);
-            if(p) {
-                p.comentarioEntrega = val.toUpperCase();
-                p.gestionado = val.trim() !== "";
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                renderHistorial();
-                renderReportesExportacion();
-            }
         }
 
         function editarPedido(id) {
@@ -791,9 +776,9 @@
             });
 
             contenedorCliente.innerHTML = ordenClientes.map(cod => `
-                <div class="flex justify-between border-b pb-1 text-sm gap-4">
-                    <span class="font-medium text-gray-700 truncate pr-2">[${cod}] ${mapaClientes[cod].nombre}</span>
-                    <span class="font-bold text-blue-900 whitespace-nowrap">L. ${mapaClientes[cod].total.toFixed(2)}</span>
+                <div class="flex justify-between items-center border-b pb-1 text-sm gap-6 whitespace-nowrap">
+                    <span class="font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</span>
+                    <span class="font-bold text-blue-900">L. ${mapaClientes[cod].total.toFixed(2)}</span>
                 </div>
             `).join('');
         }
