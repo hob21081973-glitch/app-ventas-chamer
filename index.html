@@ -678,7 +678,7 @@
             }
         }
 
-        // --- COMPROBANTE INDIVIDUAL CON PRODUCTO Y DETALLE ABAJO (CON SANGRÍA) ---
+        // --- COMPROBANTE INDIVIDUAL SIN "-> Detalle:" Y CON SANGRÍA ---
         function generarPdfPedidoIndividual(id) {
             let pedido = historialPedidos.find(p => p.id === id);
             if(!pedido) return;
@@ -706,11 +706,11 @@
                 doc.text(lineaProd, 14, y);
                 y += 6;
 
-                // Si tiene detalle adicional, se coloca justo abajo con sangría equivalente al tamaño del código
+                // Muestra el detalle limpio debajo con sangría, sin la etiqueta "-> Detalle:"
                 if(item.detalleExtra && item.detalleExtra.trim() !== "") {
                     doc.setFont("helvetica", "italic");
                     doc.setTextColor(100, 100, 100);
-                    doc.text(`     -> Detalle: ${item.detalleExtra}`, 14, y);
+                    doc.text(`     ${item.detalleExtra}`, 14, y);
                     doc.setFont("helvetica", "normal");
                     doc.setTextColor(0, 0, 0);
                     y += 6;
@@ -828,7 +828,6 @@
             }
         }
 
-        // --- REPORTE GENERAL USANDO AUTOTABLE PARA EVITAR DESBORDAMIENTO ---
         function exportarPdfGeneral() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -849,7 +848,7 @@
                 body: datosTabla,
                 columnStyles: {
                     0: { cellWidth: 30 },
-                    1: { cellWidth: 110 }, // Ancho controlado para que se ajuste y desborde hacia abajo si es muy largo
+                    1: { cellWidth: 110 },
                     2: { cellWidth: 40, halign: 'right' }
                 },
                 styles: { fontSize: 10, cellPadding: 3 },
