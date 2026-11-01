@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Ventas Ch</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF & html2canvas Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Force uppercase transformation on specified inputs */
+        .uppercase-input {
+            text-transform: uppercase;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 flex flex-col antialiased bg-slate-100">
+
+    <!-- TOP HEADER -->
+    <header class="bg-brand-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-500 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide">App Ventas Ch</h1>
+                    <p class="text-xs text-brand-100 font-medium">Gestión de Ventas & Pedidos</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span id="system-time" class="text-xs bg-brand-800 text-brand-100 px-3 py-1 rounded-full hidden sm:inline-block">--/--/--</span>
+                <button onclick="resetDataToDefault()" class="text-xs bg-red-600 hover:bg-red-700 text-white px-2.5 py-1.5 rounded-md transition shadow flex items-center gap-1" title="Restablecer Datos Demo">
+                    <i class="fa-solid fa-rotate-left"></i> <span class="hidden md:inline">Reset</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER WITH TABS -->
+    <div class="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto p-2 sm:p-4 gap-4 overflow-hidden">
+        
+        <!-- SIDEBAR / NAVIGATION TABS -->
+        <nav class="bg-white rounded-xl shadow-sm border border-slate-200 p-2 flex md:flex-col overflow-x-auto md:overflow-x-visible shrink-0 md:w-64 gap-1 z-20">
+            <button onclick="switchTab('tab-crear')" id="nav-tab-crear" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-cart-plus w-5 text-center"></i> <span>Crear Pedido</span>
+            </button>
+            <button onclick="switchTab('tab-historial')" id="nav-tab-historial" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> <span>Historial De Pedidos</span>
+            </button>
+            <button onclick="switchTab('tab-resumen-general')" id="nav-tab-resumen-general" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-chart-line w-5 text-center"></i> <span>Resumen General</span>
+            </button>
+            <button onclick="switchTab('tab-resumen-producto')" id="nav-tab-resumen-producto" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Resumen Por Producto</span>
+            </button>
+            <button onclick="switchTab('tab-exportar')" id="nav-tab-exportar" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-file-pdf w-5 text-center"></i> <span>Exportar Reportes PDF</span>
+            </button>
+            <button onclick="switchTab('tab-clientes')" id="nav-tab-clientes" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-users w-5 text-center"></i> <span>Gestión De Clientes</span>
+            </button>
+            <button onclick="switchTab('tab-productos')" id="nav-tab-productos" class="nav-tab flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition whitespace-nowrap">
+                <i class="fa-solid fa-boxes-packing w-5 text-center"></i> <span>Gestión De Productos</span>
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 overflow-y-auto min-h-[500px]">
+            
+            <!-- 1. CREAR PEDIDO -->
+            <section id="tab-crear" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-cart-plus text-brand-600"></i> <span id="crear-pedido-title">Crear Nuevo Pedido</span>
+                    </h2>
+                    <span id="editing-order-badge" class="hidden bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-amber-300">
+                        Modo Edición: <span id="editing-order-id">#00</span>
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Client Selection -->
+                    <div class="relative">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seleccionar Cliente</label>
+                        <div class="relative">
+                            <input type="text" id="client-search" autocomplete="off" placeholder="BUSCAR CODIGO O NOMBRE CLIENTE..." class="uppercase-input w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <i class="fa-solid fa-user-tag absolute left-3 top-2.5 text-slate-400"></i>
+                        </div>
+                        <div id="client-results" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto hidden"></div>
+                        <div id="selected-client-display" class="mt-2 text-xs font-semibold text-brand-700 bg-brand-50 p-2 rounded border border-brand-200 hidden">
+                            Cliente: <span id="selected-client-text"></span>
+                        </div>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div class="relative">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seleccionar Producto</label>
+                        <div class="relative">
+                            <input type="text" id="product-search" autocomplete="off" placeholder="BUSCAR CODIGO O NOMBRE PRODUCTO..." class="uppercase-input w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <i class="fa-solid fa-box-open absolute left-3 top-2.5 text-slate-400"></i>
+                        </div>
+                        <div id="product-results" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Cart Table -->
+                <div class="border rounded-lg overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-slate-700 border-b font-semibold text-xs uppercase">
+                            <tr>
+                                <th class="p-3">Producto</th>
+                                <th class="p-3 text-right">Precio</th>
+                                <th class="p-3 text-center">Cant.</th>
+                                <th class="p-3">Detalle Extra</th>
+                                <th class="p-3 text-right">Gran Total</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-table-body" class="divide-y divide-slate-100">
+                            <!-- Items added dynamically -->
+                            <tr id="cart-empty-row">
+                                <td colspan="6" class="p-8 text-center text-slate-400">
+                                    <i class="fa-solid fa-basket-shopping text-3xl mb-2"></i>
+                                    <p>No hay productos agregados al pedido</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50 border-t font-bold">
+                            <tr>
+                                <td colspan="4" class="p-3 text-right text-slate-700">TOTAL PEDIDO:</td>
+                                <td id="cart-grand-total" class="p-3 text-right text-brand-700 text-base">L. 0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-wrap gap-3 justify-end pt-2">
+                    <button onclick="cancelOrderEdit()" id="btn-cancel-edit" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-lg text-sm transition">
+                        Cancelar Edición
+                    </button>
+                    <button onclick="saveCurrentOrder()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> <span>Guardar / Finalizar Pedido</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. HISTORIAL DE PEDIDOS -->
+            <section id="tab-historial" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-brand-600"></i> Historial De Pedidos
+                    </h2>
+                    <span id="order-count-badge" class="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full border">0 Pedidos</span>
+                </div>
+
+                <div id="order-history-list" class="space-y-4">
+                    <!-- Orders dynamically rendered -->
+                </div>
+            </section>
+
+            <!-- 3. RESUMEN GENERAL -->
+            <section id="tab-resumen-general" class="tab-content hidden space-y-6">
+                <div class="border-b pb-3">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-brand-600"></i> Resumen General de Ventas
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Total General -->
+                    <div class="bg-gradient-to-br from-brand-500 to-brand-700 text-white p-5 rounded-xl shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase font-semibold text-brand-100">Venta General Acumulada</span>
+                            <i class="fa-solid fa-sack-dollar text-xl opacity-80"></i>
+                        </div>
+                        <div class="mt-4">
+                            <h3 id="stat-venta-general" class="text-2xl sm:text-3xl font-black tracking-tight">L. 0.00</h3>
+                        </div>
+                    </div>
+
+                    <!-- Venta por Fecha -->
+                    <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs uppercase font-semibold text-slate-500">Venta Por Fecha</span>
+                                <i class="fa-solid fa-calendar-day text-brand-600"></i>
+                            </div>
+                            <input type="date" id="summary-date-picker" onchange="updateGeneralSummary()" class="w-full text-xs border rounded p-1.5 mb-2 focus:ring-1 focus:ring-brand-500">
+                        </div>
+                        <div>
+                            <span id="summary-date-label" class="text-xs text-slate-400 block">Fecha seleccionada</span>
+                            <h3 id="stat-venta-fecha" class="text-xl font-bold text-slate-800">L. 0.00</h3>
+                        </div>
+                    </div>
+
+                    <!-- Venta por Cliente -->
+                    <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs uppercase font-semibold text-slate-500">Venta Por Cliente</span>
+                                <i class="fa-solid fa-user-check text-brand-600"></i>
+                            </div>
+                            <select id="summary-client-select" onchange="updateGeneralSummary()" class="w-full text-xs border rounded p-1.5 mb-2 focus:ring-1 focus:ring-brand-500">
+                                <option value="">SELECCIONAR CLIENTE...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span id="summary-client-name" class="text-xs text-slate-400 block truncate">Ningún cliente</span>
+                            <h3 id="stat-venta-cliente" class="text-xl font-bold text-slate-800">L. 0.00</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. RESUMEN POR PRODUCTO -->
+            <section id="tab-resumen-producto" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-3">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-brand-600"></i> Ranking De Productos
+                    </h2>
+                    <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                        <button id="rank-btn-units" onclick="setProductRankingSort('units')" class="px-3 py-1.5 rounded-md text-xs font-semibold transition bg-white text-brand-700 shadow-sm">
+                            <i class="fa-solid fa-arrow-down-1-9 mr-1"></i> Unidades
+                        </button>
+                        <button id="rank-btn-val" onclick="setProductRankingSort('value')" class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                            <i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Valor L.
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-slate-700 border-b font-semibold text-xs uppercase">
+                            <tr>
+                                <th class="p-3">#</th>
+                                <th class="p-3">Código y Producto</th>
+                                <th class="p-3 text-center">Unidades Acumuladas</th>
+                                <th class="p-3 text-right">Valor Total Vendido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-ranking-tbody" class="divide-y divide-slate-100">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. EXPORTAR REPORTES A PDFS -->
+            <section id="tab-exportar" class="tab-content hidden space-y-8">
+                <div class="border-b pb-3">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-brand-600"></i> Exportar Reportes De Ventas
+                    </h2>
+                </div>
+
+                <!-- Report 1: General Sales -->
+                <div class="bg-slate-50 border border-slate-200 p-4 sm:p-5 rounded-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <h3 class="font-bold text-slate-800">Reporte General de Ventas – App Ventas Ch</h3>
+                            <p class="text-xs text-slate-500">Ordenado del pedido más reciente al más antiguo.</p>
+                        </div>
+                        <button onclick="exportGeneralSalesReportPDF()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-file-pdf text-sm"></i> Generar y Guardar PDF
+                        </button>
+                    </div>
+
+                    <div id="pdf-report-general-container" class="bg-white p-4 border rounded-lg overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 border-b font-bold text-slate-700 uppercase">
+                                <tr>
+                                    <th class="p-2.5">Pedido No.</th>
+                                    <th class="p-2.5">Nombre Cliente</th>
+                                    <th class="p-2.5 text-right">Valor Venta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-general-tbody" class="divide-y divide-slate-100">
+                                <!-- Generated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Report 2: Incidences & Delivery -->
+                <div class="bg-slate-50 border border-slate-200 p-4 sm:p-5 rounded-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-800">Reporte General Por Cliente E Incidencias</h3>
+                            <p class="text-xs text-slate-500">Gestión de entregas y registro de incidencias.</p>
+                        </div>
+                        <button onclick="exportIncidencesReportPDF()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-lg text-xs transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-file-pdf text-sm"></i> Generar y Guardar PDF
+                        </button>
+                    </div>
+
+                    <!-- Delivery Management Form -->
+                    <div class="bg-white p-4 border rounded-lg space-y-3">
+                        <h4 class="text-xs font-bold uppercase text-slate-600">Registrar / Editar Entrega de Pedido</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Seleccionar Pedido</label>
+                                <select id="delivery-order-select" onchange="loadOrderForDelivery(this.value)" class="w-full border rounded p-1.5 text-xs">
+                                    <option value="">SELECCIONAR...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Cliente (No Editable)</label>
+                                <input type="text" id="delivery-client-name" readonly class="w-full bg-slate-100 border rounded p-1.5 text-xs text-slate-600 font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Valor Venta (No Editable)</label>
+                                <input type="text" id="delivery-order-value" readonly class="w-full bg-slate-100 border rounded p-1.5 text-xs text-slate-600 font-medium">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Valor Entrega (L.)</label>
+                                <input type="number" step="0.01" id="delivery-amount" placeholder="0.00" class="w-full border rounded p-1.5 text-xs focus:ring-1 focus:ring-brand-500">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Comentario de Entrega / Incidencia</label>
+                                <input type="text" id="delivery-comment" placeholder="EJ: ENTREGA COMPLETA O INCOMPLETA Y DETALLES..." class="uppercase-input w-full border rounded p-1.5 text-xs focus:ring-1 focus:ring-brand-500">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-1">
+                            <button onclick="saveDeliveryDetails()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-1.5 rounded text-xs transition">
+                                Guardar Info Entrega
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Incidences Output Table -->
+                    <div id="pdf-report-incidences-container" class="bg-white p-4 border rounded-lg overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 border-b font-bold text-slate-700 uppercase">
+                                <tr>
+                                    <th class="p-2.5">Pedido No.</th>
+                                    <th class="p-2.5">Nombre Cliente</th>
+                                    <th class="p-2.5 text-right">Valor Venta</th>
+                                    <th class="p-2.5 text-right">Valor Entrega</th>
+                                    <th class="p-2.5">Comentario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-incidences-tbody" class="divide-y divide-slate-100">
+                                <!-- Generated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. GESTION DE CLIENTES -->
+            <section id="tab-clientes" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-brand-600"></i> Gestión De Clientes
+                    </h2>
+                    <div class="flex gap-2">
+                        <button onclick="openClientModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-user-plus"></i> Nuevo Cliente
+                        </button>
+                        <button onclick="openGoogleSheetSyncModal('clientes')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> Sync Google Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-slate-700 border-b font-semibold text-xs uppercase">
+                            <tr>
+                                <th class="p-3">Código</th>
+                                <th class="p-3">Nombre</th>
+                                <th class="p-3">Teléfono</th>
+                                <th class="p-3">Dirección</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-table-body" class="divide-y divide-slate-100">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 7. GESTION DE PRODUCTOS -->
+            <section id="tab-productos" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-2">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-packing text-brand-600"></i> Gestión De Productos
+                    </h2>
+                    <div class="flex gap-2">
+                        <button onclick="openProductModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-plus"></i> Nuevo Producto
+                        </button>
+                        <button onclick="openGoogleSheetSyncModal('productos')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> Sync Google Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 text-slate-700 border-b font-semibold text-xs uppercase">
+                            <tr>
+                                <th class="p-3">Código</th>
+                                <th class="p-3">Nombre del Producto</th>
+                                <th class="p-3 text-right">Precio</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body" class="divide-y divide-slate-100">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: NUMERIC KEYPAD DIALOG FOR PRODUCT QUANTITY -->
+    <div id="modal-keypad" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-xl border w-full max-w-xs overflow-hidden">
+            <div class="bg-brand-900 text-white p-4 text-center">
+                <h3 id="keypad-product-name" class="font-bold text-sm truncate">NOMBRE PRODUCTO</h3>
+                <p id="keypad-product-price" class="text-xs text-brand-200 mt-1">Precio: L. 0.00</p>
+            </div>
+            <div class="p-4 space-y-3">
+                <div class="bg-slate-100 p-3 rounded-lg text-right">
+                    <span class="text-xs text-slate-400 block uppercase">Cantidad a Llevar</span>
+                    <span id="keypad-display" class="text-3xl font-extrabold text-slate-800">1</span>
+                </div>
+
+                <!-- Number Pad Grid -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="keypadPress('1')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">1</button>
+                    <button onclick="keypadPress('2')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">2</button>
+                    <button onclick="keypadPress('3')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">3</button>
+                    <button onclick="keypadPress('4')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">4</button>
+                    <button onclick="keypadPress('5')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">5</button>
+                    <button onclick="keypadPress('6')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">6</button>
+                    <button onclick="keypadPress('7')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">7</button>
+                    <button onclick="keypadPress('8')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">8</button>
+                    <button onclick="keypadPress('9')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">9</button>
+                    <button onclick="keypadPress('C')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-lg py-3 rounded-lg">C</button>
+                    <button onclick="keypadPress('0')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xl py-3 rounded-lg">0</button>
+                    <button onclick="keypadPress('DEL')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold text-lg py-3 rounded-lg"><i class="fa-solid fa-backspace"></i></button>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeKeypadModal()" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg text-sm">Cancelar</button>
+                    <button onclick="confirmKeypadQuantity()" class="w-1/2 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg text-sm shadow">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD EXTRA PRODUCT DETAIL (COLOR, TALLA, OTRO) -->
+    <div id="modal-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl border w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-bold text-base text-slate-800 border-b pb-2">Agregar Detalle Adicional</h3>
+            <p id="detail-modal-product-name" class="text-xs text-brand-700 font-semibold"></p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Detalle (Color, Talla, Especificaciones)</label>
+                <input type="text" id="detail-input" placeholder="EJ: COLOR NEGRO, TALLA M" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg text-xs">Cancelar</button>
+                <button onclick="saveItemDetail()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-lg text-xs shadow">Guardar Detalle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CLIENT CRUD -->
+    <div id="modal-client" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl border w-full max-w-md p-5 space-y-4">
+            <h3 id="client-modal-title" class="font-bold text-base text-slate-800 border-b pb-2">Nuevo Cliente</h3>
+            <input type="hidden" id="client-form-index">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Código Cliente</label>
+                    <input type="text" id="client-code-input" placeholder="EJ: C-001" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="client-name-input" placeholder="NOMBRE DEL CLIENTE" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono</label>
+                    <input type="text" id="client-phone-input" placeholder="0000-0000" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Dirección</label>
+                    <input type="text" id="client-address-input" placeholder="DIRECCIÓN DE ENTREGA" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeClientModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg text-xs">Cancelar</button>
+                <button onclick="saveClient()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-lg text-xs shadow">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PRODUCT CRUD -->
+    <div id="modal-product" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl border w-full max-w-md p-5 space-y-4">
+            <h3 id="product-modal-title" class="font-bold text-base text-slate-800 border-b pb-2">Nuevo Producto</h3>
+            <input type="hidden" id="product-form-index">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Código Producto</label>
+                    <input type="text" id="product-code-input" placeholder="EJ: P-001" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre del Producto</label>
+                    <input type="text" id="product-name-input" placeholder="DESCRIPCIÓN DEL PRODUCTO" class="uppercase-input w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Precio (L.)</label>
+                    <input type="number" step="0.01" id="product-price-input" placeholder="0.00" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeProductModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg text-xs">Cancelar</button>
+                <button onclick="saveProduct()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2 rounded-lg text-xs shadow">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GOOGLE SHEETS SYNC / CSV IMPORT -->
+    <div id="modal-gsheets" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl border w-full max-w-md p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-base text-slate-800">Conexión Google Sheets</h3>
+                <span id="gsheet-type-tag" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded"></span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Importe sus datos directamente mediante formato CSV o configure su endpoint de Google Apps Script Web App para sincronizar con la hoja de Google Sheets.
+            </p>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Opción A: Pegar CSV desde Google Sheets</label>
+                    <textarea id="csv-import-area" rows="3" placeholder="Pegue filas separadas por coma o tabulación aquí..." class="w-full text-xs p-2 border rounded-lg font-mono focus:ring-2 focus:ring-brand-500"></textarea>
+                    <button onclick="processCSVImport()" class="mt-1 w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-1.5 rounded text-xs">Importar Datos CSV</button>
+                </div>
+                <div class="border-t pt-2">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Opción B: URL Google Web App API (Opcional)</label>
+                    <input type="text" id="gsheet-api-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border rounded p-2 text-xs focus:ring-2 focus:ring-brand-500">
+                    <button onclick="saveGSheetURL()" class="mt-1 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 rounded text-xs">Guardar Enlace API</button>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeGoogleSheetModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-1.5 rounded text-xs">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRM DIALOG MODAL (No alert/confirm) -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-xl border w-full max-w-xs p-5 text-center space-y-4">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 id="confirm-title" class="font-bold text-base text-slate-800">¿Confirmar Acción?</h3>
+                <p id="confirm-message" class="text-xs text-slate-500 mt-1">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="resolveConfirm(false)" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 rounded-lg text-xs">NO</button>
+                <button onclick="resolveConfirm(true)" class="w-1/2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg text-xs shadow">SÍ, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM MESSAGE TOAST -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 text-xs">
+        <i id="toast-icon" class="fa-solid fa-circle-info text-brand-400 text-base"></i>
+        <span id="toast-message">Mensaje del sistema</span>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // Default Mock Data Initializer
+        const DEFAULT_CLIENTS = [
+            { code: "0001", name: "DISTRIBUIDORA DE HONDURAS", phone: "9988-7766", address: "TEGUCIGALPA, M.D.C." },
+            { code: "0002", name: "INVERSIONES CENTRALES S. DE R.L.", phone: "9555-1234", address: "SAN PEDRO SULA, CORTÉS" },
+            { code: "0003", name: "COMERCIAL LA ECONOMICA", phone: "8844-3322", address: "LA CEIBA, ATLÁNTIDA" }
+        ];
+
+        const DEFAULT_PRODUCTS = [
+            { code: "001", name: "CAMISA TIPO POLO ALGODÓN", price: 350.00 },
+            { code: "002", name: "PANTALÓN JEAN CLÁSICO", price: 650.00 },
+            { code: "003", name: "ZAPATILLAS DEPORTIVAS CH", price: 1200.00 },
+            { code: "004", name: "GORRA BORDADA LOGO", price: 180.00 }
+        ];
+
+        // State Management
+        let clients = [];
+        let products = [];
+        let orders = [];
+        let deliveries = {}; // Key: orderId -> { deliveryAmount, comment }
+        
+        let currentCart = [];
+        let selectedClientForOrder = null;
+        let editingOrderId = null;
+
+        let activeKeypadProduct = null;
+        let keypadInputValue = "1";
+        let activeDetailCartIndex = null;
+        let activeGSheetSyncType = null;
+        let confirmResolver = null;
+
+        let productRankingSort = 'units'; // 'units' or 'value'
+
+        // Utility: Currency Formatter
+        function formatLempiras(amount) {
+            const val = parseFloat(amount) || 0;
+            return "L. " + val.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Utility: Auto Uppercase Transformation
+        function setupUppercaseHandlers() {
+            document.querySelectorAll('.uppercase-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    e.target.value = e.target.value.toUpperCase();
+                    e.target.setSelectionRange(start, end);
+                });
+            });
+        }
+
+        // App Initialization
+        window.onload = function() {
+            loadLocalStorageData();
+            setupUppercaseHandlers();
+            updateSystemTime();
+            setInterval(updateSystemTime, 60000);
+
+            // Setup search listeners
+            setupAutocompleteListeners();
+
+            // Render current view
+            switchTab('tab-crear');
+            renderClientsTable();
+            renderProductsTable();
+            renderOrderHistory();
+            updateGeneralSummary();
+            renderProductRanking();
+            renderReports();
+        };
+
+        function updateSystemTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+            const month = monthNames[now.getMonth()];
+            const year = String(now.getFullYear()).slice(-2);
+            document.getElementById('system-time').innerText = `${day}/${month}/${year}`;
+        }
+
+        // LocalStorage Management
+        function loadLocalStorageData() {
+            const storedClients = localStorage.getItem('app_ventas_ch_clients');
+            const storedProducts = localStorage.getItem('app_ventas_ch_products');
+            const storedOrders = localStorage.getItem('app_ventas_ch_orders');
+            const storedDeliveries = localStorage.getItem('app_ventas_ch_deliveries');
+
+            clients = storedClients ? JSON.parse(storedClients) : [...DEFAULT_CLIENTS];
+            products = storedProducts ? JSON.parse(storedProducts) : [...DEFAULT_PRODUCTS];
+            orders = storedOrders ? JSON.parse(storedOrders) : [];
+            deliveries = storedDeliveries ? JSON.parse(storedDeliveries) : {};
+
+            saveLocalStorageData();
+        }
+
+        function saveLocalStorageData() {
+            localStorage.setItem('app_ventas_ch_clients', JSON.stringify(clients));
+            localStorage.setItem('app_ventas_ch_products', JSON.stringify(products));
+            localStorage.setItem('app_ventas_ch_orders', JSON.stringify(orders));
+            localStorage.setItem('app_ventas_ch_deliveries', JSON.stringify(deliveries));
+        }
+
+        function resetDataToDefault() {
+            showConfirmModal("¿Restablecer Datos Demo?", "Se reiniciarán los clientes, productos e historial de pedidos.", (confirmed) => {
+                if (confirmed) {
+                    clients = [...DEFAULT_CLIENTS];
+                    products = [...DEFAULT_PRODUCTS];
+                    orders = [];
+                    deliveries = {};
+                    saveLocalStorageData();
+                    location.reload();
+                }
+            });
+        }
+
+        // Navigation Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('bg-brand-50', 'text-brand-600', 'font-bold');
+                el.classList.add('text-slate-600');
+            });
+
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetNav) {
+                targetNav.classList.add('bg-brand-50', 'text-brand-600', 'font-bold');
+                targetNav.classList.remove('text-slate-600');
+            }
+
+            // Refresh specific tab contents on switch
+            if (tabId === 'tab-resumen-general') updateGeneralSummary();
+            if (tabId === 'tab-resumen-producto') renderProductRanking();
+            if (tabId === 'tab-exportar') renderReports();
+        }
+
+        // ================= TAB 1: CREAR PEDIDO =================
+        function setupAutocompleteListeners() {
+            // Client Autocomplete Search
+            const clientInput = document.getElementById('client-search');
+            const clientResults = document.getElementById('client-results');
+
+            clientInput.addEventListener('input', function() {
+                const query = this.value.toUpperCase().trim();
+                if (!query) {
+                    clientResults.classList.add('hidden');
+                    return;
+                }
+
+                const filtered = clients.filter(c => c.code.includes(query) || c.name.toUpperCase().includes(query));
+                if (filtered.length === 0) {
+                    clientResults.innerHTML = `<div class="p-2 text-xs text-slate-400">Sin coincidencias</div>`;
+                } else {
+                    clientResults.innerHTML = filtered.map(c => `
+                        <div onclick="selectClientForOrder('${c.code}')" class="p-2 hover:bg-brand-50 cursor-pointer text-xs border-b border-slate-100">
+                            <span class="font-bold text-brand-700">[${c.code}]</span> ${c.name}
+                        </div>
+                    `).join('');
+                }
+                clientResults.classList.remove('hidden');
+            });
+
+            // Product Autocomplete Search
+            const productInput = document.getElementById('product-search');
+            const productResults = document.getElementById('product-results');
+
+            productInput.addEventListener('input', function() {
+                const query = this.value.toUpperCase().trim();
+                if (!query) {
+                    productResults.classList.add('hidden');
+                    return;
+                }
+
+                const filtered = products.filter(p => p.code.includes(query) || p.name.toUpperCase().includes(query));
+                if (filtered.length === 0) {
+                    productResults.innerHTML = `<div class="p-2 text-xs text-slate-400">Sin coincidencias</div>`;
+                } else {
+                    productResults.innerHTML = filtered.map(p => `
+                        <div onclick="triggerKeypadForProduct('${p.code}')" class="p-2 hover:bg-brand-50 cursor-pointer text-xs border-b border-slate-100 flex justify-between">
+                            <span><span class="font-bold text-brand-700">[${p.code}]</span> ${p.name}</span>
+                            <span class="font-semibold text-slate-700">${formatLempiras(p.price)}</span>
+                        </div>
+                    `).join('');
+                }
+                productResults.classList.remove('hidden');
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!clientInput.contains(e.target) && !clientResults.contains(e.target)) {
+                    clientResults.classList.add('hidden');
+                }
+                if (!productInput.contains(e.target) && !productResults.contains(e.target)) {
+                    productResults.classList.add('hidden');
+                }
+            });
+        }
+
+        function selectClientForOrder(code) {
+            const client = clients.find(c => c.code === code);
+            if (!client) return;
+            selectedClientForOrder = client;
+
+            document.getElementById('client-search').value = `[${client.code}] ${client.name}`;
+            document.getElementById('client-results').classList.add('hidden');
+            
+            const display = document.getElementById('selected-client-display');
+            document.getElementById('selected-client-text').innerText = `[${client.code}] ${client.name}`;
+            display.classList.remove('hidden');
+        }
+
+        // Numeric Keypad Modal Triggering
+        function triggerKeypadForProduct(code) {
+            const product = products.find(p => p.code === code);
+            if (!product) return;
+
+            activeKeypadProduct = product;
+            keypadInputValue = "1";
+            document.getElementById('keypad-display').innerText = keypadInputValue;
+            document.getElementById('keypad-product-name').innerText = `[${product.code}] ${product.name}`;
+            document.getElementById('keypad-product-price').innerText = `Precio: ${formatLempiras(product.price)}`;
+
+            document.getElementById('product-results').classList.add('hidden');
+            document.getElementById('product-search').value = "";
+            document.getElementById('modal-keypad').classList.remove('hidden');
+        }
+
+        function keypadPress(val) {
+            if (val === 'C') {
+                keypadInputValue = "1";
+            } else if (val === 'DEL') {
+                keypadInputValue = keypadInputValue.slice(0, -1);
+                if (keypadInputValue === "") keypadInputValue = "1";
+            } else {
+                if (keypadInputValue === "1") keypadInputValue = val;
+                else keypadInputValue += val;
+            }
+            document.getElementById('keypad-display').innerText = keypadInputValue;
+        }
+
+        function closeKeypadModal() {
+            document.getElementById('modal-keypad').classList.add('hidden');
+            activeKeypadProduct = null;
+        }
+
+        function confirmKeypadQuantity() {
+            const qty = parseInt(keypadInputValue) || 1;
+            if (qty <= 0) return;
+
+            // Check if product already in cart
+            const existingIndex = currentCart.findIndex(item => item.product.code === activeKeypadProduct.code);
+            if (existingIndex > -1) {
+                currentCart[existingIndex].quantity += qty;
+                currentCart[existingIndex].subtotal = currentCart[existingIndex].quantity * currentCart[existingIndex].product.price;
+            } else {
+                currentCart.push({
+                    product: activeKeypadProduct,
+                    quantity: qty,
+                    detail: "",
+                    subtotal: qty * activeKeypadProduct.price
+                });
+            }
+
+            closeKeypadModal();
+            renderCartTable();
+            showToast("Producto agregado al pedido");
+        }
+
+        // Cart Table Management
+        function renderCartTable() {
+            const tbody = document.getElementById('cart-table-body');
+            if (currentCart.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="cart-empty-row">
+                        <td colspan="6" class="p-8 text-center text-slate-400">
+                            <i class="fa-solid fa-basket-shopping text-3xl mb-2"></i>
+                            <p>No hay productos agregados al pedido</p>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('cart-grand-total').innerText = formatLempiras(0);
+                return;
+            }
+
+            let grandTotal = 0;
+            tbody.innerHTML = currentCart.map((item, index) => {
+                grandTotal += item.subtotal;
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3">
+                            <span class="font-bold text-brand-700">[${item.product.code}]</span> ${item.product.name}
+                        </td>
+                        <td class="p-3 text-right font-medium">${formatLempiras(item.product.price)}</td>
+                        <td class="p-3 text-center font-bold">${item.quantity}</td>
+                        <td class="p-3 cursor-pointer" onclick="openDetailModal(${index})">
+                            <span class="${item.detail ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-400'} text-xs px-2 py-1 rounded inline-flex items-center gap-1 hover:border border-amber-300">
+                                <i class="fa-solid fa-pen text-[10px]"></i> ${item.detail || '+ Agregar Detalle (Color/Talla)'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-right font-bold text-slate-800">${formatLempiras(item.subtotal)}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="removeCartItem(${index})" class="text-red-500 hover:text-red-700 p-1" title="Eliminar Producto">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('cart-grand-total').innerText = formatLempiras(grandTotal);
+        }
+
+        function removeCartItem(index) {
+            currentCart.splice(index, 1);
+            renderCartTable();
+        }
+
+        // Detail Modal (Color, Talla, Extra)
+        function openDetailModal(index) {
+            activeDetailCartIndex = index;
+            const item = currentCart[index];
+            document.getElementById('detail-modal-product-name').innerText = `[${item.product.code}] ${item.product.name}`;
+            document.getElementById('detail-input').value = item.detail || '';
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('modal-detail').classList.add('hidden');
+            activeDetailCartIndex = null;
+        }
+
+        function saveItemDetail() {
+            if (activeDetailCartIndex !== null && currentCart[activeDetailCartIndex]) {
+                currentCart[activeDetailCartIndex].detail = document.getElementById('detail-input').value.toUpperCase().trim();
+                renderCartTable();
+            }
+            closeDetailModal();
+        }
+
+        // Save / Finalize Order
+        function saveCurrentOrder() {
+            if (!selectedClientForOrder) {
+                showToast("Debe seleccionar un cliente antes de finalizar", "warning");
+                return;
+            }
+            if (currentCart.length === 0) {
+                showToast("Agregue al menos un producto al pedido", "warning");
+                return;
+            }
+
+            const grandTotal = currentCart.reduce((sum, item) => sum + item.subtotal, 0);
+
+            if (editingOrderId) {
+                // Update existing order
+                const orderIndex = orders.findIndex(o => o.id === editingOrderId);
+                if (orderIndex > -1) {
+                    orders[orderIndex].client = selectedClientForOrder;
+                    orders[orderIndex].items = [...currentCart];
+                    orders[orderIndex].total = grandTotal;
+                    showToast(`Pedido #${orders[orderIndex].orderNum} actualizado con éxito`);
+                }
+            } else {
+                // Generate next Order Number (e.g. "01", "02")
+                const orderSeq = orders.length + 1;
+                const orderNum = String(orderSeq).padStart(2, '0');
+                const now = new Date();
+                
+                const newOrder = {
+                    id: Date.now().toString(),
+                    orderNum: orderNum,
+                    date: now.toISOString(),
+                    client: selectedClientForOrder,
+                    items: [...currentCart],
+                    total: grandTotal
+                };
+
+                orders.unshift(newOrder); // Most recent first
+                showToast(`Pedido #${orderNum} creado exitosamente`);
+            }
+
+            saveLocalStorageData();
+            resetOrderForm();
+            renderOrderHistory();
+            updateGeneralSummary();
+            renderProductRanking();
+            renderReports();
+
+            switchTab('tab-historial');
+        }
+
+        function resetOrderForm() {
+            editingOrderId = null;
+            selectedClientForOrder = null;
+            currentCart = [];
+            document.getElementById('client-search').value = '';
+            document.getElementById('selected-client-display').classList.add('hidden');
+            document.getElementById('editing-order-badge').classList.add('hidden');
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+            document.getElementById('crear-pedido-title').innerText = "Crear Nuevo Pedido";
+            renderCartTable();
+        }
+
+        function cancelOrderEdit() {
+            resetOrderForm();
+            showToast("Edición cancelada");
+        }
+
+        // ================= TAB 2: HISTORIAL DE PEDIDOS =================
+        function renderOrderHistory() {
+            const container = document.getElementById('order-history-list');
+            document.getElementById('order-count-badge').innerText = `${orders.length} Pedido(s)`;
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-8 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                        <i class="fa-solid fa-receipt text-3xl mb-2"></i>
+                        <p>No hay pedidos registrados en el historial</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                const dateFormatted = new Date(order.date).toLocaleDateString('es-HN', {
+                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }).toUpperCase();
+
+                const itemsListHtml = order.items.map(item => `
+                    <div class="text-xs text-slate-700 py-0.5">
+                        <span class="font-bold text-brand-700">[${item.product.code}]</span> ${item.product.name} 
+                        <span class="text-slate-500 font-semibold">x${item.quantity}</span> 
+                        ${item.detail ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded ml-1 font-medium">${item.detail}</span>` : ''}
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow transition space-y-3">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-2 gap-1">
+                            <div>
+                                <span class="bg-brand-900 text-white font-extrabold text-xs px-2.5 py-1 rounded-md">Pedido #${order.orderNum}</span>
+                                <span class="text-xs text-slate-400 ml-2">${dateFormatted}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-500 font-medium">Gran Total:</span>
+                                <span class="text-base font-black text-brand-700 ml-1">${formatLempiras(order.total)}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">
+                                <i class="fa-solid fa-user text-slate-400 mr-1"></i> [${order.client.code}] ${order.client.name}
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Detalle de Productos:</span>
+                            ${itemsListHtml}
+                        </div>
+
+                        <div class="flex flex-wrap justify-end gap-2 pt-1 border-t">
+                            <button onclick="editOrder('${order.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
+                                <i class="fa-solid fa-pen-to-square"></i> Editar Pedido
+                            </button>
+                            <button onclick="generateSingleOrderPDF('${order.id}')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i> Generar PDF
+                            </button>
+                            <button onclick="deleteOrderPrompt('${order.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 font-medium px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            editingOrderId = order.id;
+            selectedClientForOrder = order.client;
+            currentCart = JSON.parse(JSON.stringify(order.items));
+
+            document.getElementById('client-search').value = `[${order.client.code}] ${order.client.name}`;
+            document.getElementById('selected-client-text').innerText = `[${order.client.code}] ${order.client.name}`;
+            document.getElementById('selected-client-display').classList.remove('hidden');
+
+            document.getElementById('editing-order-id').innerText = `#${order.orderNum}`;
+            document.getElementById('editing-order-badge').classList.remove('hidden');
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            document.getElementById('crear-pedido-title').innerText = "Editar Pedido Existente";
+
+            renderCartTable();
+            switchTab('tab-crear');
+            showToast(`Cargado Pedido #${order.orderNum} para edición`);
+        }
+
+        function deleteOrderPrompt(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            showConfirmModal(
+                `¿Eliminar Pedido #${order.orderNum}?`,
+                `Se eliminará el pedido de [${order.client.code}] ${order.client.name} por valor de ${formatLempiras(order.total)}.`,
+                (confirmed) => {
+                    if (confirmed) {
+                        orders = orders.filter(o => o.id !== orderId);
+                        delete deliveries[orderId];
+                        saveLocalStorageData();
+                        renderOrderHistory();
+                        updateGeneralSummary();
+                        renderProductRanking();
+                        renderReports();
+                        showToast(`Pedido #${order.orderNum} eliminado`);
+                    }
+                }
+            );
+        }
+
+        // ================= TAB 3: RESUMEN GENERAL =================
+        function updateGeneralSummary() {
+            // 1. Total General
+            const grandTotal = orders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('stat-venta-general').innerText = formatLempiras(grandTotal);
+
+            // 2. Venta por Fecha
+            const dateInput = document.getElementById('summary-date-picker');
+            let selectedDateStr = dateInput.value;
+            if (!selectedDateStr) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+                selectedDateStr = today;
+            }
+
+            const totalForDate = orders
+                .filter(o => o.date.startsWith(selectedDateStr))
+                .reduce((sum, o) => sum + o.total, 0);
+            
+            const dateObj = new Date(selectedDateStr + 'T00:00:00');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+            const formattedDateLabel = `${day}/${months[dateObj.getMonth()]}/${String(dateObj.getFullYear()).slice(-2)}`;
+
+            document.getElementById('summary-date-label').innerText = `Venta del ${formattedDateLabel}`;
+            document.getElementById('stat-venta-fecha').innerText = formatLempiras(totalForDate);
+
+            // 3. Venta por Cliente
+            const clientSelect = document.getElementById('summary-client-select');
+            const prevSelectedCode = clientSelect.value;
+            
+            clientSelect.innerHTML = `<option value="">SELECCIONAR CLIENTE...</option>` + 
+                clients.map(c => `<option value="${c.code}">[${c.code}] ${c.name}</option>`).join('');
+            
+            if (prevSelectedCode) clientSelect.value = prevSelectedCode;
+
+            const selectedClientCode = clientSelect.value;
+            if (selectedClientCode) {
+                const clientObj = clients.find(c => c.code === selectedClientCode);
+                const totalForClient = orders
+                    .filter(o => o.client.code === selectedClientCode)
+                    .reduce((sum, o) => sum + o.total, 0);
+                
+                document.getElementById('summary-client-name').innerText = clientObj ? clientObj.name : 'Cliente seleccionado';
+                document.getElementById('stat-venta-cliente').innerText = formatLempiras(totalForClient);
+            } else {
+                document.getElementById('summary-client-name').innerText = 'Ningún cliente seleccionado';
+                document.getElementById('stat-venta-cliente').innerText = formatLempiras(0);
+            }
+        }
+
+        // ================= TAB 4: RESUMEN POR PRODUCTO =================
+        function setProductRankingSort(type) {
+            productRankingSort = type;
+            const btnUnits = document.getElementById('rank-btn-units');
+            const btnVal = document.getElementById('rank-btn-val');
+
+            if (type === 'units') {
+                btnUnits.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition bg-white text-brand-700 shadow-sm";
+                btnVal.className = "px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+            } else {
+                btnVal.className = "px-3 py-1.5 rounded-md text-xs font-semibold transition bg-white text-brand-700 shadow-sm";
+                btnUnits.className = "px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+            }
+            renderProductRanking();
+        }
+
+        function renderProductRanking() {
+            const tbody = document.getElementById('product-ranking-tbody');
+            
+            // Map product metrics
+            const metrics = {};
+            products.forEach(p => {
+                metrics[p.code] = { product: p, units: 0, totalVal: 0 };
+            });
+
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (metrics[item.product.code]) {
+                        metrics[item.product.code].units += item.quantity;
+                        metrics[item.product.code].totalVal += item.subtotal;
+                    } else {
+                        metrics[item.product.code] = {
+                            product: item.product,
+                            units: item.quantity,
+                            totalVal: item.subtotal
+                        };
+                    }
+                });
+            });
+
+            let rankingArray = Object.values(metrics);
+
+            // Sort Descending according to criteria
+            if (productRankingSort === 'units') {
+                rankingArray.sort((a, b) => b.units - a.units);
+            } else {
+                rankingArray.sort((a, b) => b.totalVal - a.totalVal);
+            }
+
+            if (rankingArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin datos de ventas</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = rankingArray.map((row, index) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-slate-400 text-xs">${index + 1}</td>
+                    <td class="p-3 font-medium text-slate-800 text-xs">
+                        <span class="font-bold text-brand-700">[${row.product.code}]</span> ${row.product.name}
+                    </td>
+                    <td class="p-3 text-center font-bold text-slate-700 text-xs">
+                        <span class="bg-slate-100 px-2 py-1 rounded border">${row.units}</span>
+                    </td>
+                    <td class="p-3 text-right font-bold text-brand-800 text-xs">${formatLempiras(row.totalVal)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= TAB 5: EXPORTAR REPORTES & INCIDENCIAS =================
+        function renderReports() {
+            // 1. Reporte General de Ventas (Newest to Oldest)
+            const reportGeneralTbody = document.getElementById('report-general-tbody');
+            const sortedNewest = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (sortedNewest.length === 0) {
+                reportGeneralTbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">No hay datos para generar el reporte</td></tr>`;
+            } else {
+                reportGeneralTbody.innerHTML = sortedNewest.map(o => `
+                    <tr>
+                        <td class="p-2.5 font-bold text-brand-700">Pedido #${o.orderNum}</td>
+                        <td class="p-2.5 font-medium">[${o.client.code}] ${o.client.name}</td>
+                        <td class="p-2.5 text-right font-bold">${formatLempiras(o.total)}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // 2. Populate Order Selector for Delivery Management
+            const deliverySelect = document.getElementById('delivery-order-select');
+            const currentSelVal = deliverySelect.value;
+            deliverySelect.innerHTML = `<option value="">SELECCIONAR...</option>` +
+                orders.map(o => `<option value="${o.id}">Pedido #${o.orderNum} - ${o.client.name}</option>`).join('');
+            if (currentSelVal) deliverySelect.value = currentSelVal;
+
+            // 3. Reporte General Por Cliente E Incidencias (Ascending order 01, 02, 03)
+            const reportIncidencesTbody = document.getElementById('report-incidences-tbody');
+            const sortedAscending = [...orders].sort((a, b) => parseInt(a.orderNum) - parseInt(b.orderNum));
+
+            if (sortedAscending.length === 0) {
+                reportIncidencesTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay datos de entregas registradas</td></tr>`;
+            } else {
+                reportIncidencesTbody.innerHTML = sortedAscending.map(o => {
+                    const delInfo = deliveries[o.id] || { deliveryAmount: o.total, comment: "Entrega completa" };
+                    return `
+                        <tr>
+                            <td class="p-2.5 font-bold text-brand-700">Pedido #${o.orderNum}</td>
+                            <td class="p-2.5 font-medium">[${o.client.code}] ${o.client.name}</td>
+                            <td class="p-2.5 text-right font-semibold">${formatLempiras(o.total)}</td>
+                            <td class="p-2.5 text-right font-bold text-emerald-700">${formatLempiras(delInfo.deliveryAmount)}</td>
+                            <td class="p-2.5 text-slate-600">${delInfo.comment}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function loadOrderForDelivery(orderId) {
+            if (!orderId) {
+                document.getElementById('delivery-client-name').value = '';
+                document.getElementById('delivery-order-value').value = '';
+                document.getElementById('delivery-amount').value = '';
+                document.getElementById('delivery-comment').value = '';
+                return;
+            }
+
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            document.getElementById('delivery-client-name').value = `[${order.client.code}] ${order.client.name}`;
+            document.getElementById('delivery-order-value').value = formatLempiras(order.total);
+
+            const existingDel = deliveries[order.id];
+            if (existingDel) {
+                document.getElementById('delivery-amount').value = existingDel.deliveryAmount;
+                document.getElementById('delivery-comment').value = existingDel.comment;
+            } else {
+                document.getElementById('delivery-amount').value = order.total;
+                document.getElementById('delivery-comment').value = 'ENTREGA COMPLETA';
+            }
+        }
+
+        function saveDeliveryDetails() {
+            const orderId = document.getElementById('delivery-order-select').value;
+            if (!orderId) {
+                showToast("Seleccione un pedido para guardar la entrega", "warning");
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('delivery-amount').value) || 0;
+            const comment = document.getElementById('delivery-comment').value.toUpperCase().trim() || "ENTREGA COMPLETA";
+
+            deliveries[orderId] = {
+                deliveryAmount: amount,
+                comment: comment
+            };
+
+            saveLocalStorageData();
+            renderReports();
+            showToast("Información de entrega registrada");
+        }
+
+        // PDF GENERATION LOGIC WITH JSPDF & HTML2CANVAS
+        async function exportGeneralSalesReportPDF() {
+            const element = document.getElementById('pdf-report-general-container');
+            showToast("Generando PDF de Reporte General...");
+
+            try {
+                const canvas = await html2canvas(element, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                pdf.setFontSize(16);
+                pdf.setTextColor(2, 132, 199);
+                pdf.text("Reporte General de Ventas – App Ventas Ch", 14, 15);
+                
+                pdf.setFontSize(9);
+                pdf.setTextColor(100);
+                pdf.text(`Fecha de Emisión: ${new Date().toLocaleString('es-HN')}`, 14, 21);
+
+                const imgWidth = 180;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 14, 25, imgWidth, imgHeight);
+
+                pdf.save(`Reporte_General_Ventas_${Date.now()}.pdf`);
+                showToast("PDF descargado correctamente");
+            } catch (err) {
+                console.error(err);
+                showToast("Error al generar PDF", "warning");
+            }
+        }
+
+        async function exportIncidencesReportPDF() {
+            const element = document.getElementById('pdf-report-incidences-container');
+            showToast("Generando PDF de Incidencias...");
+
+            try {
+                const canvas = await html2canvas(element, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                pdf.setFontSize(16);
+                pdf.setTextColor(2, 132, 199);
+                pdf.text("Reporte General Por Cliente E Incidencias", 14, 15);
+                
+                pdf.setFontSize(9);
+                pdf.setTextColor(100);
+                pdf.text(`Fecha de Emisión: ${new Date().toLocaleString('es-HN')}`, 14, 21);
+
+                const imgWidth = 180;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 14, 25, imgWidth, imgHeight);
+
+                pdf.save(`Reporte_Cliente_Incidencias_${Date.now()}.pdf`);
+                showToast("PDF descargado correctamente");
+            } catch (err) {
+                console.error(err);
+                showToast("Error al generar PDF", "warning");
+            }
+        }
+
+        async function generateSingleOrderPDF(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            showToast(`Generando PDF para Pedido #${order.orderNum}...`);
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            // Styled Order Receipt Layout
+            pdf.setFillColor(7, 89, 133); // Brand color
+            pdf.rect(0, 0, 210, 25, 'F');
+
+            pdf.setFontSize(18);
+            pdf.setTextColor(255, 255, 255);
+            pdf.text("APP VENTAS CH", 14, 16);
+            pdf.setFontSize(12);
+            pdf.text(`COMPROBANTE DE PEDIDO #${order.orderNum}`, 140, 16);
+
+            pdf.setFontSize(10);
+            pdf.setTextColor(50, 50, 50);
+            pdf.text(`Fecha: ${new Date(order.date).toLocaleString('es-HN')}`, 14, 35);
+            pdf.text(`Cliente: [${order.client.code}] ${order.client.name}`, 14, 42);
+            pdf.text(`Teléfono: ${order.client.phone || 'N/A'}`, 14, 49);
+            pdf.text(`Dirección: ${order.client.address || 'N/A'}`, 14, 56);
+
+            // Table Headers
+            let startY = 66;
+            pdf.setFillColor(241, 245, 249);
+            pdf.rect(14, startY, 182, 8, 'F');
+            pdf.setFontSize(9);
+            pdf.setFont(undefined, 'bold');
+            pdf.text("Código / Producto", 16, startY + 5.5);
+            pdf.text("Precio", 120, startY + 5.5);
+            pdf.text("Cant.", 145, startY + 5.5);
+            pdf.text("Total", 175, startY + 5.5);
+
+            pdf.setFont(undefined, 'normal');
+            startY += 12;
+
+            order.items.forEach((item) => {
+                const prodText = `[${item.product.code}] ${item.product.name}` + (item.detail ? ` (${item.detail})` : '');
+                pdf.text(prodText.slice(0, 50), 16, startY);
+                pdf.text(formatLempiras(item.product.price), 120, startY);
+                pdf.text(String(item.quantity), 147, startY);
+                pdf.text(formatLempiras(item.subtotal), 175, startY);
+                startY += 7;
+            });
+
+            pdf.setLineWidth(0.5);
+            pdf.line(14, startY, 196, startY);
+            startY += 8;
+
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(`GRAN TOTAL: ${formatLempiras(order.total)}`, 130, startY);
+
+            pdf.save(`Pedido_${order.orderNum}_Client_${order.client.code}.pdf`);
+            showToast("PDF del pedido generado");
+        }
+
+        // ================= TAB 6: GESTIÓN DE CLIENTES =================
+        function renderClientsTable() {
+            const tbody = document.getElementById('clients-table-body');
+            if (clients.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay clientes registrados</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = clients.map((c, index) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-brand-700">${c.code}</td>
+                    <td class="p-3 font-medium text-slate-800">${c.name}</td>
+                    <td class="p-3 text-slate-600">${c.phone || '-'}</td>
+                    <td class="p-3 text-slate-600">${c.address || '-'}</td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="openClientModal(${index})" class="text-brand-600 hover:text-brand-800 p-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteClient(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openClientModal(index = null) {
+            document.getElementById('client-form-index').value = index !== null ? index : '';
+            if (index !== null) {
+                const c = clients[index];
+                document.getElementById('client-modal-title').innerText = "Editar Cliente";
+                document.getElementById('client-code-input').value = c.code;
+                document.getElementById('client-name-input').value = c.name;
+                document.getElementById('client-phone-input').value = c.phone || '';
+                document.getElementById('client-address-input').value = c.address || '';
+            } else {
+                document.getElementById('client-modal-title').innerText = "Nuevo Cliente";
+                const nextCode = String(clients.length + 1).padStart(4, '0');
+                document.getElementById('client-code-input').value = nextCode;
+                document.getElementById('client-name-input').value = '';
+                document.getElementById('client-phone-input').value = '';
+                document.getElementById('client-address-input').value = '';
+            }
+            document.getElementById('modal-client').classList.remove('hidden');
+        }
+
+        function closeClientModal() {
+            document.getElementById('modal-client').classList.add('hidden');
+        }
+
+        function saveClient() {
+            const index = document.getElementById('client-form-index').value;
+            const code = document.getElementById('client-code-input').value.toUpperCase().trim();
+            const name = document.getElementById('client-name-input').value.toUpperCase().trim();
+            const phone = document.getElementById('client-phone-input').value.toUpperCase().trim();
+            const address = document.getElementById('client-address-input').value.toUpperCase().trim();
+
+            if (!code || !name) {
+                showToast("Código y Nombre son obligatorios", "warning");
+                return;
+            }
+
+            if (index !== '') {
+                clients[index] = { code, name, phone, address };
+            } else {
+                clients.push({ code, name, phone, address });
+            }
+
+            saveLocalStorageData();
+            renderClientsTable();
+            closeClientModal();
+            showToast("Cliente guardado correctamente");
+        }
+
+        function deleteClient(index) {
+            showConfirmModal("¿Eliminar Cliente?", `Se eliminará el cliente ${clients[index].name}.`, (confirmed) => {
+                if (confirmed) {
+                    clients.splice(index, 1);
+                    saveLocalStorageData();
+                    renderClientsTable();
+                    showToast("Cliente eliminado");
+                }
+            });
+        }
+
+        // ================= TAB 7: GESTIÓN DE PRODUCTOS =================
+        function renderProductsTable() {
+            const tbody = document.getElementById('products-table-body');
+            if (products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No hay productos registrados</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = products.map((p, index) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-brand-700">${p.code}</td>
+                    <td class="p-3 font-medium text-slate-800">${p.name}</td>
+                    <td class="p-3 text-right font-bold text-slate-700">${formatLempiras(p.price)}</td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="openProductModal(${index})" class="text-brand-600 hover:text-brand-800 p-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteProduct(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openProductModal(index = null) {
+            document.getElementById('product-form-index').value = index !== null ? index : '';
+            if (index !== null) {
+                const p = products[index];
+                document.getElementById('product-modal-title').innerText = "Editar Producto";
+                document.getElementById('product-code-input').value = p.code;
+                document.getElementById('product-name-input').value = p.name;
+                document.getElementById('product-price-input').value = p.price;
+            } else {
+                document.getElementById('product-modal-title').innerText = "Nuevo Producto";
+                const nextCode = String(products.length + 1).padStart(3, '0');
+                document.getElementById('product-code-input').value = nextCode;
+                document.getElementById('product-name-input').value = '';
+                document.getElementById('product-price-input').value = '';
+            }
+            document.getElementById('modal-product').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('modal-product').classList.add('hidden');
+        }
+
+        function saveProduct() {
+            const index = document.getElementById('product-form-index').value;
+            const code = document.getElementById('product-code-input').value.toUpperCase().trim();
+            const name = document.getElementById('product-name-input').value.toUpperCase().trim();
+            const price = parseFloat(document.getElementById('product-price-input').value) || 0;
+
+            if (!code || !name) {
+                showToast("Código y Nombre son obligatorios", "warning");
+                return;
+            }
+
+            if (index !== '') {
+                products[index] = { code, name, price };
+            } else {
+                products.push({ code, name, price });
+            }
+
+            saveLocalStorageData();
+            renderProductsTable();
+            closeProductModal();
+            showToast("Producto guardado correctamente");
+        }
+
+        function deleteProduct(index) {
+            showConfirmModal("¿Eliminar Producto?", `Se eliminará el producto ${products[index].name}.`, (confirmed) => {
+                if (confirmed) {
+                    products.splice(index, 1);
+                    saveLocalStorageData();
+                    renderProductsTable();
+                    showToast("Producto eliminado");
+                }
+            });
+        }
+
+        // ================= GOOGLE SHEETS & CSV SYNC MODAL =================
+        function openGoogleSheetSyncModal(type) {
+            activeGSheetSyncType = type;
+            document.getElementById('gsheet-type-tag').innerText = type.toUpperCase();
+            document.getElementById('csv-import-area').value = '';
+            document.getElementById('modal-gsheets').classList.remove('hidden');
+        }
+
+        function closeGoogleSheetModal() {
+            document.getElementById('modal-gsheets').classList.add('hidden');
+            activeGSheetSyncType = null;
+        }
+
+        function processCSVImport() {
+            const raw = document.getElementById('csv-import-area').value.trim();
+            if (!raw) {
+                showToast("Pegue filas CSV válidas", "warning");
+                return;
+            }
+
+            const lines = raw.split('\n');
+            let importedCount = 0;
+
+            if (activeGSheetSyncType === 'clientes') {
+                lines.forEach(line => {
+                    const parts = line.split(/,|\t/);
+                    if (parts.length >= 2) {
+                        const code = parts[0].trim().toUpperCase();
+                        const name = parts[1].trim().toUpperCase();
+                        const phone = parts[2] ? parts[2].trim().toUpperCase() : '';
+                        const address = parts[3] ? parts[3].trim().toUpperCase() : '';
+                        if (code && name) {
+                            clients.push({ code, name, phone, address });
+                            importedCount++;
+                        }
+                    }
+                });
+                renderClientsTable();
+            } else if (activeGSheetSyncType === 'productos') {
+                lines.forEach(line => {
+                    const parts = line.split(/,|\t/);
+                    if (parts.length >= 2) {
+                        const code = parts[0].trim().toUpperCase();
+                        const name = parts[1].trim().toUpperCase();
+                        const price = parts[2] ? parseFloat(parts[2]) : 0;
+                        if (code && name) {
+                            products.push({ code, name, price });
+                            importedCount++;
+                        }
+                    }
+                });
+                renderProductsTable();
+            }
+
+            saveLocalStorageData();
+            closeGoogleSheetModal();
+            showToast(`Se importaron ${importedCount} registros exitosamente`);
+        }
+
+        function saveGSheetURL() {
+            const url = document.getElementById('gsheet-api-url').value.trim();
+            if (url) {
+                localStorage.setItem(`app_ventas_ch_gsheet_${activeGSheetSyncType}`, url);
+                showToast("Enlace de sincronización guardado");
+            }
+        }
+
+        // ================= CUSTOM CONFIRM & TOAST NOTIFICATIONS =================
+        function showConfirmModal(title, message, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            confirmResolver = callback;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        function resolveConfirm(result) {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            if (confirmResolver) confirmResolver(result);
+            confirmResolver = null;
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+
+            if (type === "warning") {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400 text-base";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-info text-brand-400 text-base";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
