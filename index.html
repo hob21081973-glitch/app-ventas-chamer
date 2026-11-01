@@ -8,32 +8,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- jsPDF & html2canvas -->
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1e40af',
-                        secondary: '#3b82f6',
-                        accent: '#f59e0b'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         .uppercase-input { text-transform: uppercase; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
     <!-- HEADER -->
-    <header class="bg-primary text-white shadow-md">
+    <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
                 <i class="fa-solid fa-store"></i> App Ventas Ch
@@ -44,57 +30,54 @@
         </div>
     </header>
 
-    <!-- NAVEGACIÓN DE PESTAÑAS (Scrollable horizontalmente en móviles) -->
+    <!-- NAVEGACIÓN DE PESTAÑAS -->
     <nav class="bg-white shadow-sm border-b overflow-x-auto whitespace-nowrap">
-        <div class="container mx-auto flex px-2">
-            <button onclick="switchTab('crear-pedido')" class="tab-btn py-3 px-4 text-sm font-semibold text-primary border-b-2 border-primary flex items-center gap-2" data-target="crear-pedido">
+        <div class="container mx-auto flex px-2 gap-1">
+            <button onclick="cambiarPestana('crear')" class="nav-btn py-3 px-4 text-sm font-bold text-blue-900 border-b-2 border-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-cart-plus"></i> Crear Pedido
             </button>
-            <button onclick="switchTab('historial')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="historial">
+            <button onclick="cambiarPestana('historial')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-clock-rotate-left"></i> Historial
             </button>
-            <button onclick="switchTab('resumen-general')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="resumen-general">
+            <button onclick="cambiarPestana('general')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie"></i> Resumen General
             </button>
-            <button onclick="switchTab('resumen-producto')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="resumen-producto">
+            <button onclick="cambiarPestana('producto')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-boxes-stacked"></i> Resumen Producto
             </button>
-            <button onclick="switchTab('exportar')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="exportar">
+            <button onclick="cambiarPestana('exportar')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-file-pdf"></i> Exportar PDFs
             </button>
-            <button onclick="switchTab('clientes')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="clientes">
+            <button onclick="cambiarPestana('clientes')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-users"></i> G. Clientes
             </button>
-            <button onclick="switchTab('productos')" class="tab-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-primary flex items-center gap-2" data-target="productos">
+            <button onclick="cambiarPestana('productos')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
                 <i class="fa-solid fa-box"></i> G. Productos
             </button>
         </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENIDO DE LAS PESTAÑAS -->
     <main class="container mx-auto p-4 flex-grow max-w-6xl">
 
         <!-- 1. CREAR PEDIDO -->
-        <section id="crear-pedido" class="tab-content active space-y-4">
+        <div id="panel-crear" class="tab-panel active space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Seleccionar Cliente -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
-                    <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-secondary focus:outline-none" oninput="filtrarClientes()">
+                    <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                     <div id="cliente-seleccionado-info" class="mt-2 text-sm text-blue-700 font-medium">Ningún cliente seleccionado.</div>
                 </div>
-                <!-- Seleccionar Producto -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
-                    <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-secondary focus:outline-none" oninput="filtrarProductos()">
+                    <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                     <div id="producto-seleccionado-info" class="mt-2 text-sm text-green-700 font-medium">Ningún producto seleccionado.</div>
                 </div>
             </div>
 
-            <!-- Tabla del Pedido Actual -->
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
@@ -121,18 +104,18 @@
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- 2. HISTORIAL DE PEDIDOS -->
-        <section id="historial" class="tab-content space-y-4">
+        <div id="panel-historial" class="tab-panel space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
             <div id="contenedor-historial" class="space-y-4">
                 <div class="bg-white p-6 rounded-lg shadow text-center text-gray-400">No hay pedidos registrados todavía.</div>
             </div>
-        </section>
+        </div>
 
         <!-- 3. RESUMEN GENERAL -->
-        <section id="resumen-general" class="tab-content space-y-6">
+        <div id="panel-general" class="tab-panel space-y-6">
             <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
@@ -148,15 +131,15 @@
                     <div id="resumen-venta-cliente" class="text-lg font-semibold text-gray-800 mt-1">Seleccione cliente...</div>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- 4. RESUMEN POR PRODUCTO -->
-        <section id="resumen-producto" class="tab-content space-y-4">
+        <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
                 <div class="flex gap-2">
-                    <button onclick="ordenarRanking('unidades')" class="bg-secondary text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
-                    <button onclick="ordenarRanking('valor')" class="bg-secondary text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
+                    <button onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
+                    <button onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -175,17 +158,16 @@
                     </table>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- 5. EXPORTAR REPORTES A PDFS -->
-        <section id="exportar" class="tab-content space-y-6">
+        <div id="panel-exportar" class="tab-panel space-y-6">
             <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
             
-            <!-- Reporte General -->
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
                 <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse" id="tabla-reporte-general-export">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Pedido No.</th>
@@ -203,11 +185,10 @@
                 </button>
             </div>
 
-            <!-- Reporte General Por Clientes E Incidencias -->
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
                 <h3 class="text-lg font-semibold text-gray-700">Reporte General Por Cliente E Incidencias</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse" id="tabla-incidencias-export">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Pedido No.</th>
@@ -226,13 +207,13 @@
                     <i class="fa-solid fa-file-pdf"></i> Generar PDF Incidencias y Entregas
                 </button>
             </div>
-        </section>
+        </div>
 
         <!-- 6. GESTIÓN DE CLIENTES -->
-        <section id="clientes" class="tab-content space-y-4">
+        <div id="panel-clientes" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes (Google Sheets)</h2>
-                <button onclick="sincronizarGoogleSheets()" class="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
+                <button onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
                     <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
                 </button>
             </div>
@@ -251,13 +232,13 @@
                     </table>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- 7. GESTIÓN DE PRODUCTOS -->
-        <section id="productos" class="tab-content space-y-4">
+        <div id="panel-productos" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-800">Gestión De Productos (Google Sheets)</h2>
-                <button onclick="sincronizarGoogleSheets()" class="bg-secondary text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
+                <button onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
                     <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
                 </button>
             </div>
@@ -277,7 +258,7 @@
                     </table>
                 </div>
             </div>
-        </section>
+        </div>
 
     </main>
 
@@ -309,17 +290,16 @@
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full space-y-4">
             <h3 class="text-lg font-bold text-gray-800">Agregar Detalle Adicional</h3>
             <p class="text-sm text-gray-600">Especifique color, talla u otro:</p>
-            <input type="text" id="input-detalle-extra" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-secondary focus:outline-none" placeholder="EJ: TALLA L - COLOR ROJO">
+            <input type="text" id="input-detalle-extra" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="EJ: TALLA L - COLOR ROJO">
             <div class="flex justify-end gap-2">
                 <button onclick="cerrarModalDetalle()" class="px-4 py-2 bg-gray-300 rounded font-semibold text-gray-700">Cancelar</button>
-                <button onclick="guardarDetalleExtra()" class="px-4 py-2 bg-primary text-white rounded font-semibold hover:bg-blue-800">Guardar</button>
+                <button onclick="guardarDetalleExtra()" class="px-4 py-2 bg-blue-900 text-white rounded font-semibold hover:bg-blue-800">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT DE LA APLICACIÓN -->
+    <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
-        // ENLACES GOOGLE SHEETS CSV PROPORCIONADOS
         const URL_CLIENTES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=0&single=true&output=csv';
         const URL_PRODUCTOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=1903712481&single=true&output=csv';
 
@@ -333,7 +313,28 @@
         let numeroCantidadActual = "1";
         let editandoPedidoId = null;
 
-        // Inicialización
+        // FUNCIÓN GLOBAL Y DIRECTA DE CAMBIO DE PESTAÑAS
+        function cambiarPestana(id) {
+            // Ocultar todos los paneles
+            const paneles = document.querySelectorAll('.tab-panel');
+            paneles.forEach(p => p.classList.remove('active'));
+
+            // Desactivar todos los botones
+            const botones = document.querySelectorAll('.nav-btn');
+            botones.forEach(b => {
+                b.classList.remove('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
+                b.classList.add('text-gray-600', 'font-medium');
+            });
+
+            // Mostrar panel seleccionado
+            const panelActivo = document.getElementById('panel-' + id);
+            if(panelActivo) panelActivo.classList.add('active');
+
+            // Activar botón correspondiente buscando por evento o posición
+            event.currentTarget.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
+            event.currentTarget.classList.remove('text-gray-600', 'font-medium');
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             sincronizarGoogleSheets();
             renderHistorial();
@@ -342,21 +343,6 @@
             renderReportesExportacion();
         });
 
-        function switchTab(targetId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('border-b-2', 'border-primary', 'text-primary');
-                btn.classList.add('text-gray-600');
-            });
-            document.getElementById(targetId).classList.add('active');
-            const activeBtn = document.querySelector(`[data-target="${targetId}"]`);
-            if(activeBtn) {
-                activeBtn.classList.add('border-b-2', 'border-primary', 'text-primary');
-                activeBtn.classList.remove('text-gray-600');
-            }
-        }
-
-        // Parseador CSV robusto
         function parseCSV(text) {
             let lines = text.split('\n');
             let result = [];
@@ -387,7 +373,6 @@
             const statusEl = document.getElementById('sync-status');
             statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
             try {
-                // Cargar Clientes
                 const resC = await fetch(URL_CLIENTES);
                 const textC = await resC.text();
                 const rowsC = parseCSV(textC);
@@ -398,7 +383,6 @@
                     }
                 }
 
-                // Cargar Productos
                 const resP = await fetch(URL_PRODUCTOS);
                 const textP = await resP.text();
                 const rowsP = parseCSV(textP);
@@ -430,7 +414,7 @@
             }
             tbody.innerHTML = listaClientes.map(c => `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2 border font-semibold text-primary">[${c.codigo}]</td>
+                    <td class="p-2 border font-semibold text-blue-900">[${c.codigo}]</td>
                     <td class="p-2 border">${c.nombre}</td>
                 </tr>
             `).join('');
@@ -444,14 +428,13 @@
             }
             tbody.innerHTML = listaProductos.map(p => `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2 border font-semibold text-secondary">[${p.codigo}]</td>
+                    <td class="p-2 border font-semibold text-blue-600">[${p.codigo}]</td>
                     <td class="p-2 border">${p.nombre}</td>
                     <td class="p-2 border text-right font-medium">L. ${p.precio.toFixed(2)}</td>
                 </tr>
             `).join('');
         }
 
-        // BÚSQUEDA Y FILTRADO DE CLIENTES
         function filtrarClientes() {
             const query = document.getElementById('input-buscar-cliente').value.toUpperCase();
             const contenedor = document.getElementById('lista-clientes-sugeridos');
@@ -465,7 +448,7 @@
             } else {
                 contenedor.innerHTML = filtrados.map(c => `
                     <div onclick="seleccionarCliente('${c.codigo}', '${c.nombre}')" class="p-2 hover:bg-blue-50 cursor-pointer border-b text-sm">
-                        <span class="font-bold text-primary">[${c.codigo}]</span>${c.nombre}
+                        <span class="font-bold text-blue-900">[${c.codigo}]</span> ${c.nombre}
                     </div>
                 `).join('');
             }
@@ -474,12 +457,11 @@
 
         function seleccionarCliente(codigo, nombre) {
             pedidoActualCliente = { codigo, nombre };
-            document.getElementById('input-buscar-cliente').value = `[${codigo}]${nombre}`;
-            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${codigo}]${nombre}`;
+            document.getElementById('input-buscar-cliente').value = `[${codigo}] ${nombre}`;
+            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${codigo}] ${nombre}`;
             document.getElementById('lista-clientes-sugeridos').classList.add('hidden');
         }
 
-        // BÚSQUEDA Y FILTRADO DE PRODUCTOS
         function filtrarProductos() {
             const query = document.getElementById('input-buscar-producto').value.toUpperCase();
             const contenedor = document.getElementById('lista-productos-sugeridos');
@@ -492,8 +474,8 @@
                 contenedor.innerHTML = `<div class="p-2 text-gray-400 text-sm">No se encontraron productos</div>`;
             } else {
                 contenedor.innerHTML = filtrados.map(p => `
-                    <div onclick="iniciarSeleccionCantidad('${p.codigo}', '${p.nombre}',${p.precio})" class="p-2 hover:bg-green-50 cursor-pointer border-b text-sm">
-                        <span class="font-bold text-secondary">[${p.codigo}]</span>${p.nombre} - <span class="text-green-600 font-semibold">L. ${p.precio.toFixed(2)}</span>
+                    <div onclick="iniciarSeleccionCantidad('${p.codigo}', '${p.nombre}', ${p.precio})" class="p-2 hover:bg-green-50 cursor-pointer border-b text-sm">
+                        <span class="font-bold text-blue-600">[${p.codigo}]</span> ${p.nombre} - <span class="text-green-600 font-semibold">L. ${p.precio.toFixed(2)}</span>
                     </div>
                 `).join('');
             }
@@ -556,7 +538,7 @@
                 granTotalGeneral += totalItem;
                 return `
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="p-2 border"><span class="font-bold text-secondary">[${item.codigo}]</span>${item.nombre}</td>
+                        <td class="p-2 border"><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</td>
                         <td class="p-2 border">L. ${item.precio.toFixed(2)}</td>
                         <td class="p-2 border">${item.cantidad}</td>
                         <td class="p-2 border font-semibold">L. ${totalItem.toFixed(2)}</td>
@@ -569,7 +551,58 @@
                     </tr>
                 `;
             }).join('');
-            document.getElementById('label-gran-total-pedido').innerText = `L. ${granTotalGeneral.toFixed(2)}`; }  function eliminarItemPedido(index) { itemsPedidoActual.splice(index, 1); renderTablaPedidoActual(); }  function abrirModalDetalle(index) { indiceItemEditandoDetalle = index; document.getElementById('input-detalle-extra').value = itemsPedidoActual[index].detalleExtra \vert{}\vert{} ""; document.getElementById('modal-detalle').classList.remove('hidden'); }  function cerrarModalDetalle() { document.getElementById('modal-detalle').classList.add('hidden'); indiceItemEditandoDetalle = null; }  function guardarDetalleExtra() { if(indiceItemEditandoDetalle !== null) { itemsPedidoActual[indiceItemEditandoDetalle].detalleExtra = document.getElementById('input-detalle-extra').value.toUpperCase(); renderTablaPedidoActual(); } cerrarModalDetalle(); }  function guardarPedidoActual() { if(!pedidoActualCliente) { alert("Debe seleccionar un cliente para el pedido."); return; } if(itemsPedidoActual.length === 0) { alert("Debe agregar al menos un producto al pedido."); return; } let totalPedido = itemsPedidoActual.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);  if(editandoPedidoId !== null) { // Actualizar pedido existente let pedido = historialPedidos.find(p => p.id === editandoPedidoId); if(pedido) { pedido.cliente = pedidoActualCliente; pedido.items = [...itemsPedidoActual]; pedido.total = totalPedido; } editandoPedidoId = null; } else { // Crear nuevo pedido let nuevoId = String(historialPedidos.length + 1).padStart(2, '0'); let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase(); let nuevoPedido = { id: nuevoId, numeroPedido: `Pedido #${nuevoId}`,
+            document.getElementById('label-gran-total-pedido').innerText = `L. ${granTotalGeneral.toFixed(2)}`;
+        }
+
+        function eliminarItemPedido(index) {
+            itemsPedidoActual.splice(index, 1);
+            renderTablaPedidoActual();
+        }
+
+        function abrirModalDetalle(index) {
+            indiceItemEditandoDetalle = index;
+            document.getElementById('input-detalle-extra').value = itemsPedidoActual[index].detalleExtra || "";
+            document.getElementById('modal-detalle').classList.remove('hidden');
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById('modal-detalle').classList.add('hidden');
+            indiceItemEditandoDetalle = null;
+        }
+
+        function guardarDetalleExtra() {
+            if(indiceItemEditandoDetalle !== null) {
+                itemsPedidoActual[indiceItemEditandoDetalle].detalleExtra = document.getElementById('input-detalle-extra').value.toUpperCase();
+                renderTablaPedidoActual();
+            }
+            cerrarModalDetalle();
+        }
+
+        function guardarPedidoActual() {
+            if(!pedidoActualCliente) {
+                alert("Debe seleccionar un cliente para el pedido.");
+                return;
+            }
+            if(itemsPedidoActual.length === 0) {
+                alert("Debe agregar al menos un producto al pedido.");
+                return;
+            }
+            let totalPedido = itemsPedidoActual.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+            if(editandoPedidoId !== null) {
+                let pedido = historialPedidos.find(p => p.id === editandoPedidoId);
+                if(pedido) {
+                    pedido.cliente = pedidoActualCliente;
+                    pedido.items = [...itemsPedidoActual];
+                    pedido.total = totalPedido;
+                }
+                editandoPedidoId = null;
+            } else {
+                let nuevoId = String(historialPedidos.length + 1).padStart(2, '0');
+                let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+                let nuevoPedido = {
+                    id: nuevoId,
+                    numeroPedido: `Pedido #${nuevoId}`,
                     cliente: pedidoActualCliente,
                     items: [...itemsPedidoActual],
                     total: totalPedido,
@@ -582,7 +615,6 @@
 
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             
-            // Limpiar formulario
             pedidoActualCliente = null;
             itemsPedidoActual = [];
             document.getElementById('input-buscar-cliente').value = "";
@@ -592,10 +624,12 @@
             renderResumenGeneral();
             renderResumenProducto();
             renderReportesExportacion();
-            switchTab('historial');
+            
+            // Forzar cambio visual a historial
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-historial').classList.add('active');
         }
 
-        // RENDER HISTORIAL DE PEDIDOS
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(historialPedidos.length === 0) {
@@ -603,16 +637,16 @@
                 return;
             }
             contenedor.innerHTML = historialPedidos.map(p => `
-                <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-primary">
+                <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900">
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-lg text-primary">${p.numeroPedido}</span>
+                        <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
                         <span class="text-xs text-gray-500">${p.fecha}</span>
                     </div>
-                    <div class="font-semibold text-gray-800">[${p.cliente.codigo}]${p.cliente.nombre}</div>
+                    <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
                     <div class="bg-gray-50 p-3 rounded-md space-y-1">
                         <div class="text-xs font-bold text-gray-500 uppercase">Detalle de Productos:</div>
                         ${p.items.map(item => `
-                            <div class="text-sm pl-2 border-l-2 border-secondary">
+                            <div class="text-sm pl-2 border-l-2 border-blue-500">
                                 <span class="font-semibold">[${item.codigo}] ${item.nombre}</span> (Cant: ${item.cantidad}) ${item.detalleExtra ? ' - ' + item.detalleExtra : ''}
                             </div>
                         `).join('')}
@@ -635,9 +669,45 @@
             editandoPedidoId = id;
             pedidoActualCliente = pedido.cliente;
             itemsPedidoActual = [...pedido.items];
-            document.getElementById('input-buscar-cliente').value = `[${pedido.cliente.codigo}]${pedido.cliente.nombre}`;
-            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`; renderTablaPedidoActual(); switchTab('crear-pedido'); }  function eliminarPedido(id) { if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) { historialPedidos = historialPedidos.filter(p => p.id !== id); localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos)); renderHistorial(); renderResumenGeneral(); renderResumenProducto(); renderReportesExportacion(); } }  function generarPdfPedidoIndividual(id) { let pedido = historialPedidos.find(p => p.id === id); if(!pedido) return; const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFont("helvetica", "bold"); doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20); doc.setFont("helvetica", "normal"); doc.text(`Número: ${pedido.numeroPedido}`, 14, 30);
-            doc.text(`Fecha: ${pedido.fecha}`, 14, 38); doc.text(`Cliente: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`, 14, 46);  let y = 60; doc.setFont("helvetica", "bold"); doc.text("Productos:", 14, y); y += 8; doc.setFont("helvetica", "normal"); pedido.items.forEach(item => { doc.text(`- [${item.codigo}] ${item.nombre} (Cant:${item.cantidad}) L. ${(item.precio * item.cantidad).toFixed(2)}${item.detalleExtra ? '['+item.detalleExtra+']' : ''}`, 18, y);
+            document.getElementById('input-buscar-cliente').value = `[${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
+            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
+            renderTablaPedidoActual();
+            
+            // Cambiar a pestaña crear
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-crear').classList.add('active');
+        }
+
+        function eliminarPedido(id) {
+            if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
+                historialPedidos = historialPedidos.filter(p => p.id !== id);
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                renderHistorial();
+                renderResumenGeneral();
+                renderResumenProducto();
+                renderReportesExportacion();
+            }
+        }
+
+        function generarPdfPedidoIndividual(id) {
+            let pedido = historialPedidos.find(p => p.id === id);
+            if(!pedido) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Número: ${pedido.numeroPedido}`, 14, 30);
+            doc.text(`Fecha: ${pedido.fecha}`, 14, 38);
+            doc.text(`Cliente: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`, 14, 46);
+            
+            let y = 60;
+            doc.setFont("helvetica", "bold");
+            doc.text("Productos:", 14, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            pedido.items.forEach(item => {
+                doc.text(`- [${item.codigo}] ${item.nombre} (Cant: ${item.cantidad}) L. ${(item.precio * item.cantidad).toFixed(2)} ${item.detalleExtra ? '['+item.detalleExtra+']' : ''}`, 18, y);
                 y += 7;
             });
             y += 5;
@@ -646,7 +716,157 @@
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre}.pdf`);
         }
 
-        // RESUMEN GENERAL
         function renderResumenGeneral() {
             let ventaTotal = historialPedidos.reduce((acc, p) => acc + p.total, 0);
-            document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;  let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase(); let ventaHoy = historialPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0); document.getElementById('resumen-venta-fecha').innerText = `${fechaHoy}
+            document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
+            
+            let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+            let ventaHoy = historialPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0);
+            document.getElementById('resumen-venta-fecha').innerText = `${fechaHoy} : L. ${ventaHoy.toFixed(2)}`;
+            
+            if(pedidoActualCliente) {
+                let ventaCliente = historialPedidos.filter(p => p.cliente.codigo === pedidoActualCliente.codigo).reduce((acc, p) => acc + p.total, 0);
+                document.getElementById('resumen-venta-cliente').innerText = `${pedidoActualCliente.nombre}: L. ${ventaCliente.toFixed(2)}`;
+            } else {
+                document.getElementById('resumen-venta-cliente').innerText = `Ningún cliente seleccionado`;
+            }
+        }
+
+        let ordenRankingTipo = 'unidades';
+        function ordenarRanking(tipo) {
+            ordenRankingTipo = tipo;
+            renderResumenProducto();
+        }
+
+        function renderResumenProducto() {
+            let mapaProductos = {};
+            historialPedidos.forEach(p => {
+                p.items.forEach(item => {
+                    if(!mapaProductos[item.codigo]) {
+                        mapaProductos[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
+                    }
+                    mapaProductos[item.codigo].unidades += item.cantidad;
+                    mapaProductos[item.codigo].valor += (item.precio * item.cantidad);
+                });
+            });
+
+            let rankingArray = Object.values(mapaProductos);
+            if(ordenRankingTipo === 'unidades') {
+                rankingArray.sort((a, b) => b.unidades - a.unidades);
+            } else {
+                rankingArray.sort((a, b) => b.valor - a.valor);
+            }
+
+            const tbody = document.getElementById('tabla-ranking-productos');
+            if(rankingArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = rankingArray.map(r => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
+                    <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
+                    <td class="p-2 border text-right font-bold text-green-600">L. ${r.valor.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderReportesExportacion() {
+            const tbodyGen = document.getElementById('tbody-reporte-general');
+            const tbodyInc = document.getElementById('tbody-reporte-incidencias');
+
+            if(historialPedidos.length === 0) {
+                tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>`;
+                tbodyInc.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
+                return;
+            }
+
+            tbodyGen.innerHTML = historialPedidos.map(p => `
+                <tr class="border-b">
+                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                    <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                    <td class="p-2 border text-right font-medium">L. ${p.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            tbodyInc.innerHTML = pedidosAsc.map(p => `
+                <tr class="border-b">
+                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                    <td class="p-2 border">${p.cliente.nombre}</td>
+                    <td class="p-2 border text-right">L. ${p.total.toFixed(2)}</td>
+                    <td class="p-2 border text-right">
+                        <input type="number" value="${p.valorEntrega !== undefined ? p.valorEntrega : p.total}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
+                    </td>
+                    <td class="p-2 border">
+                        <input type="text" value="${p.comentarioEntrega || 'Entrega completa'}" onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function actualizarValorEntrega(id, val) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(p) {
+                p.valorEntrega = parseFloat(val) || 0;
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            }
+        }
+
+        function actualizarComentarioEntrega(id, val) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(p) {
+                p.comentarioEntrega = val.toUpperCase();
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            }
+        }
+
+        function exportarPdfGeneral() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte General de Ventas – App Ventas Ch", 14, 20);
+            let y = 30;
+            doc.setFont("helvetica", "bold");
+            doc.text("Pedido No.", 14, y);
+            doc.text("Nombre Cliente", 50, y);
+            doc.text("Valor Venta", 160, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            historialPedidos.forEach(p => {
+                doc.text(p.numeroPedido, 14, y);
+                doc.text(`[${p.cliente.codigo}] ${p.cliente.nombre}`, 50, y);
+                doc.text(`L. ${p.total.toFixed(2)}`, 160, y);
+                y += 8;
+            });
+            doc.save("Reporte_General_Ventas.pdf");
+        }
+
+        function exportarPdfIncidencias() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte General Por Cliente E Incidencias", 14, 20);
+            let y = 30;
+            doc.setFont("helvetica", "bold");
+            doc.text("Pedido", 14, y);
+            doc.text("Cliente", 40, y);
+            doc.text("Venta", 110, y);
+            doc.text("Entrega", 140, y);
+            doc.text("Comentario", 170, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            pedidosAsc.forEach(p => {
+                doc.text(p.numeroPedido, 14, y);
+                doc.text(p.cliente.nombre.substring(0, 20), 40, y);
+                doc.text(`L.${p.total.toFixed(2)}`, 110, y);
+                doc.text(`L.${(p.valorEntrega !== undefined ? p.valorEntrega : p.total).toFixed(2)}`, 140, y);
+                doc.text((p.comentarioEntrega || "Entrega completa").substring(0, 15), 170, y);
+                y += 8;
+            });
+            doc.save("Reporte_Clientes_Incidencias.pdf");
+        }
+    </script>
+</body>
+</html>
