@@ -267,7 +267,7 @@
     <div id="modal-teclado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
             <h3 class="text-lg font-bold text-gray-800 text-center">Digite la Cantidad</h3>
-            <div id="display-cantidad" class="text-3xl font-bold text-center bg-gray-100 p-3 rounded-md border">1</div>
+            <div id="display-cantidad" class="text-3xl font-bold text-center bg-gray-100 p-3 rounded-md border min-h-[55px]">0</div>
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="tecladoPress('1')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">1</button>
                 <button onclick="tecladoPress('2')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">2</button>
@@ -311,8 +311,9 @@
         let historialPedidos = JSON.parse(localStorage.getItem('app_ventas_ch_pedidos')) || [];
         let productoSeleccionadoTemporal = null;
         let indiceItemEditandoDetalle = null;
-        let numeroCantidadActual = "1";
+        let numeroCantidadActual = "";
         let editandoPedidoId = null;
+        let indiceItemEditandoCantidad = null;
 
         function cambiarPestana(id) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -475,24 +476,30 @@
 
         function iniciarSeleccionCantidad(codigo, nombre, precio) {
             productoSeleccionadoTemporal = { codigo, nombre, precio };
+            indiceItemEditandoCantidad = null;
             document.getElementById('input-buscar-producto').value = `[${codigo}]${nombre},${precio}`;
             document.getElementById('lista-productos-sugeridos').classList.add('hidden');
-            numeroCantidadActual = "1";
+            numeroCantidadActual = "";
+            document.getElementById('display-cantidad').innerText = "0";
+            document.getElementById('modal-teclado').classList.remove('hidden');
+        }
+
+        function abrirEditarCantidad(index) {
+            indiceItemEditandoCantidad = index;
+            productoSeleccionadoTemporal = null;
+            numeroCantidadActual = String(itemsPedidoActual[index].cantidad);
             document.getElementById('display-cantidad').innerText = numeroCantidadActual;
             document.getElementById('modal-teclado').classList.remove('hidden');
         }
 
         function tecladoPress(val) {
             if(val === 'C') {
-                numeroCantidadActual = "1";
+                numeroCantidadActual = "";
+                document.getElementById('display-cantidad').innerText = "0";
             } else {
-                if(numeroCantidadActual === "1" && val !== "0") {
-                    numeroCantidadActual = val;
-                } else {
-                    numeroCantidadActual += val;
-                }
+                numeroCantidadActual += val;
+                document.getElementById('display-cantidad').innerText = numeroCantidadActual;
             }
-            document.getElementById('display-cantidad').innerText = numeroCantidadActual;
         }
 
         function cerrarTeclado() {
@@ -502,7 +509,11 @@
         function tecladoOk() {
             const cantidad = parseInt(numeroCantidadActual) || 1;
             cerrarTeclado();
-            if(productoSeleccionadoTemporal) {
+            if(indiceItemEditandoCantidad !== null) {
+                itemsPedidoActual[indiceItemEditandoCantidad].cantidad = cantidad;
+                indiceItemEditandoCantidad = null;
+                renderTablaPedidoActual();
+            } else if(productoSeleccionadoTemporal) {
                 itemsPedidoActual.push({
                     codigo: productoSeleccionadoTemporal.codigo,
                     nombre: productoSeleccionadoTemporal.nombre,
@@ -531,13 +542,16 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-2 border"><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</td>
                         <td class="p-2 border">L. ${item.precio.toFixed(2)}</td>
-                        <td class="p-2 border">${item.cantidad}</td>
+                        <td class="p-2 border font-bold text-blue-900 cursor-pointer hover:underline" onclick="abrirEditarCantidad(${idx})" title="Click para editar cantidad">
+                            ${item.cantidad} <i class="fa-solid fa-pen text-xs text-gray-400 ml-1"></i>
+                        </td>
                         <td class="p-2 border font-semibold">L. ${totalItem.toFixed(2)}</td>
                         <td class="p-2 border text-blue-600 cursor-pointer font-medium" onclick="abrirModalDetalle(${idx})">
                             ${item.detalleExtra ? item.detalleExtra : '<span class="text-gray-400 italic">+ Agregar detalle</span>'}
                         </td>
-                        <td class="p-2 border text-center">
-                            <button onclick="eliminarItemPedido(${idx})" class="text-red-500 hover:text-red-700 px-2"><i class="fa-solid fa-trash"></i></button>
+                        <td class="p-2 border text-center flex justify-center gap-2">
+                            <button onclick="abrirEditarCantidad(${idx})" class="text-blue-600 hover:text-blue-800 px-1" title="Editar cantidad"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="eliminarItemPedido(${idx})" class="text-red-500 hover:text-red-700 px-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -678,7 +692,7 @@
             }
         }
 
-        // --- COMPROBANTE INDIVIDUAL SIN "-> Detalle:" Y CON SANGRÍA ---
+        // --- COMPROBANTE INDIVIDUAL CON ALINEACIÓN EXACTA DE SANGRÍA ---
         function generarPdfPedidoIndividual(id) {
             let pedido = historialPedidos.find(p => p.id === id);
             if(!pedido) return;
@@ -706,11 +720,11 @@
                 doc.text(lineaProd, 14, y);
                 y += 6;
 
-                // Muestra el detalle limpio debajo con sangría, sin la etiqueta "-> Detalle:"
+                // Detalle adicional debajo alineado perfectamente con la sangría exacta del código del producto
                 if(item.detalleExtra && item.detalleExtra.trim() !== "") {
                     doc.setFont("helvetica", "italic");
                     doc.setTextColor(100, 100, 100);
-                    doc.text(`     ${item.detalleExtra}`, 14, y);
+                    doc.text(`${item.detalleExtra}`, 18, y); // Sangría exacta alineada al inicio del texto del producto
                     doc.setFont("helvetica", "normal");
                     doc.setTextColor(0, 0, 0);
                     y += 6;
