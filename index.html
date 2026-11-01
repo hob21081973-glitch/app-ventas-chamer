@@ -110,8 +110,10 @@
         <!-- 2. HISTORIAL DE PEDIDOS -->
         <div id="panel-historial" class="tab-panel space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
-            <div id="contenedor-historial" class="space-y-4">
-                <div class="bg-white p-6 rounded-lg shadow text-center text-gray-400">No hay pedidos registrados todavía.</div>
+            <div class="overflow-x-auto bg-white rounded-lg shadow p-2">
+                <div id="contenedor-historial" class="min-w-[700px] space-y-4">
+                    <div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>
+                </div>
             </div>
         </div>
 
@@ -145,7 +147,7 @@
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
@@ -168,7 +170,7 @@
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
                 <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Pedido No.</th>
@@ -186,10 +188,11 @@
                 </button>
             </div>
 
+            <!-- Reporte General Por Cliente E Incidencias con Estructura Horizontal y Estado -->
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
                 <h3 class="text-lg font-semibold text-gray-700">Reporte General Por Cliente E Incidencias</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Pedido No.</th>
@@ -197,10 +200,11 @@
                                 <th class="p-2 border text-right">Valor Venta</th>
                                 <th class="p-2 border text-right">Valor Entrega</th>
                                 <th class="p-2 border">Comentario / Incidencia</th>
+                                <th class="p-2 border text-center">Estado</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-reporte-incidencias" class="text-sm">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
+                            <tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -220,7 +224,7 @@
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[400px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Código</th>
@@ -245,7 +249,7 @@
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Código</th>
@@ -515,7 +519,6 @@
                 indiceItemEditandoCantidad = null;
                 renderTablaPedidoActual();
             } else if(productoSeleccionadoTemporal) {
-                // Nuevo producto se agrega al inicio (unshift) para que el más reciente quede arriba
                 itemsPedidoActual.unshift({
                     codigo: productoSeleccionadoTemporal.codigo,
                     nombre: productoSeleccionadoTemporal.nombre,
@@ -615,7 +618,8 @@
                     total: totalPedido,
                     fecha: fechaHoy,
                     valorEntrega: totalPedido,
-                    comentarioEntrega: "Entrega completa"
+                    comentarioEntrega: "",
+                    gestionado: false
                 };
                 historialPedidos.unshift(nuevoPedido);
             }
@@ -636,17 +640,23 @@
             document.getElementById('panel-historial').classList.add('active');
         }
 
+        // --- HISTORIAL DE PEDIDOS CON ESTRUCTURA HORIZONTAL Y ESTADO ---
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(historialPedidos.length === 0) {
-                contenedor.innerHTML = `<div class="bg-white p-6 rounded-lg shadow text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
+                contenedor.innerHTML = `<div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
                 return;
             }
             contenedor.innerHTML = historialPedidos.map(p => `
                 <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900">
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
-                        <span class="text-xs text-gray-500">${p.fecha}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
+                                ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
+                            </span>
+                            <span class="text-xs text-gray-500">${p.fecha}</span>
+                        </div>
                     </div>
                     <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
                     <div class="bg-gray-50 p-3 rounded-md space-y-1">
@@ -657,16 +667,32 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="flex justify-between items-center pt-2 border-t">
-                        <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
-                        <div class="flex gap-2">
-                            <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
-                            <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
-                            <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t items-center">
+                        <div class="flex items-center gap-2">
+                            <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia o comentario..." onchange="actualizarComentarioHistorial('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded text-sm">
+                        </div>
+                        <div class="flex justify-between md:justify-end items-center gap-4">
+                            <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
+                            <div class="flex gap-2">
+                                <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
+                                <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
+                                <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function actualizarComentarioHistorial(id, val) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(p) {
+                p.comentarioEntrega = val.toUpperCase();
+                p.gestionado = val.trim() !== "";
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                renderHistorial();
+                renderReportesExportacion();
+            }
         }
 
         function editarPedido(id) {
@@ -737,7 +763,6 @@
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
 
-        // --- RESUMEN GENERAL (INCLUYENDO CLIENTES ORDENADOS DEL MÁS RECIENTE AL MÁS ANTIGUO) ---
         function renderResumenGeneral() {
             let ventaTotal = historialPedidos.reduce((acc, p) => acc + p.total, 0);
             document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
@@ -752,7 +777,6 @@
                 return;
             }
 
-            // Agrupar ventas por cliente manteniendo el orden del historial (del más reciente al más antiguo)
             let mapaClientes = {};
             let ordenClientes = [];
             
@@ -760,7 +784,7 @@
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
                     mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
-                    ordenClientes.push(cod); // Mantiene el orden de aparición (más reciente primero)
+                    ordenClientes.push(cod);
                 }
                 mapaClientes[cod].total += p.total;
             });
@@ -812,13 +836,14 @@
             `).join('');
         }
 
+        // --- REPORTE DE INCIDENCIAS CON INDICADOR DE ESTADO (CHECK ✅ / ROJO ❌) ---
         function renderReportesExportacion() {
             const tbodyGen = document.getElementById('tbody-reporte-general');
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
 
             if(historialPedidos.length === 0) {
                 tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>`;
-                tbodyInc.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
+                tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
                 return;
             }
 
@@ -840,7 +865,12 @@
                         <input type="number" value="${p.valorEntrega !== undefined ? p.valorEntrega : p.total}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
                     </td>
                     <td class="p-2 border">
-                        <input type="text" value="${p.comentarioEntrega || 'Entrega completa'}" onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                        <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                    </td>
+                    <td class="p-2 border text-center text-lg">
+                        <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
+                            ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
+                        </span>
                     </td>
                 </tr>
             `).join('');
@@ -858,7 +888,10 @@
             let p = historialPedidos.find(item => item.id === id);
             if(p) {
                 p.comentarioEntrega = val.toUpperCase();
+                p.gestionado = val.trim() !== "";
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                renderReportesExportacion();
+                renderHistorial();
             }
         }
 
@@ -905,7 +938,7 @@
                 p.cliente.nombre,
                 `L. ${p.total.toFixed(2)}`,
                 `L. ${(p.valorEntrega !== undefined ? p.valorEntrega : p.total).toFixed(2)}`,
-                p.comentarioEntrega || "Entrega completa"
+                p.comentarioEntrega || "Sin incidencia"
             ]);
 
             doc.autoTable({
