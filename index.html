@@ -3,662 +3,869 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Finanzas Hob</title>
+    <title>App Ventas Ch</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome para iconos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para los resúmenes gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .uppercase-input { text-transform: uppercase; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
-    <!-- Header / Navbar -->
-    <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center space-x-3 mb-2 md:mb-0">
-                <i class="fa-solid fa-wallet text-2xl"></i>
-                <h1 class="text-2xl font-bold tracking-wide">App Finanzas Hob</h1>
+    <!-- HEADER -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-store"></i> App Ventas Ch
+            </h1>
+            <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
+                <i class="fa-solid fa-cloud"></i> Google Sheets Conectado
             </div>
-            <!-- Navegación por pestañas -->
-            <nav class="flex space-x-2 bg-emerald-700 p-1 rounded-lg">
-                <button onclick="cambiarPestana('nuevo')" id="btn-nuevo" class="px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-800 text-white shadow">
-                    <i class="fa-solid fa-plus-circle mr-1"></i> Nuevo Movimiento
-                </button>
-                <button onclick="cambiarPestana('historial')" id="btn-historial" class="px-4 py-2 rounded-md font-medium text-sm transition text-emerald-100 hover:bg-emerald-600">
-                    <i class="fa-solid fa-clock-rotate-left mr-1"></i> Historial
-                </button>
-                <button onclick="cambiarPestana('resumenes')" id="btn-resumenes" class="px-4 py-2 rounded-md font-medium text-sm transition text-emerald-100 hover:bg-emerald-600">
-                    <i class="fa-solid fa-chart-pie mr-1"></i> Resúmenes
-                </button>
-            </nav>
         </div>
     </header>
 
-    <!-- Contenedor Principal -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+    <!-- NAVEGACIÓN DE PESTAÑAS -->
+    <nav class="bg-white shadow-sm border-b overflow-x-auto whitespace-nowrap">
+        <div class="container mx-auto flex px-2 gap-1">
+            <button onclick="cambiarPestana('crear')" class="nav-btn py-3 px-4 text-sm font-bold text-blue-900 border-b-2 border-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-cart-plus"></i> Crear Pedido
+            </button>
+            <button onclick="cambiarPestana('historial')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+            <button onclick="cambiarPestana('general')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> Resumen General
+            </button>
+            <button onclick="cambiarPestana('producto')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked"></i> Resumen Producto
+            </button>
+            <button onclick="cambiarPestana('exportar')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Exportar PDFs
+            </button>
+            <button onclick="cambiarPestana('clientes')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-users"></i> G. Clientes
+            </button>
+            <button onclick="cambiarPestana('productos')" class="nav-btn py-3 px-4 text-sm font-medium text-gray-600 hover:text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-box"></i> G. Productos
+            </button>
+        </div>
+    </nav>
 
-        <!-- ================= 1. PESTAÑA NUEVO MOVIMIENTO ================= -->
-        <section id="pestana-nuevo" class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100">
-            <h2 id="form-titulo" class="text-xl font-bold text-gray-800 mb-6 border-b pb-2 flex items-center">
-                <i class="fa-solid fa-pen-to-square text-emerald-600 mr-2"></i> Registrar Nuevo Movimiento
-            </h2>
+    <!-- CONTENIDO DE LAS PESTAÑAS -->
+    <main class="container mx-auto p-4 flex-grow max-w-6xl">
 
-            <form id="form-movimiento" onsubmit="guardarMovimiento(event)" class="space-y-5">
-                <input type="hidden" id="movimiento-id">
-
-                <!-- Fecha -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha</label>
-                    <input type="date" id="fecha" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <!-- 1. CREAR PEDIDO -->
+        <div id="panel-crear" class="tab-panel active space-y-4">
+            <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow relative">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
+                    <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                    <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
+                    <div id="cliente-seleccionado-info" class="mt-2 text-sm text-blue-700 font-medium">Ningún cliente seleccionado.</div>
                 </div>
-
-                <!-- Cuenta (Egreso o Ingreso) -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tipo de Cuenta</label>
-                    <select id="cuenta" onchange="actualizarDetalles()" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white uppercase">
-                        <option value="INGRESO">INGRESO</option>
-                        <option value="EGRESO">EGRESO</option>
-                    </select>
-                </div>
-
-                <!-- Movimiento (Detalle) -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Detalle del Movimiento</label>
-                    <div class="flex gap-2">
-                        <select id="movimiento-detalle" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white uppercase">
-                            <!-- Dinámico A-Z en Mayúsculas -->
-                        </select>
-                        <button type="button" onclick="abrirModalDetalle()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium transition flex items-center gap-1 whitespace-nowrap" title="Gestionar detalles">
-                            <i class="fa-solid fa-plus"></i> Gestionar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Valor (Lempiras) -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Valor (L - Lempiras)</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">L</span>
-                        <input type="number" step="0.01" min="0.01" id="valor" placeholder="0.00" required class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Observación -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Observación</label>
-                    <textarea id="observacion" rows="3" placeholder="Escribe un comentario opcional..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none uppercase"></textarea>
-                </div>
-
-                <!-- Botones de Acción -->
-                <div class="flex items-center space-x-3 pt-4">
-                    <button type="submit" id="btn-guardar" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow transition">
-                        Guardar Movimiento
-                    </button>
-                    <button type="button" id="btn-cancelar" onclick="limpiarFormulario()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2.5 px-4 rounded-lg transition">
-                        Cancelar Edición
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- ================= 2. PESTAÑA HISTORIAL DE MOVIMIENTOS ================= -->
-        <section id="pestana-historial" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fa-solid fa-list text-emerald-600 mr-2"></i> Historial de Movimientos
-                </h2>
-                <!-- Doble Buscador -->
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <select id="buscador-mes" onchange="renderizarHistorial()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white uppercase">
-                        <option value="">TODOS LOS MESES</option>
-                    </select>
-                    <input type="text" id="buscador-historial" onkeyup="renderizarHistorial()" placeholder="Buscar detalle u observación..." class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none uppercase">
+                <div class="bg-white p-4 rounded-lg shadow relative">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
+                    <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                    <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
+                    <div id="producto-seleccionado-info" class="mt-2 text-sm text-green-700 font-medium">Ningún producto seleccionado.</div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[650px] table-fixed">
+                    <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-700 text-xs uppercase tracking-wider border-b">
-                                <th class="py-3 px-4 w-28">Fecha</th>
-                                <th class="py-3 px-4 w-28">Tipo</th>
-                                <th class="py-3 px-4 w-44">Detalle (Movimiento)</th>
-                                <th class="py-3 px-4 w-28">Valor</th>
-                                <th class="py-3 px-4">Observación</th>
-                                <th class="py-3 px-4 text-center w-24">Opciones</th>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Código & Producto</th>
+                                <th class="p-2 border">Precio</th>
+                                <th class="p-2 border">Cantidad</th>
+                                <th class="p-2 border">Gran Total</th>
+                                <th class="p-2 border">Detalle Adicional</th>
+                                <th class="p-2 border text-center">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-historial" class="divide-y divide-gray-200 text-sm uppercase">
-                            <!-- Dinámico -->
+                        <tbody id="tabla-pedido-detalle" class="text-sm">
+                            <tr><td colspan="6" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <div id="historial-vacio" class="text-center py-12 text-gray-500 hidden">
-                    <i class="fa-regular fa-folder-open text-4xl mb-2 text-gray-400"></i>
-                    <p>No hay movimientos registrados todavía.</p>
+                <div class="mt-4 flex justify-between items-center border-t pt-3">
+                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0.00</span></div>
+                    <button onclick="guardarPedidoActual()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i> Guardar Pedido
+                    </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- ================= 3. PESTAÑA RESÚMENES ================= -->
-        <section id="pestana-resumenes" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fa-solid fa-chart-column text-emerald-600 mr-2"></i> Resúmenes Financieros
-                </h2>
-                <div>
-                    <label class="text-sm font-semibold text-gray-700 mr-2">Filtrar por Mes:</label>
-                    <select id="filtro-mes" onchange="renderizarResumenes()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white uppercase">
-                        <option value="">TODOS LOS MESES</option>
-                    </select>
+        <!-- 2. HISTORIAL DE PEDIDOS -->
+        <div id="panel-historial" class="tab-panel space-y-4">
+            <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
+            <div id="contenedor-historial" class="space-y-4">
+                <div class="bg-white p-6 rounded-lg shadow text-center text-gray-400">No hay pedidos registrados todavía.</div>
+            </div>
+        </div>
+
+        <!-- 3. RESUMEN GENERAL -->
+        <div id="panel-general" class="tab-panel space-y-6">
+            <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
+                    <div class="text-sm text-gray-500 font-medium">Venta General</div>
+                    <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0.00</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
+                    <div class="text-sm text-gray-500 font-medium">Venta Por Fecha (Hoy)</div>
+                    <div id="resumen-venta-fecha" class="text-2xl font-bold text-gray-800 mt-1">--/---/-- : L. 0.00</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+                    <div class="text-sm text-gray-500 font-medium">Venta Por Cliente</div>
+                    <div id="resumen-venta-cliente" class="text-lg font-semibold text-gray-800 mt-1">Seleccione cliente...</div>
                 </div>
             </div>
+        </div>
 
-            <!-- Tarjetas de Totales -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 border-l-4 border-l-emerald-500">
-                    <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Ingresos</p>
-                    <h3 id="resumen-total-ingresos" class="text-2xl font-bold text-emerald-600 mt-1">L 0.00</h3>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 border-l-4 border-l-rose-500">
-                    <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Total Egresos</p>
-                    <h3 id="resumen-total-egresos" class="text-2xl font-bold text-rose-600 mt-1">L 0.00</h3>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 border-l-4 border-l-blue-500">
-                    <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Balance Neto</p>
-                    <h3 id="resumen-balance" class="text-2xl font-bold text-blue-600 mt-1">L 0.00</h3>
+        <!-- 4. RESUMEN POR PRODUCTO -->
+        <div id="panel-producto" class="tab-panel space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
+                <div class="flex gap-2">
+                    <button onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
+                    <button onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
                 </div>
             </div>
-
-            <!-- Gráfica y Tabla Resumen -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Gráfica -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col justify-center items-center">
-                    <h3 class="text-md font-bold text-gray-700 mb-4 self-start">Distribución de Gastos e Ingresos</h3>
-                    <div class="w-full max-w-xs h-64">
-                        <canvas id="graficoFinanzas"></canvas>
-                    </div>
-                </div>
-
-                <!-- Tabla de Acumulados por Cuenta/Detalle -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                    <h3 class="text-md font-bold text-gray-700 mb-4">Acumulado por Detalle</h3>
-                    <div class="overflow-x-auto max-h-64 overflow-y-auto">
-                        <table class="w-full text-left text-sm uppercase min-w-[350px]">
-                            <thead>
-                                <tr class="bg-gray-100 text-gray-700 text-xs uppercase">
-                                    <th class="py-2 px-3">Tipo</th>
-                                    <th class="py-2 px-3">Detalle</th>
-                                    <th class="py-2 px-3 text-right">Valor Acumulado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-resumen-detalles" class="divide-y divide-gray-200">
-                                <!-- Dinámico -->
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Producto</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                <th class="p-2 border text-right">Valor Total (L.)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ranking-productos" class="text-sm">
+                            <tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- 5. EXPORTAR REPORTES A PDFS -->
+        <div id="panel-exportar" class="tab-panel space-y-6">
+            <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
+            
+            <div class="bg-white p-6 rounded-lg shadow space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Pedido No.</th>
+                                <th class="p-2 border">Nombre Cliente</th>
+                                <th class="p-2 border text-right">Valor Venta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-reporte-general" class="text-sm">
+                            <tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="exportarPdfGeneral()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Reporte General
+                </button>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700">Reporte General Por Cliente E Incidencias</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Pedido No.</th>
+                                <th class="p-2 border">Nombre Cliente</th>
+                                <th class="p-2 border text-right">Valor Venta</th>
+                                <th class="p-2 border text-right">Valor Entrega</th>
+                                <th class="p-2 border">Comentario / Incidencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-reporte-incidencias" class="text-sm">
+                            <tr><td colspan="5" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="exportarPdfIncidencias()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Incidencias y Entregas
+                </button>
+            </div>
+        </div>
+
+        <!-- 6. GESTIÓN DE CLIENTES -->
+        <div id="panel-clientes" class="tab-panel space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes (Google Sheets)</h2>
+                <button onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
+                </button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Código</th>
+                                <th class="p-2 border">Cliente</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-clientes" class="text-sm">
+                            <tr><td colspan="2" class="p-4 text-center text-gray-400">Cargando clientes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. GESTIÓN DE PRODUCTOS -->
+        <div id="panel-productos" class="tab-panel space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Productos (Google Sheets)</h2>
+                <button onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
+                </button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-sm">
+                                <th class="p-2 border">Código</th>
+                                <th class="p-2 border">Producto</th>
+                                <th class="p-2 border text-right">Precio (L.)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-productos" class="text-sm">
+                            <tr><td colspan="3" class="p-4 text-center text-gray-400">Cargando productos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </main>
 
-    <!-- ================= MODAL PARA GESTIONAR DETALLES ================= -->
-    <div id="modal-detalle" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden justify-center items-center z-50 p-4">
-        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full space-y-4">
-            <h3 class="text-lg font-bold text-gray-800">GESTIONAR DETALLES</h3>
-            <p id="modal-subtitulo" class="text-xs text-gray-500">Agrega, edita o elimina detalles para esta categoría.</p>
-            
-            <div class="flex gap-2">
-                <input type="text" id="nuevo-detalle-input" placeholder="NUEVO DETALLE..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm uppercase">
-                <button type="button" onclick="guardarNuevoDetalle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Agregar</button>
+    <!-- MODAL TECLADO NUMÉRICO -->
+    <div id="modal-teclado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
+            <h3 class="text-lg font-bold text-gray-800 text-center">Digite la Cantidad</h3>
+            <div id="display-cantidad" class="text-3xl font-bold text-center bg-gray-100 p-3 rounded-md border">1</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="tecladoPress('1')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">1</button>
+                <button onclick="tecladoPress('2')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">2</button>
+                <button onclick="tecladoPress('3')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">3</button>
+                <button onclick="tecladoPress('4')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">4</button>
+                <button onclick="tecladoPress('5')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">5</button>
+                <button onclick="tecladoPress('6')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">6</button>
+                <button onclick="tecladoPress('7')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">7</button>
+                <button onclick="tecladoPress('8')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">8</button>
+                <button onclick="tecladoPress('9')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">9</button>
+                <button onclick="tecladoPress('C')" class="bg-red-100 py-3 text-xl font-bold rounded text-red-600 hover:bg-red-200">C</button>
+                <button onclick="tecladoPress('0')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">0</button>
+                <button onclick="tecladoOk()" class="bg-green-600 py-3 text-xl font-bold rounded text-white hover:bg-green-700">OK</button>
             </div>
+            <button onclick="cerrarTeclado()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
+        </div>
+    </div>
 
-            <div class="mt-4">
-                <label class="block text-xs font-semibold text-gray-600 mb-2">Detalles existentes (A-Z):</label>
-                <div id="lista-gestion-detalles" class="max-h-48 overflow-y-auto divide-y divide-gray-100 border border-gray-200 rounded-lg p-2 bg-gray-50 text-sm uppercase">
-                    <!-- Dinámico -->
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-2">
-                <button type="button" onclick="cerrarModalDetalle()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Cerrar</button>
+    <!-- MODAL DETALLE ADICIONAL -->
+    <div id="modal-detalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full space-y-4">
+            <h3 class="text-lg font-bold text-gray-800">Agregar Detalle Adicional</h3>
+            <p class="text-sm text-gray-600">Especifique color, talla u otro:</p>
+            <input type="text" id="input-detalle-extra" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="EJ: TALLA L - COLOR ROJO">
+            <div class="flex justify-end gap-2">
+                <button onclick="cerrarModalDetalle()" class="px-4 py-2 bg-gray-300 rounded font-semibold text-gray-700">Cancelar</button>
+                <button onclick="guardarDetalleExtra()" class="px-4 py-2 bg-blue-900 text-white rounded font-semibold hover:bg-blue-800">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500 mt-auto">
-        App Finanzas Hob &copy; 2026 - Desarrollado para gestión financiera personal en Lempiras (L)
-    </footer>
-
-    <!-- ================= LÓGICA DE JAVASCRIPT ================= -->
+    <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
-        let rawIngresos = JSON.parse(localStorage.getItem('hob_detallesIngreso')) || ['COMISION'];
-        let detallesIngreso = rawIngresos.map(item => item.toUpperCase());
+        const URL_CLIENTES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=0&single=true&output=csv';
+        const URL_PRODUCTOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=1903712481&single=true&output=csv';
 
-        let rawEgresos = JSON.parse(localStorage.getItem('hob_detallesEgreso')) || ['PAGO DE LUZ'];
-        let detallesEgreso = rawEgresos.map(item => item.toUpperCase());
+        let listaClientes = [];
+        let listaProductos = [];
+        let pedidoActualCliente = null;
+        let itemsPedidoActual = [];
+        let historialPedidos = JSON.parse(localStorage.getItem('app_ventas_ch_pedidos')) || [];
+        let productoSeleccionadoTemporal = null;
+        let indiceItemEditandoDetalle = null;
+        let numeroCantidadActual = "1";
+        let editandoPedidoId = null;
 
-        let movimientos = JSON.parse(localStorage.getItem('hob_movimientos')) || [];
-        movimientos.forEach(m => {
-            m.cuenta = m.cuenta.toUpperCase();
-            m.detalle = m.detalle.toUpperCase();
-            if(m.observacion) m.observacion = m.observacion.toUpperCase();
+        // FUNCIÓN GLOBAL Y DIRECTA DE CAMBIO DE PESTAÑAS
+        function cambiarPestana(id) {
+            // Ocultar todos los paneles
+            const paneles = document.querySelectorAll('.tab-panel');
+            paneles.forEach(p => p.classList.remove('active'));
+
+            // Desactivar todos los botones
+            const botones = document.querySelectorAll('.nav-btn');
+            botones.forEach(b => {
+                b.classList.remove('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
+                b.classList.add('text-gray-600', 'font-medium');
+            });
+
+            // Mostrar panel seleccionado
+            const panelActivo = document.getElementById('panel-' + id);
+            if(panelActivo) panelActivo.classList.add('active');
+
+            // Activar botón correspondiente buscando por evento o posición
+            event.currentTarget.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
+            event.currentTarget.classList.remove('text-gray-600', 'font-medium');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            sincronizarGoogleSheets();
+            renderHistorial();
+            renderResumenGeneral();
+            renderResumenProducto();
+            renderReportesExportacion();
         });
 
-        let chartInstancia = null;
+        function parseCSV(text) {
+            let lines = text.split('\n');
+            let result = [];
+            for(let i=0; i<lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if(!currentLine) continue;
+                let row = [];
+                let inQuotes = false;
+                let entry = '';
+                for(let j=0; j<currentLine.length; j++) {
+                    let char = currentLine[j];
+                    if(char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if(char === ',' && !inQuotes) {
+                        row.push(entry.trim());
+                        entry = '';
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.trim());
+                result.push(row);
+            }
+            return result;
+        }
 
-        window.onload = function() {
-            document.getElementById('fecha').valueAsDate = new Date();
-            actualizarDetalles();
-            poblarSelectoresMeses();
-            renderizarHistorial();
-            renderizarResumenes();
-        };
+        async function sincronizarGoogleSheets() {
+            const statusEl = document.getElementById('sync-status');
+            statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
+            try {
+                const resC = await fetch(URL_CLIENTES);
+                const textC = await resC.text();
+                const rowsC = parseCSV(textC);
+                listaClientes = [];
+                for(let i=1; i<rowsC.length; i++) {
+                    if(rowsC[i].length >= 2 && rowsC[i][0]) {
+                        listaClientes.push({ codigo: rowsC[i][0], nombre: rowsC[i][1] });
+                    }
+                }
 
-        function cambiarPestana(pestana) {
-            document.getElementById('pestana-nuevo').classList.add('hidden');
-            document.getElementById('pestana-historial').classList.add('hidden');
-            document.getElementById('pestana-resumenes').classList.add('hidden');
+                const resP = await fetch(URL_PRODUCTOS);
+                const textP = await resP.text();
+                const rowsP = parseCSV(textP);
+                listaProductos = [];
+                for(let i=1; i<rowsP.length; i++) {
+                    if(rowsP[i].length >= 3 && rowsP[i][0]) {
+                        listaProductos.push({ 
+                            codigo: rowsP[i][0], 
+                            nombre: rowsP[i][1], 
+                            precio: parseFloat(rowsP[i][2].replace(/[^0-9.]/g, '')) || 0 
+                        });
+                    }
+                }
 
-            document.getElementById('btn-nuevo').className = "px-4 py-2 rounded-md font-medium text-sm transition text-emerald-100 hover:bg-emerald-600";
-            document.getElementById('btn-historial').className = "px-4 py-2 rounded-md font-medium text-sm transition text-emerald-100 hover:bg-emerald-600";
-            document.getElementById('btn-resumenes').className = "px-4 py-2 rounded-md font-medium text-sm transition text-emerald-100 hover:bg-emerald-600";
-
-            if (pestana === 'nuevo') {
-                document.getElementById('pestana-nuevo').classList.remove('hidden');
-                document.getElementById('btn-nuevo').className = "px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-800 text-white shadow";
-            } else if (pestana === 'historial') {
-                document.getElementById('pestana-historial').classList.remove('hidden');
-                document.getElementById('btn-historial').className = "px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-800 text-white shadow";
-                poblarSelectoresMeses();
-                renderizarHistorial();
-            } else if (pestana === 'resumenes') {
-                document.getElementById('pestana-resumenes').classList.remove('hidden');
-                document.getElementById('btn-resumenes').className = "px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-800 text-white shadow";
-                poblarSelectoresMeses();
-                renderizarResumenes();
+                statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
+                renderGestionClientes();
+                renderGestionProductos();
+            } catch (error) {
+                console.error("Error sincronizando:", error);
+                statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Error de conexión';
             }
         }
 
-        function actualizarDetalles() {
-            const cuenta = document.getElementById('cuenta').value.toUpperCase();
-            const selectDetalle = document.getElementById('movimiento-detalle');
-            selectDetalle.innerHTML = '';
-
-            let lista = cuenta === 'INGRESO' ? detallesIngreso : detallesEgreso;
-            lista.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-
-            lista.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                selectDetalle.appendChild(option);
-            });
+        function renderGestionClientes() {
+            const tbody = document.getElementById('tabla-gestion-clientes');
+            if(listaClientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-400">No hay clientes sincronizados</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = listaClientes.map(c => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-2 border font-semibold text-blue-900">[${c.codigo}]</td>
+                    <td class="p-2 border">${c.nombre}</td>
+                </tr>
+            `).join('');
         }
 
-        function abrirModalDetalle() {
-            const cuenta = document.getElementById('cuenta').value.toUpperCase();
-            document.getElementById('modal-subtitulo').textContent = `Administrar detalles para la categoría de ${cuenta}.`;
-            document.getElementById('nuevo-detalle-input').value = '';
-            renderizarListaGestionDetalles();
+        function renderGestionProductos() {
+            const tbody = document.getElementById('tabla-gestion-productos');
+            if(listaProductos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay productos sincronizados</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = listaProductos.map(p => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-2 border font-semibold text-blue-600">[${p.codigo}]</td>
+                    <td class="p-2 border">${p.nombre}</td>
+                    <td class="p-2 border text-right font-medium">L. ${p.precio.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrarClientes() {
+            const query = document.getElementById('input-buscar-cliente').value.toUpperCase();
+            const contenedor = document.getElementById('lista-clientes-sugeridos');
+            if(!query) {
+                contenedor.classList.add('hidden');
+                return;
+            }
+            const filtrados = listaClientes.filter(c => c.codigo.toUpperCase().includes(query) || c.nombre.toUpperCase().includes(query));
+            if(filtrados.length === 0) {
+                contenedor.innerHTML = `<div class="p-2 text-gray-400 text-sm">No se encontraron clientes</div>`;
+            } else {
+                contenedor.innerHTML = filtrados.map(c => `
+                    <div onclick="seleccionarCliente('${c.codigo}', '${c.nombre}')" class="p-2 hover:bg-blue-50 cursor-pointer border-b text-sm">
+                        <span class="font-bold text-blue-900">[${c.codigo}]</span> ${c.nombre}
+                    </div>
+                `).join('');
+            }
+            contenedor.classList.remove('hidden');
+        }
+
+        function seleccionarCliente(codigo, nombre) {
+            pedidoActualCliente = { codigo, nombre };
+            document.getElementById('input-buscar-cliente').value = `[${codigo}] ${nombre}`;
+            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${codigo}] ${nombre}`;
+            document.getElementById('lista-clientes-sugeridos').classList.add('hidden');
+        }
+
+        function filtrarProductos() {
+            const query = document.getElementById('input-buscar-producto').value.toUpperCase();
+            const contenedor = document.getElementById('lista-productos-sugeridos');
+            if(!query) {
+                contenedor.classList.add('hidden');
+                return;
+            }
+            const filtrados = listaProductos.filter(p => p.codigo.toUpperCase().includes(query) || p.nombre.toUpperCase().includes(query));
+            if(filtrados.length === 0) {
+                contenedor.innerHTML = `<div class="p-2 text-gray-400 text-sm">No se encontraron productos</div>`;
+            } else {
+                contenedor.innerHTML = filtrados.map(p => `
+                    <div onclick="iniciarSeleccionCantidad('${p.codigo}', '${p.nombre}', ${p.precio})" class="p-2 hover:bg-green-50 cursor-pointer border-b text-sm">
+                        <span class="font-bold text-blue-600">[${p.codigo}]</span> ${p.nombre} - <span class="text-green-600 font-semibold">L. ${p.precio.toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+            contenedor.classList.remove('hidden');
+        }
+
+        function iniciarSeleccionCantidad(codigo, nombre, precio) {
+            productoSeleccionadoTemporal = { codigo, nombre, precio };
+            document.getElementById('input-buscar-producto').value = `[${codigo}]${nombre},${precio}`;
+            document.getElementById('lista-productos-sugeridos').classList.add('hidden');
+            numeroCantidadActual = "1";
+            document.getElementById('display-cantidad').innerText = numeroCantidadActual;
+            document.getElementById('modal-teclado').classList.remove('hidden');
+        }
+
+        function tecladoPress(val) {
+            if(val === 'C') {
+                numeroCantidadActual = "1";
+            } else {
+                if(numeroCantidadActual === "1" && val !== "0") {
+                    numeroCantidadActual = val;
+                } else {
+                    numeroCantidadActual += val;
+                }
+            }
+            document.getElementById('display-cantidad').innerText = numeroCantidadActual;
+        }
+
+        function cerrarTeclado() {
+            document.getElementById('modal-teclado').classList.add('hidden');
+        }
+
+        function tecladoOk() {
+            const cantidad = parseInt(numeroCantidadActual) || 1;
+            cerrarTeclado();
+            if(productoSeleccionadoTemporal) {
+                itemsPedidoActual.push({
+                    codigo: productoSeleccionadoTemporal.codigo,
+                    nombre: productoSeleccionadoTemporal.nombre,
+                    precio: productoSeleccionadoTemporal.precio,
+                    cantidad: cantidad,
+                    detalleExtra: ""
+                });
+                productoSeleccionadoTemporal = null;
+                document.getElementById('input-buscar-producto').value = "";
+                renderTablaPedidoActual();
+            }
+        }
+
+        function renderTablaPedidoActual() {
+            const tbody = document.getElementById('tabla-pedido-detalle');
+            if(itemsPedidoActual.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>`;
+                document.getElementById('label-gran-total-pedido').innerText = "L. 0.00";
+                return;
+            }
+            let granTotalGeneral = 0;
+            tbody.innerHTML = itemsPedidoActual.map((item, idx) => {
+                let totalItem = item.precio * item.cantidad;
+                granTotalGeneral += totalItem;
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-2 border"><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</td>
+                        <td class="p-2 border">L. ${item.precio.toFixed(2)}</td>
+                        <td class="p-2 border">${item.cantidad}</td>
+                        <td class="p-2 border font-semibold">L. ${totalItem.toFixed(2)}</td>
+                        <td class="p-2 border text-blue-600 cursor-pointer font-medium" onclick="abrirModalDetalle(${idx})">
+                            ${item.detalleExtra ? item.detalleExtra : '<span class="text-gray-400 italic">+ Agregar detalle</span>'}
+                        </td>
+                        <td class="p-2 border text-center">
+                            <button onclick="eliminarItemPedido(${idx})" class="text-red-500 hover:text-red-700 px-2"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            document.getElementById('label-gran-total-pedido').innerText = `L. ${granTotalGeneral.toFixed(2)}`;
+        }
+
+        function eliminarItemPedido(index) {
+            itemsPedidoActual.splice(index, 1);
+            renderTablaPedidoActual();
+        }
+
+        function abrirModalDetalle(index) {
+            indiceItemEditandoDetalle = index;
+            document.getElementById('input-detalle-extra').value = itemsPedidoActual[index].detalleExtra || "";
             document.getElementById('modal-detalle').classList.remove('hidden');
-            document.getElementById('modal-detalle').classList.add('flex');
         }
 
         function cerrarModalDetalle() {
-            document.getElementById('modal-detalle').classList.remove('flex');
             document.getElementById('modal-detalle').classList.add('hidden');
-            actualizarDetalles();
+            indiceItemEditandoDetalle = null;
         }
 
-        function renderizarListaGestionDetalles() {
-            const cuenta = document.getElementById('cuenta').value.toUpperCase();
-            let lista = cuenta === 'INGRESO' ? detallesIngreso : detallesEgreso;
-            lista.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-
-            const contenedor = document.getElementById('lista-gestion-detalles');
-            contenedor.innerHTML = '';
-
-            if (lista.length === 0) {
-                contenedor.innerHTML = `<p class="text-center text-gray-400 py-2">No hay detalles registrados.</p>`;
-                return;
+        function guardarDetalleExtra() {
+            if(indiceItemEditandoDetalle !== null) {
+                itemsPedidoActual[indiceItemEditandoDetalle].detalleExtra = document.getElementById('input-detalle-extra').value.toUpperCase();
+                renderTablaPedidoActual();
             }
-
-            lista.forEach((item) => {
-                const indexReal = lista.indexOf(item);
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center py-1.5 px-2 hover:bg-gray-100 rounded";
-                div.innerHTML = `
-                    <span class="font-medium text-gray-700">${item}</span>
-                    <div class="space-x-2">
-                        <button onclick="editarDetalleModal('${cuenta}', ${indexReal})" class="text-blue-600 hover:text-blue-800" title="Editar"><i class="fa-solid fa-pen text-xs"></i></button>
-                        <button onclick="eliminarDetalleModal('${cuenta}', ${indexReal})" class="text-rose-600 hover:text-rose-800" title="Eliminar"><i class="fa-solid fa-trash text-xs"></i></button>
-                    </div>
-                `;
-                contenedor.appendChild(div);
-            });
+            cerrarModalDetalle();
         }
 
-        function guardarNuevoDetalle() {
-            const nuevoDetalle = document.getElementById('nuevo-detalle-input').value.trim().toUpperCase();
-            const cuenta = document.getElementById('cuenta').value.toUpperCase();
-
-            if (!nuevoDetalle) {
-                alert('Por favor ingresa un nombre válido.');
+        function guardarPedidoActual() {
+            if(!pedidoActualCliente) {
+                alert("Debe seleccionar un cliente para el pedido.");
                 return;
             }
+            if(itemsPedidoActual.length === 0) {
+                alert("Debe agregar al menos un producto al pedido.");
+                return;
+            }
+            let totalPedido = itemsPedidoActual.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
 
-            let lista = cuenta === 'INGRESO' ? detallesIngreso : detallesEgreso;
-            const existe = lista.includes(nuevoDetalle);
-
-            if (!existe) {
-                lista.push(nuevoDetalle);
-                if (cuenta === 'INGRESO') {
-                    localStorage.setItem('hob_detallesIngreso', JSON.stringify(detallesIngreso));
-                } else {
-                    localStorage.setItem('hob_detallesEgreso', JSON.stringify(detallesEgreso));
+            if(editandoPedidoId !== null) {
+                let pedido = historialPedidos.find(p => p.id === editandoPedidoId);
+                if(pedido) {
+                    pedido.cliente = pedidoActualCliente;
+                    pedido.items = [...itemsPedidoActual];
+                    pedido.total = totalPedido;
                 }
+                editandoPedidoId = null;
             } else {
-                alert('Este detalle ya existe.');
-                return;
-            }
-
-            document.getElementById('nuevo-detalle-input').value = '';
-            renderizarListaGestionDetalles();
-        }
-
-        function editarDetalleModal(cuenta, index) {
-            let lista = cuenta === 'INGRESO' ? detallesIngreso : detallesEgreso;
-            const actual = lista[index];
-            const nuevoNombre = prompt("Editar nombre del detalle:", actual);
-
-            if (nuevoNombre && nuevoNombre.trim() !== "") {
-                const nombreLimpio = nuevoNombre.trim().toUpperCase();
-                if (nombreLimpio !== actual && lista.includes(nombreLimpio)) {
-                    alert('Ya existe un detalle con ese nombre.');
-                    return;
-                }
-                lista[index] = nombreLimpio;
-
-                if (cuenta === 'INGRESO') {
-                    localStorage.setItem('hob_detallesIngreso', JSON.stringify(detallesIngreso));
-                } else {
-                    localStorage.setItem('hob_detallesEgreso', JSON.stringify(detallesEgreso));
-                }
-                renderizarListaGestionDetalles();
-            }
-        }
-
-        function eliminarDetalleModal(cuenta, index) {
-            let lista = cuenta === 'INGRESO' ? detallesIngreso : detallesEgreso;
-            if (lista.length <= 1) {
-                alert('Debe mantener al menos un detalle en la categoría.');
-                return;
-            }
-
-            if (confirm('¿Estás seguro de eliminar este detalle?')) {
-                lista.splice(index, 1);
-                if (cuenta === 'INGRESO') {
-                    localStorage.setItem('hob_detallesIngreso', JSON.stringify(detallesIngreso));
-                } else {
-                    localStorage.setItem('hob_detallesEgreso', JSON.stringify(detallesEgreso));
-                }
-                renderizarListaGestionDetalles();
-            }
-        }
-
-        function formatearFecha(fechaStr) {
-            if (!fechaStr) return '';
-            const partes = fechaStr.split('-');
-            if (partes.length === 3) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-            }
-            return fechaStr;
-        }
-
-        function guardarMovimiento(event) {
-            event.preventDefault();
-
-            const id = document.getElementById('movimiento-id').value;
-            const fecha = document.getElementById('fecha').value;
-            const cuenta = document.getElementById('cuenta').value.toUpperCase();
-            const detalle = document.getElementById('movimiento-detalle').value.toUpperCase();
-            const valor = parseFloat(document.getElementById('valor').value);
-            const observacion = document.getElementById('observacion').value.toUpperCase();
-
-            if (id) {
-                const index = movimientos.findIndex(m => m.id == id);
-                if (index !== -1) {
-                    movimientos[index] = { id: Number(id), fecha, cuenta, detalle, valor, observacion };
-                }
-            } else {
-                const nuevoMov = {
-                    id: Date.now(),
-                    fecha,
-                    cuenta,
-                    detalle,
-                    valor,
-                    observacion
+                let nuevoId = String(historialPedidos.length + 1).padStart(2, '0');
+                let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+                let nuevoPedido = {
+                    id: nuevoId,
+                    numeroPedido: `Pedido #${nuevoId}`,
+                    cliente: pedidoActualCliente,
+                    items: [...itemsPedidoActual],
+                    total: totalPedido,
+                    fecha: fechaHoy,
+                    valorEntrega: totalPedido,
+                    comentarioEntrega: "Entrega completa"
                 };
-                movimientos.push(nuevoMov);
+                historialPedidos.unshift(nuevoPedido);
             }
 
-            movimientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-            localStorage.setItem('hob_movimientos', JSON.stringify(movimientos));
+            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             
-            limpiarFormulario();
-            alert('¡Movimiento guardado exitosamente!');
-        }
-
-        function limpiarFormulario() {
-            document.getElementById('form-movimiento').reset();
-            document.getElementById('movimiento-id').value = '';
-            document.getElementById('fecha').valueAsDate = new Date();
-            document.getElementById('form-titulo').innerHTML = `<i class="fa-solid fa-pen-to-square text-emerald-600 mr-2"></i> Registrar Nuevo Movimiento`;
-            document.getElementById('btn-guardar').textContent = "Guardar Movimiento";
-            document.getElementById('btn-cancelar').classList.add('hidden');
-            actualizarDetalles();
-            document.getElementById('fecha').focus();
-        }
-
-        function poblarSelectoresMeses() {
-            const selectMesHistorial = document.getElementById('buscador-mes');
-            const selectMesResumen = document.getElementById('filtro-mes');
+            pedidoActualCliente = null;
+            itemsPedidoActual = [];
+            document.getElementById('input-buscar-cliente').value = "";
+            document.getElementById('cliente-seleccionado-info').innerText = "Ningún cliente seleccionado.";
+            renderTablaPedidoActual();
+            renderHistorial();
+            renderResumenGeneral();
+            renderResumenProducto();
+            renderReportesExportacion();
             
-            const valHistorial = selectMesHistorial.value;
-            const valResumen = selectMesResumen.value;
-
-            const mesesSet = new Set();
-            movimientos.forEach(m => {
-                if (m.fecha) mesesSet.add(m.fecha.slice(0, 7));
-            });
-
-            const mesesArray = Array.from(mesesSet).sort().reverse();
-            const nombresMeses = {
-                '01': 'ENERO', '02': 'FEBRERO', '03': 'MARZO', '04': 'ABRIL',
-                '05': 'MAYO', '06': 'JUNIO', '07': 'JULIO', '08': 'AGOSTO',
-                '09': 'SEPTIEMBRE', '10': 'OCTUBRE', '11': 'NOVIEMBRE', '12': 'DICIEMBRE'
-            };
-
-            let optionsHTML = '<option value="">TODOS LOS MESES</option>';
-            mesesArray.forEach(anioMes => {
-                const [anio, mesNum] = anioMes.split('-');
-                optionsHTML += `<option value="${anioMes}">${nombresMeses[mesNum] || mesNum} ${anio}</option>`;
-            });
-
-            selectMesHistorial.innerHTML = optionsHTML;
-            selectMesResumen.innerHTML = optionsHTML;
-
-            if (mesesArray.includes(valHistorial)) selectMesHistorial.value = valHistorial;
-            if (mesesArray.includes(valResumen)) selectMesResumen.value = valResumen;
+            // Forzar cambio visual a historial
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-historial').classList.add('active');
         }
 
-        function renderizarHistorial() {
-            const tbody = document.getElementById('tabla-historial');
-            const mensajeVacio = document.getElementById('historial-vacio');
-            const filtroBusqueda = document.getElementById('buscador-historial').value.toLowerCase();
-            const filtroMes = document.getElementById('buscador-mes').value;
-
-            tbody.innerHTML = '';
-
-            movimientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-            const movimientosFiltrados = movimientos.filter(m => {
-                const coincideTexto = m.detalle.toLowerCase().includes(filtroBusqueda) || 
-                                       m.observacion.toLowerCase().includes(filtroBusqueda) ||
-                                       formatearFecha(m.fecha).includes(filtroBusqueda);
-                const coincideMes = !filtroMes || m.fecha.startsWith(filtroMes);
-                return coincideTexto && coincideMes;
-            });
-
-            if (movimientosFiltrados.length === 0) {
-                mensajeVacio.classList.remove('hidden');
+        function renderHistorial() {
+            const contenedor = document.getElementById('contenedor-historial');
+            if(historialPedidos.length === 0) {
+                contenedor.innerHTML = `<div class="bg-white p-6 rounded-lg shadow text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
                 return;
-            } else {
-                mensajeVacio.classList.add('hidden');
             }
-
-            movimientosFiltrados.forEach(m => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition border-b align-top";
-
-                const badgeColor = m.cuenta === 'INGRESO' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
-
-                tr.innerHTML = `
-                    <td class="py-3 px-4 text-gray-600 font-medium break-words">${formatearFecha(m.fecha)}</td>
-                    <td class="py-3 px-4 break-words"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">${m.cuenta}</span></td>
-                    <td class="py-3 px-4 font-medium text-gray-800 break-words">${m.detalle}</td>
-                    <td class="py-3 px-4 font-bold break-words ${m.cuenta === 'INGRESO' ? 'text-emerald-600' : 'text-rose-600'}">L ${m.valor.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    <td class="py-3 px-4 text-gray-500 break-words">
-                        <div>${m.observacion || '-'}</div>
-                    </td>
-                    <td class="py-3 px-4 text-center space-x-2 whitespace-nowrap">
-                        <button onclick="cargarParaEditar(${m.id})" class="text-blue-600 hover:text-blue-800 transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="eliminarMovimiento(${m.id})" class="text-rose-600 hover:text-rose-800 transition" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+            contenedor.innerHTML = historialPedidos.map(p => `
+                <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
+                        <span class="text-xs text-gray-500">${p.fecha}</span>
+                    </div>
+                    <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
+                    <div class="bg-gray-50 p-3 rounded-md space-y-1">
+                        <div class="text-xs font-bold text-gray-500 uppercase">Detalle de Productos:</div>
+                        ${p.items.map(item => `
+                            <div class="text-sm pl-2 border-l-2 border-blue-500">
+                                <span class="font-semibold">[${item.codigo}] ${item.nombre}</span> (Cant: ${item.cantidad}) ${item.detalleExtra ? ' - ' + item.detalleExtra : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t">
+                        <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
+                        <div class="flex gap-2">
+                            <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
+                            <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
+                            <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function cargarParaEditar(id) {
-            const m = movimientos.find(item => item.id == id);
-            if (!m) return;
-
-            document.getElementById('movimiento-id').value = m.id;
-            document.getElementById('fecha').value = m.fecha;
-            document.getElementById('cuenta').value = m.cuenta;
-            actualizarDetalles();
-            document.getElementById('movimiento-detalle').value = m.detalle;
-            document.getElementById('valor').value = m.valor;
-            document.getElementById('observacion').value = m.observacion;
-
-            document.getElementById('form-titulo').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Editar Movimiento`;
-            document.getElementById('btn-guardar').textContent = "Actualizar Movimiento";
-            document.getElementById('btn-cancelar').classList.remove('hidden');
-
-            cambiarPestana('nuevo');
-        }
-
-        function eliminarMovimiento(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar este movimiento?')) {
-                movimientos = movimientos.filter(m => m.id != id);
-                localStorage.setItem('hob_movimientos', JSON.stringify(movimientos));
-                poblarSelectoresMeses();
-                renderizarHistorial();
-                renderizarResumenes();
-            }
-        }
-
-        function renderizarResumenes() {
-            const mesSeleccionado = document.getElementById('filtro-mes').value;
-
-            const filtrados = movimientos.filter(m => {
-                if (!mesSeleccionado) return true;
-                return m.fecha.startsWith(mesSeleccionado);
-            });
-
-            let totalIngresos = 0;
-            let totalEgresos = 0;
-            const ingresosDetalle = {};
-            const egresosDetalle = {};
-
-            filtrados.forEach(m => {
-                if (m.cuenta === 'INGRESO') {
-                    totalIngresos += m.valor;
-                    ingresosDetalle[m.detalle] = (ingresosDetalle[m.detalle] || 0) + m.valor;
-                } else {
-                    totalEgresos += m.valor;
-                    egresosDetalle[m.detalle] = (egresosDetalle[m.detalle] || 0) + m.valor;
-                }
-            });
-
-            const balance = totalIngresos - totalEgresos;
-
-            document.getElementById('resumen-total-ingresos').textContent = `L ${totalIngresos.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            document.getElementById('resumen-total-egresos').textContent = `L ${totalEgresos.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        function editarPedido(id) {
+            let pedido = historialPedidos.find(p => p.id === id);
+            if(!pedido) return;
+            editandoPedidoId = id;
+            pedidoActualCliente = pedido.cliente;
+            itemsPedidoActual = [...pedido.items];
+            document.getElementById('input-buscar-cliente').value = `[${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
+            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
+            renderTablaPedidoActual();
             
-            const elBalance = document.getElementById('resumen-balance');
-            elBalance.textContent = `L ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            elBalance.className = `text-2xl font-bold mt-1 ${balance >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
+            // Cambiar a pestaña crear
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-crear').classList.add('active');
+        }
 
-            const ingresosOrdenados = Object.entries(ingresosDetalle).sort((a, b) => b[1] - a[1]);
-            const egresosOrdenados = Object.entries(egresosDetalle).sort((a, b) => b[1] - a[1]);
+        function eliminarPedido(id) {
+            if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
+                historialPedidos = historialPedidos.filter(p => p.id !== id);
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                renderHistorial();
+                renderResumenGeneral();
+                renderResumenProducto();
+                renderReportesExportacion();
+            }
+        }
 
-            const tbodyDetalles = document.getElementById('tabla-resumen-detalles');
-            tbodyDetalles.innerHTML = '';
+        function generarPdfPedidoIndividual(id) {
+            let pedido = historialPedidos.find(p => p.id === id);
+            if(!pedido) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Número: ${pedido.numeroPedido}`, 14, 30);
+            doc.text(`Fecha: ${pedido.fecha}`, 14, 38);
+            doc.text(`Cliente: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`, 14, 46);
+            
+            let y = 60;
+            doc.setFont("helvetica", "bold");
+            doc.text("Productos:", 14, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            pedido.items.forEach(item => {
+                doc.text(`- [${item.codigo}] ${item.nombre} (Cant: ${item.cantidad}) L. ${(item.precio * item.cantidad).toFixed(2)} ${item.detalleExtra ? '['+item.detalleExtra+']' : ''}`, 18, y);
+                y += 7;
+            });
+            y += 5;
+            doc.setFont("helvetica", "bold");
+            doc.text(`Gran Total: L. ${pedido.total.toFixed(2)}`, 14, y);
+            doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre}.pdf`);
+        }
 
-            const totalElementos = ingresosOrdenados.length + egresosOrdenados.length;
-            if (totalElementos === 0) {
-                tbodyDetalles.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400">No hay datos para este período.</td></tr>`;
+        function renderResumenGeneral() {
+            let ventaTotal = historialPedidos.reduce((acc, p) => acc + p.total, 0);
+            document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
+            
+            let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+            let ventaHoy = historialPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0);
+            document.getElementById('resumen-venta-fecha').innerText = `${fechaHoy} : L. ${ventaHoy.toFixed(2)}`;
+            
+            if(pedidoActualCliente) {
+                let ventaCliente = historialPedidos.filter(p => p.cliente.codigo === pedidoActualCliente.codigo).reduce((acc, p) => acc + p.total, 0);
+                document.getElementById('resumen-venta-cliente').innerText = `${pedidoActualCliente.nombre}: L. ${ventaCliente.toFixed(2)}`;
             } else {
-                ingresosOrdenados.forEach(([detalle, valor]) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50 border-b";
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">INGRESO</span></td>
-                        <td class="py-2.5 px-3 font-medium text-gray-800 break-words">${detalle}</td>
-                        <td class="py-2.5 px-3 text-right font-semibold text-emerald-600 whitespace-nowrap">L ${valor.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    `;
-                    tbodyDetalles.appendChild(tr);
-                });
+                document.getElementById('resumen-venta-cliente').innerText = `Ningún cliente seleccionado`;
+            }
+        }
 
-                egresosOrdenados.forEach(([detalle, valor]) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50 border-b";
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">EGRESO</span></td>
-                        <td class="py-2.5 px-3 font-medium text-gray-800 break-words">${detalle}</td>
-                        <td class="py-2.5 px-3 text-right font-semibold text-rose-600 whitespace-nowrap">L ${valor.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    `;
-                    tbodyDetalles.appendChild(tr);
+        let ordenRankingTipo = 'unidades';
+        function ordenarRanking(tipo) {
+            ordenRankingTipo = tipo;
+            renderResumenProducto();
+        }
+
+        function renderResumenProducto() {
+            let mapaProductos = {};
+            historialPedidos.forEach(p => {
+                p.items.forEach(item => {
+                    if(!mapaProductos[item.codigo]) {
+                        mapaProductos[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
+                    }
+                    mapaProductos[item.codigo].unidades += item.cantidad;
+                    mapaProductos[item.codigo].valor += (item.precio * item.cantidad);
                 });
+            });
+
+            let rankingArray = Object.values(mapaProductos);
+            if(ordenRankingTipo === 'unidades') {
+                rankingArray.sort((a, b) => b.unidades - a.unidades);
+            } else {
+                rankingArray.sort((a, b) => b.valor - a.valor);
             }
 
-            const ctx = document.getElementById('graficoFinanzas').getContext('2d');
-            if (chartInstancia) chartInstancia.destroy();
+            const tbody = document.getElementById('tabla-ranking-productos');
+            if(rankingArray.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = rankingArray.map(r => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
+                    <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
+                    <td class="p-2 border text-right font-bold text-green-600">L. ${r.valor.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
 
-            chartInstancia = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['INGRESOS', 'EGRESOS'],
-                    datasets: [{
-                        data: [totalIngresos, totalEgresos],
-                        backgroundColor: ['#10b981', '#f43f5e'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+        function renderReportesExportacion() {
+            const tbodyGen = document.getElementById('tbody-reporte-general');
+            const tbodyInc = document.getElementById('tbody-reporte-incidencias');
+
+            if(historialPedidos.length === 0) {
+                tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>`;
+                tbodyInc.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
+                return;
+            }
+
+            tbodyGen.innerHTML = historialPedidos.map(p => `
+                <tr class="border-b">
+                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                    <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                    <td class="p-2 border text-right font-medium">L. ${p.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            tbodyInc.innerHTML = pedidosAsc.map(p => `
+                <tr class="border-b">
+                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                    <td class="p-2 border">${p.cliente.nombre}</td>
+                    <td class="p-2 border text-right">L. ${p.total.toFixed(2)}</td>
+                    <td class="p-2 border text-right">
+                        <input type="number" value="${p.valorEntrega !== undefined ? p.valorEntrega : p.total}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
+                    </td>
+                    <td class="p-2 border">
+                        <input type="text" value="${p.comentarioEntrega || 'Entrega completa'}" onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function actualizarValorEntrega(id, val) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(p) {
+                p.valorEntrega = parseFloat(val) || 0;
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            }
+        }
+
+        function actualizarComentarioEntrega(id, val) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(p) {
+                p.comentarioEntrega = val.toUpperCase();
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            }
+        }
+
+        function exportarPdfGeneral() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte General de Ventas – App Ventas Ch", 14, 20);
+            let y = 30;
+            doc.setFont("helvetica", "bold");
+            doc.text("Pedido No.", 14, y);
+            doc.text("Nombre Cliente", 50, y);
+            doc.text("Valor Venta", 160, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            historialPedidos.forEach(p => {
+                doc.text(p.numeroPedido, 14, y);
+                doc.text(`[${p.cliente.codigo}] ${p.cliente.nombre}`, 50, y);
+                doc.text(`L. ${p.total.toFixed(2)}`, 160, y);
+                y += 8;
             });
+            doc.save("Reporte_General_Ventas.pdf");
+        }
+
+        function exportarPdfIncidencias() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte General Por Cliente E Incidencias", 14, 20);
+            let y = 30;
+            doc.setFont("helvetica", "bold");
+            doc.text("Pedido", 14, y);
+            doc.text("Cliente", 40, y);
+            doc.text("Venta", 110, y);
+            doc.text("Entrega", 140, y);
+            doc.text("Comentario", 170, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            pedidosAsc.forEach(p => {
+                doc.text(p.numeroPedido, 14, y);
+                doc.text(p.cliente.nombre.substring(0, 20), 40, y);
+                doc.text(`L.${p.total.toFixed(2)}`, 110, y);
+                doc.text(`L.${(p.valorEntrega !== undefined ? p.valorEntrega : p.total).toFixed(2)}`, 140, y);
+                doc.text((p.comentarioEntrega || "Entrega completa").substring(0, 15), 170, y);
+                y += 8;
+            });
+            doc.save("Reporte_Clientes_Incidencias.pdf");
         }
     </script>
 </body>
