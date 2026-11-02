@@ -65,15 +65,23 @@
         <div id="panel-crear" class="tab-panel active space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Cliente con botón limpiar -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
-                    <input type="text" id="input-buscar-cliente" placeholder="Buscar Cliente" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                    <div class="relative flex items-center">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar Cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <button onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                     <div id="cliente-seleccionado-info" class="mt-2 text-sm text-blue-700 font-medium">Ningún cliente seleccionado.</div>
                 </div>
+                <!-- Producto con botón limpiar -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
-                    <input type="text" id="input-buscar-producto" placeholder="Buscar Producto" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                    <div class="relative flex items-center">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar Producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <button onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                     <div id="producto-seleccionado-info" class="mt-2 text-sm text-green-700 font-medium">Ningún producto seleccionado.</div>
                 </div>
@@ -107,9 +115,18 @@
             </div>
         </div>
 
-        <!-- 2. HISTORIAL DE PEDIDOS (LIMPIO SIN COMENTARIOS NI ESTADOS) -->
+        <!-- 2. HISTORIAL DE PEDIDOS CON SELECCIÓN MÚLTIPLE Y ASIGNACIÓN DE SEMANA -->
         <div id="panel-historial" class="tab-panel space-y-4">
-            <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
+                    </button>
+                </div>
+            </div>
+
             <div class="overflow-x-auto bg-white rounded-lg shadow p-2">
                 <div id="contenedor-historial" class="min-w-[700px] space-y-4">
                     <div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>
@@ -165,10 +182,20 @@
             </div>
         </div>
 
-        <!-- 5. EXPORTAR REPORTES A PDFS -->
+        <!-- 5. EXPORTAR REPORTES A PDFS (INCLUYENDO REPORTE SEMANAL) -->
         <div id="panel-exportar" class="tab-panel space-y-6">
             <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
             
+            <!-- REPORTE SEMANAL ACUMULADO -->
+            <div class="bg-white p-6 rounded-lg shadow space-y-4 border-2 border-blue-900">
+                <h3 class="text-lg font-semibold text-blue-900 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
+                </h3>
+                <div id="contenedor-reporte-semanal" class="space-y-4">
+                    <div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
                 <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
                 <div class="overflow-x-auto">
@@ -314,6 +341,7 @@
         let pedidoActualCliente = null;
         let itemsPedidoActual = [];
         let historialPedidos = JSON.parse(localStorage.getItem('app_ventas_ch_pedidos')) || [];
+        let reportesSemanales = JSON.parse(localStorage.getItem('app_ventas_ch_semanales')) || {};
         let productoSeleccionadoTemporal = null;
         let indiceItemEditandoDetalle = null;
         let numeroCantidadActual = "";
@@ -452,6 +480,14 @@
             contenedor.classList.remove('hidden');
         }
 
+        function limpiarCliente() {
+            pedidoActualCliente = null;
+            document.getElementById('input-buscar-cliente').value = "";
+            document.getElementById('cliente-seleccionado-info').innerText = "Ningún cliente seleccionado.";
+            document.getElementById('lista-clientes-sugeridos').classList.add('hidden');
+            renderResumenGeneral();
+        }
+
         function seleccionarCliente(codigo, nombre) {
             pedidoActualCliente = { codigo, nombre };
             document.getElementById('input-buscar-cliente').value = `[${codigo}] ${nombre}`;
@@ -480,10 +516,18 @@
             contenedor.classList.remove('hidden');
         }
 
+        function limpiarProducto() {
+            document.getElementById('input-buscar-producto').value = "";
+            document.getElementById('producto-seleccionado-info').innerText = "Ningún producto seleccionado.";
+            document.getElementById('lista-productos-sugeridos').classList.add('hidden');
+            productoSeleccionadoTemporal = null;
+        }
+
         function iniciarSeleccionCantidad(codigo, nombre, precio) {
             productoSeleccionadoTemporal = { codigo, nombre, precio };
             indiceItemEditandoCantidad = null;
-            document.getElementById('input-buscar-producto').value = `[${codigo}]${nombre},${precio}`;
+            document.getElementById('input-buscar-producto').value = `[${codigo}] ${nombre} - L. ${precio.toFixed(2)}`;
+            document.getElementById('producto-seleccionado-info').innerHTML = `Producto seleccionado: [${codigo}] ${nombre}`;
             document.getElementById('lista-productos-sugeridos').classList.add('hidden');
             numeroCantidadActual = "";
             document.getElementById('display-cantidad').innerText = "0";
@@ -528,7 +572,7 @@
                     detalleExtra: ""
                 });
                 productoSeleccionadoTemporal = null;
-                document.getElementById('input-buscar-producto').value = "";
+                limpiarProducto();
                 renderTablaPedidoActual();
             }
         }
@@ -609,7 +653,7 @@
                 }
                 editandoPedidoId = null;
             } else {
-                let nuevoId = String(historialPedidos.length + 1).padStart(2, '0');
+                let nuevoId = String(historialPedidos.length + 1).padStart(3, '0');
                 let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
                 let nuevoPedido = {
                     id: nuevoId,
@@ -627,10 +671,8 @@
 
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             
-            pedidoActualCliente = null;
+            limpiarCliente();
             itemsPedidoActual = [];
-            document.getElementById('input-buscar-cliente').value = "";
-            document.getElementById('cliente-seleccionado-info').innerText = "Ningún cliente seleccionado.";
             renderTablaPedidoActual();
             renderHistorial();
             renderResumenGeneral();
@@ -641,7 +683,7 @@
             document.getElementById('panel-historial').classList.add('active');
         }
 
-        // --- HISTORIAL DE PEDIDOS LIMPIO (SIN CAJA DE COMENTARIOS) ---
+        // --- HISTORIAL DE PEDIDOS CON CHECKBOX MÚLTIPLE ---
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(historialPedidos.length === 0) {
@@ -649,36 +691,73 @@
                 return;
             }
             contenedor.innerHTML = historialPedidos.map(p => `
-                <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
-                                ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
-                            </span>
-                            <span class="text-xs text-gray-500">${p.fecha}</span>
-                        </div>
-                    </div>
-                    <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
-                    <div class="bg-gray-50 p-3 rounded-md space-y-2">
-                        <div class="text-xs font-bold text-gray-500 uppercase">Detalle de Productos:</div>
-                        ${p.items.map(item => `
-                            <div class="text-sm pl-2 border-l-2 border-blue-500 space-y-0.5">
-                                <div><span class="font-semibold">[${item.codigo}] ${item.nombre}</span> (Cant: ${item.cantidad})</div>
-                                ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-3">${item.detalleExtra}</div>` : ''}
+                <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900 flex items-start gap-3">
+                    <input type="checkbox" value="${p.id}" class="check-pedido mt-1.5 w-5 h-5 accent-blue-900 cursor-pointer" title="Seleccionar pedido">
+                    <div class="flex-grow space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
+                                    ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
+                                </span>
+                                <span class="text-xs text-gray-500">${p.fecha}</span>
                             </div>
-                        `).join('')}
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t">
-                        <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
-                        <div class="flex gap-2">
-                            <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
-                            <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
-                            <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
+                        </div>
+                        <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
+                        <div class="bg-gray-50 p-3 rounded-md space-y-2">
+                            <div class="text-xs font-bold text-gray-500 uppercase">Detalle de Productos:</div>
+                            ${p.items.map(item => `
+                                <div class="text-sm pl-2 border-l-2 border-blue-500 space-y-0.5">
+                                    <div><span class="font-semibold">[${item.codigo}] ${item.nombre}</span> (Cant: ${item.cantidad})</div>
+                                    ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-3">${item.detalleExtra}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t">
+                            <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
+                            <div class="flex gap-2">
+                                <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
+                                <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
+                                <button onclick="eliminarPedido('${p.id}')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200">Eliminar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function enviarPedidosASemana() {
+            const checkboxes = document.querySelectorAll('.check-pedido:checked');
+            if(checkboxes.length === 0) {
+                alert("Seleccione al menos un pedido del historial.");
+                return;
+            }
+            let semanaInput = document.getElementById('input-numero-semana').value.toUpperCase().trim();
+            if(!semanaInput) {
+                alert("Por favor ingrese el número de semana (Ej: SEMANA 44).");
+                return;
+            }
+
+            let idsSeleccionados = Array.from(checkboxes).map(cb => cb.value);
+            let pedidosAMover = historialPedidos.filter(p => idsSeleccionados.includes(p.id));
+            
+            // Remover del historial activo
+            historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
+            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+
+            // Guardar en reporte semanal
+            if(!reportesSemanales[semanaInput]) {
+                reportesSemanales[semanaInput] = [];
+            }
+            reportesSemanales[semanaInput].push(...pedidosAMover);
+            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+
+            document.getElementById('input-numero-semana').value = "";
+            renderHistorial();
+            renderResumenGeneral();
+            renderResumenProducto();
+            renderReportesExportacion();
+            alert(`¡Pedidos asignados correctamente a ${semanaInput} y movidos a Reporte Semanal!`);
         }
 
         function editarPedido(id) {
@@ -750,15 +829,18 @@
         }
 
         function renderResumenGeneral() {
-            let ventaTotal = historialPedidos.reduce((acc, p) => acc + p.total, 0);
+            let todosPedidos = [...historialPedidos];
+            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+
+            let ventaTotal = todosPedidos.reduce((acc, p) => acc + p.total, 0);
             document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
             
             let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
-            let ventaHoy = historialPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0);
+            let ventaHoy = todosPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0);
             document.getElementById('resumen-venta-fecha').innerText = `${fechaHoy} : L. ${ventaHoy.toFixed(2)}`;
             
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
-            if(historialPedidos.length === 0) {
+            if(todosPedidos.length === 0) {
                 contenedorCliente.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
                 return;
             }
@@ -766,7 +848,7 @@
             let mapaClientes = {};
             let ordenClientes = [];
             
-            historialPedidos.forEach(p => {
+            todosPedidos.forEach(p => {
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
                     mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
@@ -790,8 +872,11 @@
         }
 
         function renderResumenProducto() {
+            let todosPedidos = [...historialPedidos];
+            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+
             let mapaProductos = {};
-            historialPedidos.forEach(p => {
+            todosPedidos.forEach(p => {
                 p.items.forEach(item => {
                     if(!mapaProductos[item.codigo]) {
                         mapaProductos[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
@@ -823,16 +908,65 @@
         }
 
         function renderReportesExportacion() {
+            // Renderizar Reporte Semanal Acumulado
+            const contSemanal = document.getElementById('contenedor-reporte-semanal');
+            const semanasKeys = Object.keys(reportesSemanales);
+            if(semanasKeys.length === 0) {
+                contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>`;
+            } else {
+                contSemanal.innerHTML = semanasKeys.map(semana => {
+                    let pedidosSemana = reportesSemanales[semana];
+                    let totalSemana = pedidosSemana.reduce((acc, p) => acc + p.total, 0);
+                    return `
+                        <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="font-bold text-blue-900 text-base">${semana} (${pedidosSemana.length} pedidos)</span>
+                                <div class="flex items-center gap-4">
+                                    <span class="font-bold text-gray-800">Total: L. ${totalSemana.toFixed(2)}</span>
+                                    <button onclick="exportarPdfSemanal('${semana}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                                        <i class="fa-solid fa-file-pdf"></i> PDF ${semana}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse min-w-[500px]">
+                                    <thead>
+                                        <tr class="bg-gray-200 text-gray-700 text-xs">
+                                            <th class="p-2 border">Pedido No.</th>
+                                            <th class="p-2 border">Cliente</th>
+                                            <th class="p-2 border text-right">Valor Venta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-xs">
+                                        ${pedidosSemana.map(p => `
+                                            <tr class="border-b">
+                                                <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                                                <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                                                <td class="p-2 border text-right font-medium">L. ${p.total.toFixed(2)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Reportes Generales y de Incidencias
+            let todosPedidosParaReporte = [...historialPedidos];
+            Object.values(reportesSemanales).forEach(arr => todosPedidosParaReporte.push(...arr));
+
             const tbodyGen = document.getElementById('tbody-reporte-general');
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
 
-            if(historialPedidos.length === 0) {
+            if(todosPedidosParaReporte.length === 0) {
                 tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>`;
                 tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
                 return;
             }
 
-            tbodyGen.innerHTML = historialPedidos.map(p => `
+            tbodyGen.innerHTML = todosPedidosParaReporte.map(p => `
                 <tr class="border-b">
                     <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                     <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
@@ -840,7 +974,7 @@
                 </tr>
             `).join('');
 
-            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            let pedidosAsc = [...todosPedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
             tbodyInc.innerHTML = pedidosAsc.map(p => `
                 <tr class="border-b">
                     <td class="p-2 border font-semibold">${p.numeroPedido}</td>
@@ -863,24 +997,75 @@
 
         function actualizarValorEntrega(id, val) {
             let p = historialPedidos.find(item => item.id === id);
-            if(p) {
+            if(!p) {
+                Object.values(reportesSemanales).forEach(arr => {
+                    let encontrado = arr.find(item => item.id === id);
+                    if(encontrado) encontrado.valorEntrega = parseFloat(val) || 0;
+                });
+            } else {
                 p.valorEntrega = parseFloat(val) || 0;
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             }
+            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
         }
 
         function actualizarComentarioEntrega(id, val) {
             let p = historialPedidos.find(item => item.id === id);
-            if(p) {
+            if(!p) {
+                Object.values(reportesSemanales).forEach(arr => {
+                    let encontrado = arr.find(item => item.id === id);
+                    if(encontrado) {
+                        encontrado.comentarioEntrega = val.toUpperCase();
+                        encontrado.gestionado = val.trim() !== "";
+                    }
+                });
+            } else {
                 p.comentarioEntrega = val.toUpperCase();
                 p.gestionado = val.trim() !== "";
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                renderReportesExportacion();
-                renderHistorial();
             }
+            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+            renderReportesExportacion();
+            renderHistorial();
+        }
+
+        function exportarPdfSemanal(semana) {
+            let pedidosSemana = reportesSemanales[semana];
+            if(!pedidosSemana || pedidosSemana.length === 0) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
+
+            let datosTabla = pedidosSemana.map(p => [
+                p.numeroPedido,
+                `[${p.cliente.codigo}] ${p.cliente.nombre}`,
+                `L. ${p.total.toFixed(2)}`
+            ]);
+
+            doc.autoTable({
+                startY: 25,
+                head: [['Pedido No.', 'Nombre Cliente', 'Valor Venta']],
+                body: datosTabla,
+                columnStyles: {
+                    0: { cellWidth: 30 },
+                    1: { cellWidth: 110 },
+                    2: { cellWidth: 40, halign: 'right' }
+                },
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [30, 64, 175] }
+            });
+
+            doc.save(`Reporte_${semana.replace(/\s+/g, '_')}.pdf`);
         }
 
         function exportarPdfGeneral() {
+            let todosPedidos = [...historialPedidos];
+            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -888,7 +1073,7 @@
             doc.setFontSize(14);
             doc.text("Reporte General de Ventas – App Ventas Ch", 14, 20);
 
-            let datosTabla = historialPedidos.map(p => [
+            let datosTabla = todosPedidos.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 `L. ${p.total.toFixed(2)}`
@@ -911,13 +1096,16 @@
         }
 
         function exportarPdfIncidencias() {
+            let todosPedidos = [...historialPedidos];
+            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.text("Reporte General Por Cliente E Incidencias", 14, 20);
 
-            let pedidosAsc = [...historialPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            let pedidosAsc = [...todosPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
             let datosTabla = pedidosAsc.map(p => [
                 p.numeroPedido,
                 p.cliente.nombre,
