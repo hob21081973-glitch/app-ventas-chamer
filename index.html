@@ -65,25 +65,23 @@
         <div id="panel-crear" class="tab-panel active space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Cliente con botón limpiar -->
+                <!-- Cliente con botón limpiar (Sin etiquetas innecesarias debajo) -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar Cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
-                    <div id="cliente-seleccionado-info" class="mt-2 text-sm text-blue-700 font-medium">Ningún cliente seleccionado.</div>
                 </div>
-                <!-- Producto con botón limpiar -->
+                <!-- Producto con botón limpiar (Sin etiquetas innecesarias debajo) -->
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar Producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
-                    <div id="producto-seleccionado-info" class="mt-2 text-sm text-green-700 font-medium">Ningún producto seleccionado.</div>
                 </div>
             </div>
 
@@ -108,8 +106,9 @@
                 </div>
                 <div class="mt-4 flex justify-between items-center border-t pt-3">
                     <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0.00</span></div>
-                    <button onclick="guardarPedidoActual()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center gap-2">
-                        <i class="fa-solid fa-check"></i> Guardar Pedido
+                    <!-- Botón de Guardar optimizado con icono verde -->
+                    <button onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
+                        <i class="fa-solid fa-check text-xl"></i>
                     </button>
                 </div>
             </div>
@@ -170,8 +169,8 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Cantidad</th>
-                                <th class="p-2 border text-right">Total (L.)</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ranking-productos" class="text-sm">
@@ -182,7 +181,7 @@
             </div>
         </div>
 
-        <!-- 5. EXPORTAR REPORTES A PDFS (INCLUYENDO REPORTE SEMANAL) -->
+        <!-- 5. EXPORTAR REPORTES A PDFS -->
         <div id="panel-exportar" class="tab-panel space-y-6">
             <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
             
@@ -483,7 +482,6 @@
         function limpiarCliente() {
             pedidoActualCliente = null;
             document.getElementById('input-buscar-cliente').value = "";
-            document.getElementById('cliente-seleccionado-info').innerText = "Ningún cliente seleccionado.";
             document.getElementById('lista-clientes-sugeridos').classList.add('hidden');
             renderResumenGeneral();
         }
@@ -491,7 +489,6 @@
         function seleccionarCliente(codigo, nombre) {
             pedidoActualCliente = { codigo, nombre };
             document.getElementById('input-buscar-cliente').value = `[${codigo}] ${nombre}`;
-            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${codigo}] ${nombre}`;
             document.getElementById('lista-clientes-sugeridos').classList.add('hidden');
             renderResumenGeneral();
         }
@@ -518,7 +515,6 @@
 
         function limpiarProducto() {
             document.getElementById('input-buscar-producto').value = "";
-            document.getElementById('producto-seleccionado-info').innerText = "Ningún producto seleccionado.";
             document.getElementById('lista-productos-sugeridos').classList.add('hidden');
             productoSeleccionadoTemporal = null;
         }
@@ -527,7 +523,6 @@
             productoSeleccionadoTemporal = { codigo, nombre, precio };
             indiceItemEditandoCantidad = null;
             document.getElementById('input-buscar-producto').value = `[${codigo}] ${nombre} - L. ${precio.toFixed(2)}`;
-            document.getElementById('producto-seleccionado-info').innerHTML = `Producto seleccionado: [${codigo}] ${nombre}`;
             document.getElementById('lista-productos-sugeridos').classList.add('hidden');
             numeroCantidadActual = "";
             document.getElementById('display-cantidad').innerText = "0";
@@ -683,7 +678,6 @@
             document.getElementById('panel-historial').classList.add('active');
         }
 
-        // --- HISTORIAL DE PEDIDOS CON CHECKBOX MÚLTIPLE ---
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(historialPedidos.length === 0) {
@@ -741,11 +735,9 @@
             let idsSeleccionados = Array.from(checkboxes).map(cb => cb.value);
             let pedidosAMover = historialPedidos.filter(p => idsSeleccionados.includes(p.id));
             
-            // Remover del historial activo
             historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
 
-            // Guardar en reporte semanal
             if(!reportesSemanales[semanaInput]) {
                 reportesSemanales[semanaInput] = [];
             }
@@ -767,7 +759,6 @@
             pedidoActualCliente = pedido.cliente;
             itemsPedidoActual = [...pedido.items];
             document.getElementById('input-buscar-cliente').value = `[${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
-            document.getElementById('cliente-seleccionado-info').innerHTML = `Cliente seleccionado: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
             renderTablaPedidoActual();
             
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -908,7 +899,6 @@
         }
 
         function renderReportesExportacion() {
-            // Renderizar Reporte Semanal Acumulado
             const contSemanal = document.getElementById('contenedor-reporte-semanal');
             const semanasKeys = Object.keys(reportesSemanales);
             if(semanasKeys.length === 0) {
@@ -953,7 +943,6 @@
                 }).join('');
             }
 
-            // Reportes Generales y de Incidencias
             let todosPedidosParaReporte = [...historialPedidos];
             Object.values(reportesSemanales).forEach(arr => todosPedidosParaReporte.push(...arr));
 
