@@ -112,13 +112,34 @@
 
         <!-- 2. HISTORIAL DE PEDIDOS -->
         <div id="panel-historial" class="tab-panel space-y-4">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow">
-                <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
-                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <button onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
-                    </button>
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <button onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
+                            <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Controles de selección y rangos -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-sm">
+                    <div class="flex items-center gap-2">
+                        <button onclick="seleccionarTodos(true)" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded font-semibold hover:bg-gray-300 text-xs">Seleccionar Todos</button>
+                        <button onclick="seleccionarTodos(false)" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded font-semibold hover:bg-gray-300 text-xs">Deseleccionar</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-semibold text-gray-600">Rango No. Pedido:</span>
+                        <input type="number" id="rango-min" placeholder="Desde" class="w-20 p-1 border rounded text-xs">
+                        <input type="number" id="rango-max" placeholder="Hasta" class="w-20 p-1 border rounded text-xs">
+                        <button onclick="seleccionarRangoPedidos()" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700">Aplicar No.</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-semibold text-gray-600">Rango Fecha:</span>
+                        <input type="text" id="rango-fecha" placeholder="EJ: 06 NOV 2026" class="uppercase-input w-32 p-1 border rounded text-xs">
+                        <button onclick="seleccionarPorFecha()" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700">Aplicar Fecha</button>
+                    </div>
                 </div>
             </div>
 
@@ -188,7 +209,7 @@
                     <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-4">
-                    <div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>
+                    <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
                 </div>
             </div>
 
@@ -344,12 +365,10 @@
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
 
-        // Función para dar formato numérico redondeado sin decimales
         function formatLempiras(monto) {
             return "L. " + Math.round(monto || 0).toLocaleString('en-US');
         }
 
-        // Función estandarizadora de fechas (Mantiene el formato DD MMM YYYY siempre)
         function formatearFechaStandard(strFecha) {
             if (!strFecha) return "SIN FECHA";
             let f = strFecha.trim().toUpperCase();
@@ -673,7 +692,6 @@
                 editandoPedidoId = null;
             } else {
                 let nuevoId = String(historialPedidos.length + 1).padStart(3, '0');
-                // Formato estandarizado al crear: DD MMM YYYY (Ej: 06 NOV 2026)
                 let fechaHoyRaw = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 let fechaHoy = formatearFechaStandard(fechaHoyRaw);
                 let nuevoPedido = {
@@ -719,7 +737,10 @@
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
                                     ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
                                 </span>
-                                <span class="text-xs text-gray-500">${formatearFechaStandard(p.fecha)}</span>
+                                <div class="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                                    <span class="text-xs text-gray-700 font-semibold" id="fecha-texto-${p.id}">${formatearFechaStandard(p.fecha)}</span>
+                                    <button onclick="cambiarFechaPedido('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs" title="Cambiar fecha"><i class="fa-solid fa-pen"></i></button>
+                                </div>
                             </div>
                         </div>
                         <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
@@ -743,6 +764,51 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        function cambiarFechaPedido(id) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(!p) return;
+            let nuevaFecha = prompt("Ingrese la nueva fecha (Ej: 06 NOV 2026):", p.fecha);
+            if(nuevaFecha !== null && nuevaFecha.trim() !== "") {
+                p.fecha = formatearFechaStandard(nuevaFecha);
+                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                renderHistorial();
+                renderResumenGeneral();
+            }
+        }
+
+        function seleccionarTodos(estado) {
+            document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = estado);
+        }
+
+        function seleccionarRangoPedidos() {
+            let min = parseInt(document.getElementById('rango-min').value);
+            let max = parseInt(document.getElementById('rango-max').value);
+            if(isNaN(min) || isNaN(max)) {
+                alert("Por favor ingrese un rango válido de números de pedido.");
+                return;
+            }
+            document.querySelectorAll('.check-pedido').forEach(cb => {
+                let numId = parseInt(cb.value);
+                cb.checked = (numId >= min && numId <= max);
+            });
+        }
+
+        function seleccionarPorFecha() {
+            let fechaFiltro = document.getElementById('rango-fecha').value.toUpperCase().trim();
+            if(!fechaFiltro) {
+                alert("Por favor ingrese una fecha.");
+                return;
+            }
+            document.querySelectorAll('.check-pedido').forEach(cb => {
+                let pedido = historialPedidos.find(p => p.id === cb.value);
+                if(pedido && formatearFechaStandard(pedido.fecha).includes(fechaFiltro)) {
+                    cb.checked = true;
+                } else {
+                    cb.checked = false;
+                }
+            });
         }
 
         function enviarPedidosASemana() {
@@ -864,14 +930,12 @@
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
-                // Estandarizar la fecha para agrupar todas las variantes de 06 Nov 26 y 06 Nov 2026 juntas
                 let fechaStd = formatearFechaStandard(p.fecha);
                 if(!mapaFechas[fechaStd]) {
                     mapaFechas[fechaStd] = 0;
                 }
                 mapaFechas[fechaStd] += p.total;
 
-                // Clientes
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
                     mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
@@ -880,7 +944,6 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // Ordenar las fechas de más reciente a más antigua
             let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
                 let dateA = new Date(a);
                 let dateB = new Date(b);
@@ -890,7 +953,6 @@
                 return b.localeCompare(a);
             });
 
-            // Formato exacto pedido: 06 NOV 2026 -------> L. 00,000 sin decimales
             contenedorFecha.innerHTML = ordenFechas.map(f => `
                 <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
                     <span class="text-gray-700">${f}</span>
@@ -898,7 +960,6 @@
                 </div>
             `).join('');
 
-            // Renderizar tabla Venta Por Cliente sin decimales
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -965,7 +1026,7 @@
             const contSemanal = document.getElementById('contenedor-reporte-semanal');
             const semanasKeys = Object.keys(reportesSemanales);
             if(semanasKeys.length === 0) {
-                contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>`;
+                contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>`;
             } else {
                 contSemanal.innerHTML = semanasKeys.map(semana => {
                     let pedidosSemana = reportesSemanales[semana];
