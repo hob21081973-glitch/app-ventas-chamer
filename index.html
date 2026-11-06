@@ -84,7 +84,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Lista Productos</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
@@ -97,12 +97,12 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-pedido-detalle" class="text-sm">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 flex justify-between items-center border-t pt-3">
-                    <div class="text-xl font-bold text-gray-800">Gran Total: <span id="label-gran-total-pedido">L. 0.00</span></div>
+                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0.00</span></div>
                     <button onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
@@ -117,7 +117,7 @@
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
                     <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <button onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-calendar-week"></i> Asignar Reporte Semanal
+                        <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
                     </button>
                 </div>
             </div>
@@ -131,7 +131,7 @@
 
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Resumen General</h2>
+            <h2 class="text-xl font-bold text-gray-800">Resumen Gral</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
                     <div class="text-sm text-gray-500 font-medium">Venta General</div>
@@ -155,8 +155,8 @@
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
                 <div class="flex gap-2">
-                    <button onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar Cantidad</button>
-                    <button onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar Valor L.</button>
+                    <button onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
+                    <button onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -165,7 +165,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Cantidad</th>
+                                <th class="p-2 border text-right">Unidades</th>
                                 <th class="p-2 border text-right">Valor (L.)</th>
                             </tr>
                         </thead>
@@ -183,7 +183,7 @@
             
             <div class="bg-white p-6 rounded-lg shadow space-y-4 border-2 border-blue-900">
                 <h3 class="text-lg font-semibold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-4">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>
@@ -191,7 +191,7 @@
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">Reporte Gral de Ventas</h3>
+                <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead>
@@ -207,7 +207,7 @@
                     </table>
                 </div>
                 <button onclick="exportarPdfGeneral()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Reporte Gral
+                    <i class="fa-solid fa-file-pdf"></i> Reporte General PDF
                 </button>
             </div>
 
@@ -231,7 +231,7 @@
                     </table>
                 </div>
                 <button onclick="exportarPdfIncidencias()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Generar PDF De Entregas
+                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Incidencias y Entregas
                 </button>
             </div>
         </div>
@@ -820,6 +820,7 @@
         }
 
         function renderResumenGeneral() {
+            // CORREGIDO: Combinamos tanto el historial como todos los reportes semanales para que la Venta General y Ventas por Cliente sumen TODO correctamente.
             let todosPedidos = [...historialPedidos];
             Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
 
