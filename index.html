@@ -102,7 +102,7 @@
                     </table>
                 </div>
                 <div class="mt-4 flex justify-between items-center border-t pt-3">
-                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0.00</span></div>
+                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0</span></div>
                     <button onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
@@ -135,7 +135,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
                     <div class="text-sm text-gray-500 font-medium">Venta General</div>
-                    <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0.00</div>
+                    <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
@@ -344,6 +344,28 @@
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
 
+        // Función para dar formato numérico redondeado sin decimales
+        function formatLempiras(monto) {
+            return "L. " + Math.round(monto || 0).toLocaleString('en-US');
+        }
+
+        // Función estandarizadora de fechas (Mantiene el formato DD MMM YYYY siempre)
+        function formatearFechaStandard(strFecha) {
+            if (!strFecha) return "SIN FECHA";
+            let f = strFecha.trim().toUpperCase();
+            let partes = f.split(/\s+/);
+            if (partes.length === 3) {
+                let dia = partes[0].padStart(2, '0');
+                let mes = partes[1];
+                let anio = partes[2];
+                if (anio.length === 2) {
+                    anio = "20" + anio;
+                }
+                return `${dia} ${mes} ${anio}`;
+            }
+            return f;
+        }
+
         function cambiarPestana(id) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -353,7 +375,6 @@
             const panelActivo = document.getElementById('panel-' + id);
             if(panelActivo) panelActivo.classList.add('active');
             
-            // Buscar el botón correspondiente y activarlo visualmente
             document.querySelectorAll('.nav-btn').forEach(b => {
                 if(b.getAttribute('onclick') && b.getAttribute('onclick').includes(id)) {
                     b.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
@@ -457,7 +478,7 @@
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-2 border font-semibold text-blue-600">[${p.codigo}]</td>
                     <td class="p-2 border">${p.nombre}</td>
-                    <td class="p-2 border text-right font-medium">L. ${p.precio.toFixed(2)}</td>
+                    <td class="p-2 border text-right font-medium">${formatLempiras(p.precio)}</td>
                 </tr>
             `).join('');
         }
@@ -509,7 +530,7 @@
             } else {
                 contenedor.innerHTML = filtrados.map(p => `
                     <div onclick="iniciarSeleccionCantidad('${p.codigo}', '${p.nombre}', ${p.precio})" class="p-2 hover:bg-green-50 cursor-pointer border-b text-sm">
-                        <span class="font-bold text-blue-600">[${p.codigo}]</span> ${p.nombre} - <span class="text-green-600 font-semibold">L. ${p.precio.toFixed(2)}</span>
+                        <span class="font-bold text-blue-600">[${p.codigo}]</span> ${p.nombre} - <span class="text-green-600 font-semibold">${formatLempiras(p.precio)}</span>
                     </div>
                 `).join('');
             }
@@ -525,7 +546,7 @@
         function iniciarSeleccionCantidad(codigo, nombre, precio) {
             productoSeleccionadoTemporal = { codigo, nombre, precio };
             indiceItemEditandoCantidad = null;
-            document.getElementById('input-buscar-producto').value = `[${codigo}] ${nombre} - L. ${precio.toFixed(2)}`;
+            document.getElementById('input-buscar-producto').value = `[${codigo}] ${nombre} - ${formatLempiras(precio)}`;
             document.getElementById('lista-productos-sugeridos').classList.add('hidden');
             numeroCantidadActual = "";
             document.getElementById('display-cantidad').innerText = "0";
@@ -579,7 +600,7 @@
             const tbody = document.getElementById('tabla-pedido-detalle');
             if(itemsPedidoActual.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>`;
-                document.getElementById('label-gran-total-pedido').innerText = "L. 0.00";
+                document.getElementById('label-gran-total-pedido').innerText = "L. 0";
                 return;
             }
             let granTotalGeneral = 0;
@@ -588,20 +609,15 @@
                 granTotalGeneral += totalItem;
                 return `
                     <tr class="border-b hover:bg-gray-50">
-                        <!-- Celda Táctil del Producto para abrir el detalle adicional -->
                         <td class="p-2 border cursor-pointer hover:bg-blue-50 transition-colors whitespace-nowrap" onclick="abrirModalDetalle(${idx})" title="Toca para agregar/editar detalle">
                             <div><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</div>
                             ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-8 mt-0.5">${item.detalleExtra}</div>` : '<div class="text-xs text-gray-400 italic pl-8 mt-0.5">+ Toca para agregar detalle</div>'}
                         </td>
-                        <!-- Cantidad -->
                         <td class="p-2 border font-bold text-blue-900 cursor-pointer hover:underline whitespace-nowrap" onclick="abrirEditarCantidad(${idx})" title="Click para editar cantidad">
                             ${item.cantidad}
                         </td>
-                        <!-- Precio Unitario -->
-                        <td class="p-2 border whitespace-nowrap">L. ${item.precio.toFixed(2)}</td>
-                        <!-- Gran Total -->
-                        <td class="p-2 border font-semibold whitespace-nowrap">L. ${totalItem.toFixed(2)}</td>
-                        <!-- Acciones -->
+                        <td class="p-2 border whitespace-nowrap">${formatLempiras(item.precio)}</td>
+                        <td class="p-2 border font-semibold whitespace-nowrap">${formatLempiras(totalItem)}</td>
                         <td class="p-2 border text-center flex justify-center gap-2 whitespace-nowrap">
                             <button onclick="abrirEditarCantidad(${idx})" class="text-blue-600 hover:text-blue-800 px-1" title="Editar cantidad"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="eliminarItemPedido(${idx})" class="text-red-500 hover:text-red-700 px-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
@@ -609,7 +625,7 @@
                     </tr>
                 `;
             }).join('');
-            document.getElementById('label-gran-total-pedido').innerText = `L. ${granTotalGeneral.toFixed(2)}`;
+            document.getElementById('label-gran-total-pedido').innerText = formatLempiras(granTotalGeneral);
         }
 
         function eliminarItemPedido(index) {
@@ -657,7 +673,9 @@
                 editandoPedidoId = null;
             } else {
                 let nuevoId = String(historialPedidos.length + 1).padStart(3, '0');
-                let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+                // Formato estandarizado al crear: DD MMM YYYY (Ej: 06 NOV 2026)
+                let fechaHoyRaw = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+                let fechaHoy = formatearFechaStandard(fechaHoyRaw);
                 let nuevoPedido = {
                     id: nuevoId,
                     numeroPedido: `Pedido #${nuevoId}`,
@@ -682,7 +700,6 @@
             renderResumenProducto();
             renderReportesExportacion();
             
-            // SE QUEDA EN LA PESTAÑA CREAR PEDIDO TAL COMO LO PEDISTE
             cambiarPestana('crear');
         }
 
@@ -702,7 +719,7 @@
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
                                     ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
                                 </span>
-                                <span class="text-xs text-gray-500">${p.fecha}</span>
+                                <span class="text-xs text-gray-500">${formatearFechaStandard(p.fecha)}</span>
                             </div>
                         </div>
                         <div class="font-semibold text-gray-800">[${p.cliente.codigo}] ${p.cliente.nombre}</div>
@@ -716,7 +733,7 @@
                             `).join('')}
                         </div>
                         <div class="flex justify-between items-center pt-2 border-t">
-                            <div class="font-bold text-gray-800">Total: L. ${p.total.toFixed(2)}</div>
+                            <div class="font-bold text-gray-800">Total: ${formatLempiras(p.total)}</div>
                             <div class="flex gap-2">
                                 <button onclick="editarPedido('${p.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200">Editar</button>
                                 <button onclick="generarPdfPedidoIndividual('${p.id}')" class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-semibold hover:bg-red-200">Pdf</button>
@@ -796,7 +813,7 @@
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
             doc.text(`Número: ${pedido.numeroPedido}`, 14, 28);
-            doc.text(`Fecha: ${pedido.fecha}`, 14, 34);
+            doc.text(`Fecha: ${formatearFechaStandard(pedido.fecha)}`, 14, 34);
             doc.text(`Cliente: [${pedido.cliente.codigo}] ${pedido.cliente.nombre}`, 14, 40);
             
             let y = 50;
@@ -806,7 +823,7 @@
             
             doc.setFont("helvetica", "normal");
             pedido.items.forEach(item => {
-                let lineaProd = `- [${item.codigo}] ${item.nombre} (Cant: ${item.cantidad}) L. ${(item.precio * item.cantidad).toFixed(2)}`;
+                let lineaProd = `- [${item.codigo}] ${item.nombre} (Cant: ${item.cantidad}) ${formatLempiras(item.precio * item.cantidad)}`;
                 doc.text(lineaProd, 14, y);
                 y += 6;
 
@@ -822,7 +839,7 @@
             
             y += 4;
             doc.setFont("helvetica", "bold");
-            doc.text(`Gran Total: L. ${pedido.total.toFixed(2)}`, 14, y);
+            doc.text(`Gran Total: ${formatLempiras(pedido.total)}`, 14, y);
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
 
@@ -831,7 +848,7 @@
             Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
 
             let ventaTotal = todosPedidos.reduce((acc, p) => acc + p.total, 0);
-            document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
+            document.getElementById('resumen-venta-general').innerText = formatLempiras(ventaTotal);
             
             const contenedorFecha = document.getElementById('resumen-venta-fecha');
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
@@ -847,12 +864,12 @@
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
-                // Formato de fecha para agrupar
-                let fecha = p.fecha || "SIN FECHA";
-                if(!mapaFechas[fecha]) {
-                    mapaFechas[fecha] = 0;
+                // Estandarizar la fecha para agrupar todas las variantes de 06 Nov 26 y 06 Nov 2026 juntas
+                let fechaStd = formatearFechaStandard(p.fecha);
+                if(!mapaFechas[fechaStd]) {
+                    mapaFechas[fechaStd] = 0;
                 }
-                mapaFechas[fecha] += p.total;
+                mapaFechas[fechaStd] += p.total;
 
                 // Clientes
                 let cod = p.cliente.codigo;
@@ -863,9 +880,8 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // Ordenar las fechas de la más actual a la más antigua analizando el string de fecha o manteniendo orden inverso
+            // Ordenar las fechas de más reciente a más antigua
             let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
-                // Intentar ordenar cronológicamente de más reciente a más antiguo
                 let dateA = new Date(a);
                 let dateB = new Date(b);
                 if(!isNaN(dateA) && !isNaN(dateB)) {
@@ -874,15 +890,15 @@
                 return b.localeCompare(a);
             });
 
-            // Renderizar listado de Venta Por Fecha exactamente como lo pediste: 06 Nov 2026 -------> 5,493
+            // Formato exacto pedido: 06 NOV 2026 -------> L. 00,000 sin decimales
             contenedorFecha.innerHTML = ordenFechas.map(f => `
                 <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
                     <span class="text-gray-700">${f}</span>
-                    <span class="text-blue-900">-------> L. ${mapaFechas[f].toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="text-blue-900">-------> ${formatLempiras(mapaFechas[f])}</span>
                 </div>
             `).join('');
 
-            // Renderizar tabla Venta Por Cliente
+            // Renderizar tabla Venta Por Cliente sin decimales
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -895,7 +911,7 @@
                         ${ordenClientes.map(cod => `
                             <tr class="border-b hover:bg-gray-50 text-xs">
                                 <td class="p-1.5 border font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</td>
-                                <td class="p-1.5 border text-right font-bold text-blue-900">L. ${mapaClientes[cod].total.toFixed(2)}</td>
+                                <td class="p-1.5 border text-right font-bold text-blue-900">${formatLempiras(mapaClientes[cod].total)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -940,7 +956,7 @@
                 <tr class="border-b hover:bg-gray-50">
                     <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
                     <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
-                    <td class="p-2 border text-right font-bold text-green-600">L. ${r.valor.toFixed(2)}</td>
+                    <td class="p-2 border text-right font-bold text-green-600">${formatLempiras(r.valor)}</td>
                 </tr>
             `).join('');
         }
@@ -959,7 +975,7 @@
                             <div class="flex justify-between items-center border-b pb-2">
                                 <span class="font-bold text-blue-900 text-base">${semana} (${pedidosSemana.length} pedidos)</span>
                                 <div class="flex items-center gap-4">
-                                    <span class="font-bold text-gray-800">Total: L. ${totalSemana.toFixed(2)}</span>
+                                    <span class="font-bold text-gray-800">Total: ${formatLempiras(totalSemana)}</span>
                                     <button onclick="exportarPdfSemanal('${semana}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                                         <i class="fa-solid fa-file-pdf"></i> PDF ${semana}
                                     </button>
@@ -979,7 +995,7 @@
                                             <tr class="border-b">
                                                 <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                                                 <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
-                                                <td class="p-2 border text-right font-medium">L. ${p.total.toFixed(2)}</td>
+                                                <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -1006,7 +1022,7 @@
                 <tr class="border-b">
                     <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                     <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
-                    <td class="p-2 border text-right font-medium">L. ${p.total.toFixed(2)}</td>
+                    <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
                 </tr>
             `).join('');
 
@@ -1015,9 +1031,9 @@
                 <tr class="border-b">
                     <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                     <td class="p-2 border">${p.cliente.nombre}</td>
-                    <td class="p-2 border text-right">L. ${p.total.toFixed(2)}</td>
+                    <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
                     <td class="p-2 border text-right">
-                        <input type="number" value="${p.valorEntrega !== undefined ? p.valorEntrega : p.total}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
+                        <input type="number" value="${Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
                     </td>
                     <td class="p-2 border">
                         <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
@@ -1079,7 +1095,7 @@
             let datosTabla = pedidosSemana.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
-                `L. ${p.total.toFixed(2)}`
+                formatLempiras(p.total)
             ]);
 
             doc.autoTable({
@@ -1112,7 +1128,7 @@
             let datosTabla = todosPedidos.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
-                `L. ${p.total.toFixed(2)}`
+                formatLempiras(p.total)
             ]);
 
             doc.autoTable({
@@ -1145,8 +1161,8 @@
             let datosTabla = pedidosAsc.map(p => [
                 p.numeroPedido,
                 p.cliente.nombre,
-                `L. ${p.total.toFixed(2)}`,
-                `L. ${(p.valorEntrega !== undefined ? p.valorEntrega : p.total).toFixed(2)}`,
+                formatLempiras(p.total),
+                formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total),
                 p.comentarioEntrega || "Sin incidencia"
             ]);
 
