@@ -131,7 +131,7 @@
 
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Resumen General</h2>
+            <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
                     <div class="text-sm text-gray-500 font-medium">Venta General</div>
@@ -140,11 +140,11 @@
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
                     <div class="overflow-x-auto">
-                        <div id="resumen-venta-fecha" class="text-xs text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
+                        <div id="resumen-venta-fecha" class="text-xs text-gray-800 max-h-48 overflow-y-auto space-y-1">Sin ventas registradas</div>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente (Más reciente a más antiguo)</div>
                     <div class="overflow-x-auto">
                         <div id="resumen-venta-cliente" class="text-xs text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
                     </div>
@@ -167,8 +167,8 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Cantidad</th>
-                                <th class="p-2 border text-right">Valor (L.)</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ranking-productos" class="text-sm">
@@ -185,7 +185,7 @@
             
             <div class="bg-white p-6 rounded-lg shadow space-y-4 border-2 border-blue-900">
                 <h3 class="text-lg font-semibold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-4">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados a semanas todavía. Asígnelos desde el Historial.</div>
@@ -214,7 +214,7 @@
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">Reporte Gral Por Cliente E Incidencias</h3>
+                <h3 class="text-lg font-semibold text-gray-700">Reporte General Por Cliente E Incidencias</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[800px]">
                         <thead>
@@ -352,8 +352,14 @@
             });
             const panelActivo = document.getElementById('panel-' + id);
             if(panelActivo) panelActivo.classList.add('active');
-            event.currentTarget.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
-            event.currentTarget.classList.remove('text-gray-600', 'font-medium');
+            
+            // Buscar el botón correspondiente y activarlo visualmente
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                if(b.getAttribute('onclick') && b.getAttribute('onclick').includes(id)) {
+                    b.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
+                    b.classList.remove('text-gray-600', 'font-medium');
+                }
+            });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -651,7 +657,7 @@
                 editandoPedidoId = null;
             } else {
                 let nuevoId = String(historialPedidos.length + 1).padStart(3, '0');
-                let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+                let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 let nuevoPedido = {
                     id: nuevoId,
                     numeroPedido: `Pedido #${nuevoId}`,
@@ -676,8 +682,8 @@
             renderResumenProducto();
             renderReportesExportacion();
             
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.getElementById('panel-historial').classList.add('active');
+            // SE QUEDA EN LA PESTAÑA CREAR PEDIDO TAL COMO LO PEDISTE
+            cambiarPestana('crear');
         }
 
         function renderHistorial() {
@@ -763,8 +769,7 @@
             document.getElementById('input-buscar-cliente').value = `[${pedido.cliente.codigo}] ${pedido.cliente.nombre}`;
             renderTablaPedidoActual();
             
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.getElementById('panel-crear').classList.add('active');
+            cambiarPestana('crear');
         }
 
         function eliminarPedido(id) {
@@ -828,7 +833,6 @@
             let ventaTotal = todosPedidos.reduce((acc, p) => acc + p.total, 0);
             document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
             
-            // Agrupar ventas por Fecha en formato de tabla con texto reducido un 30% (text-xs)
             const contenedorFecha = document.getElementById('resumen-venta-fecha');
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
 
@@ -839,16 +843,14 @@
             }
 
             let mapaFechas = {};
-            let ordenFechas = [];
             let mapaClientes = {};
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
-                // Fechas
+                // Formato de fecha para agrupar
                 let fecha = p.fecha || "SIN FECHA";
                 if(!mapaFechas[fecha]) {
                     mapaFechas[fecha] = 0;
-                    ordenFechas.push(fecha);
                 }
                 mapaFechas[fecha] += p.total;
 
@@ -861,27 +863,26 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // Renderizar tabla Venta Por Fecha (Reducido un 30% en tamaño de letra: text-xs)
-            contenedorFecha.innerHTML = `
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 text-[11px]">
-                            <th class="p-1.5 border">Fecha</th>
-                            <th class="p-1.5 border text-right">Total Venta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${ordenFechas.map(f => `
-                            <tr class="border-b hover:bg-gray-50 text-xs font-semibold">
-                                <td class="p-1.5 border text-gray-700">${f}</td>
-                                <td class="p-1.5 border text-right text-blue-900">L. ${mapaFechas[f].toFixed(2)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+            // Ordenar las fechas de la más actual a la más antigua analizando el string de fecha o manteniendo orden inverso
+            let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
+                // Intentar ordenar cronológicamente de más reciente a más antiguo
+                let dateA = new Date(a);
+                let dateB = new Date(b);
+                if(!isNaN(dateA) && !isNaN(dateB)) {
+                    return dateB - dateA;
+                }
+                return b.localeCompare(a);
+            });
 
-            // Renderizar tabla Venta Por Cliente (Reducido un 30% en tamaño de letra: text-xs)
+            // Renderizar listado de Venta Por Fecha exactamente como lo pediste: 06 Nov 2026 -------> 5,493
+            contenedorFecha.innerHTML = ordenFechas.map(f => `
+                <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
+                    <span class="text-gray-700">${f}</span>
+                    <span class="text-blue-900">-------> L. ${mapaFechas[f].toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+            `).join('');
+
+            // Renderizar tabla Venta Por Cliente
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
