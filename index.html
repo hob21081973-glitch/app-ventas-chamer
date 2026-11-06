@@ -84,7 +84,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Lista Productos</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
@@ -131,20 +131,22 @@
 
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Resumen Gral</h2>
+            <h2 class="text-xl font-bold text-gray-800">Resumen General</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
                     <div class="text-sm text-gray-500 font-medium">Venta General</div>
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0.00</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium">Venta Por Fecha (Hoy)</div>
-                    <div id="resumen-venta-fecha" class="text-2xl font-bold text-gray-800 mt-1">--/---/-- : L. 0.00</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
+                    <div class="overflow-x-auto">
+                        <div id="resumen-venta-fecha" class="text-xs text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
+                    </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente</div>
                     <div class="overflow-x-auto">
-                        <div id="resumen-venta-cliente" class="text-sm text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
+                        <div id="resumen-venta-cliente" class="text-xs text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
                     </div>
                 </div>
             </div>
@@ -165,7 +167,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Unidades</th>
+                                <th class="p-2 border text-right">Cantidad</th>
                                 <th class="p-2 border text-right">Valor (L.)</th>
                             </tr>
                         </thead>
@@ -207,7 +209,7 @@
                     </table>
                 </div>
                 <button onclick="exportarPdfGeneral()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Reporte General PDF
+                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Reporte General
                 </button>
             </div>
 
@@ -820,27 +822,37 @@
         }
 
         function renderResumenGeneral() {
-            // CORREGIDO: Combinamos tanto el historial como todos los reportes semanales para que la Venta General y Ventas por Cliente sumen TODO correctamente.
             let todosPedidos = [...historialPedidos];
             Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
 
             let ventaTotal = todosPedidos.reduce((acc, p) => acc + p.total, 0);
             document.getElementById('resumen-venta-general').innerText = `L. ${ventaTotal.toFixed(2)}`;
             
-            let fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
-            let ventaHoy = todosPedidos.filter(p => p.fecha === fechaHoy).reduce((acc, p) => acc + p.total, 0);
-            document.getElementById('resumen-venta-fecha').innerText = `${fechaHoy} : L. ${ventaHoy.toFixed(2)}`;
-            
+            // Agrupar ventas por Fecha en formato de tabla con texto reducido un 30% (text-xs)
+            const contenedorFecha = document.getElementById('resumen-venta-fecha');
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
+
             if(todosPedidos.length === 0) {
+                contenedorFecha.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
                 contenedorCliente.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
                 return;
             }
 
+            let mapaFechas = {};
+            let ordenFechas = [];
             let mapaClientes = {};
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
+                // Fechas
+                let fecha = p.fecha || "SIN FECHA";
+                if(!mapaFechas[fecha]) {
+                    mapaFechas[fecha] = 0;
+                    ordenFechas.push(fecha);
+                }
+                mapaFechas[fecha] += p.total;
+
+                // Clientes
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
                     mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
@@ -849,20 +861,40 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // Formato de filas y columnas (tabla) para Venta por Cliente
+            // Renderizar tabla Venta Por Fecha (Reducido un 30% en tamaño de letra: text-xs)
+            contenedorFecha.innerHTML = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 text-[11px]">
+                            <th class="p-1.5 border">Fecha</th>
+                            <th class="p-1.5 border text-right">Total Venta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${ordenFechas.map(f => `
+                            <tr class="border-b hover:bg-gray-50 text-xs font-semibold">
+                                <td class="p-1.5 border text-gray-700">${f}</td>
+                                <td class="p-1.5 border text-right text-blue-900">L. ${mapaFechas[f].toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // Renderizar tabla Venta Por Cliente (Reducido un 30% en tamaño de letra: text-xs)
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-100 text-gray-600 text-xs">
-                            <th class="p-2 border">Cliente</th>
-                            <th class="p-2 border text-right">Total Venta</th>
+                        <tr class="bg-gray-100 text-gray-600 text-[11px]">
+                            <th class="p-1.5 border">Cliente</th>
+                            <th class="p-1.5 border text-right">Total Venta</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${ordenClientes.map(cod => `
-                            <tr class="border-b hover:bg-gray-50 text-sm">
-                                <td class="p-2 border font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</td>
-                                <td class="p-2 border text-right font-bold text-blue-900">L. ${mapaClientes[cod].total.toFixed(2)}</td>
+                            <tr class="border-b hover:bg-gray-50 text-xs">
+                                <td class="p-1.5 border font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</td>
+                                <td class="p-1.5 border text-right font-bold text-blue-900">L. ${mapaClientes[cod].total.toFixed(2)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
