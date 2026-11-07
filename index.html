@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        <!-- 4. RESUMEN POR PRODUCTO (ACTIVO GLOBAL) -->
+        <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
@@ -763,7 +763,16 @@
                 }
                 editandoPedidoId = null;
             } else {
-                let nuevoId = String(historialPedidos.length + 1).padStart(3, '0');
+                // Generar ID numérico secuencial de 2 dígitos (ej: 01, 02, 03...)
+                let maxId = historialPedidos.reduce((max, p) => Math.max(max, parseInt(p.id) || 0), 0);
+                Object.values(reportesSemanales).forEach(arr => {
+                    arr.forEach(p => {
+                        maxId = Math.max(maxId, parseInt(p.id) || 0);
+                    });
+                });
+                let nuevoIdNum = maxId + 1;
+                let nuevoId = String(nuevoIdNum).padStart(2, '0');
+
                 let fechaHoyRaw = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 let fechaHoy = formatearFechaStandard(fechaHoyRaw);
                 let nuevoPedido = {
@@ -1066,11 +1075,9 @@
         }
 
         function renderResumenProducto() {
-            let todosPedidos = [...historialPedidos];
-            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
-
+            // Ranking de productos SOLO con los pedidos activos (historialPedidos)
             let mapaProductos = {};
-            todosPedidos.forEach(p => {
+            historialPedidos.forEach(p => {
                 p.items.forEach(item => {
                     if(!mapaProductos[item.codigo]) {
                         mapaProductos[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
@@ -1089,7 +1096,7 @@
 
             const tbody = document.getElementById('tabla-ranking-productos');
             if(rankingArray.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos activos</td></tr>`;
                 return;
             }
             tbody.innerHTML = rankingArray.map(r => `
@@ -1135,7 +1142,6 @@
             const semanasKeys = Object.keys(reportesSemanales);
             let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
 
-            // 1. Renderizar acordeones de Reportes Semanales
             if(semanasKeys.length === 0) {
                 contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>`;
             } else {
@@ -1187,7 +1193,6 @@
 
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
 
-            // 2. Reporte General de Ventas filtrado
             const tbodyGen = document.getElementById('tbody-reporte-general');
             if(pedidosParaReporte.length === 0) {
                 tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos para esta selección</td></tr>`;
@@ -1201,7 +1206,6 @@
                 `).join('');
             }
 
-            // 3. Reporte de Incidencias filtrado
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(pedidosParaReporte.length === 0) {
                 tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
@@ -1227,7 +1231,6 @@
                 `).join('');
             }
 
-            // 4. Reporte por Producto Filtrado por Semana
             const tbodyProdSem = document.getElementById('tbody-reporte-producto-semana');
             let mapaProdSem = {};
             pedidosParaReporte.forEach(p => {
@@ -1242,7 +1245,7 @@
             let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
 
             if(rankingProdSemArray.length === 0) {
-                tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta semana</td></tr>`;
+                tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta selección</td></tr>`;
             } else {
                 tbodyProdSem.innerHTML = rankingProdSemArray.map(r => `
                     <tr class="border-b hover:bg-gray-50">
