@@ -154,7 +154,7 @@
             <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
-                    <div class="text-sm text-gray-500 font-medium">Venta General</div>
+                    <div class="text-sm text-gray-500 font-medium">Venta General (Pedidos Activos)</div>
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
@@ -856,7 +856,7 @@
             renderResumenGeneral();
             renderResumenProducto();
             renderReportesExportacion();
-            alert(`¡Pedidos asignados correctamente a ${semanaInput} y movidos a Reporte Semanal!`);
+            alert(`¡Pedidos asignados correctamente a ${semanaInput} y movidos al Reporte Semanal!`);
         }
 
         function editarPedido(id) {
@@ -926,12 +926,14 @@
         }
 
         function renderResumenGeneral() {
+            // Venta General solo toma en cuenta los pedidos activos sin asignar semana
+            let ventaGeneralActiva = historialPedidos.reduce((acc, p) => acc + p.total, 0);
+            document.getElementById('resumen-venta-general').innerText = formatLempiras(ventaGeneralActiva);
+            
+            // Para las tablas de fecha y cliente se mantienen todos para desglose completo
             let todosPedidos = [...historialPedidos];
             Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
 
-            let ventaTotal = todosPedidos.reduce((acc, p) => acc + p.total, 0);
-            document.getElementById('resumen-venta-general').innerText = formatLempiras(ventaTotal);
-            
             const contenedorFecha = document.getElementById('resumen-venta-fecha');
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
 
@@ -976,19 +978,20 @@
                 </div>
             `).join('');
 
+            // Columna de Total Venta ampliada con mejor distribución de espacio
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-100 text-gray-600 text-[11px]">
-                            <th class="p-1.5 border">Cliente</th>
-                            <th class="p-1.5 border text-right">Total Venta</th>
+                            <th class="p-1.5 border w-3/5">Cliente</th>
+                            <th class="p-1.5 border text-right w-2/5">Total Venta</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${ordenClientes.map(cod => `
                             <tr class="border-b hover:bg-gray-50 text-xs">
                                 <td class="p-1.5 border font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</td>
-                                <td class="p-1.5 border text-right font-bold text-blue-900">${formatLempiras(mapaClientes[cod].total)}</td>
+                                <td class="p-1.5 border text-right font-bold text-blue-950 whitespace-nowrap">${formatLempiras(mapaClientes[cod].total)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
