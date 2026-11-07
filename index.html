@@ -172,10 +172,10 @@
             </div>
         </div>
 
-        <!-- 4. RESUMEN POR PRODUCTO -->
+        <!-- 4. RESUMEN POR PRODUCTO (ACTIVO GLOBAL) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
                 <div class="flex gap-2">
                     <button onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
                     <button onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
@@ -199,11 +199,22 @@
             </div>
         </div>
 
-        <!-- 5. EXPORTAR REPORTES A PDFS -->
+        <!-- 5. EXPORTAR REPORTES A PDFS CON SELECTOR DE SEMANA -->
         <div id="panel-exportar" class="tab-panel space-y-4">
-            <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Centro de Reportes y Exportación
+                </h2>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">Seleccionar Semana:</label>
+                    <select id="select-semana-exportar" onchange="actualizarReportesExportacionPorSemana()" class="uppercase-input p-2 border rounded-md text-sm font-bold text-blue-900 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-48">
+                        <option value="TODAS">TODAS LAS SEMANAS</option>
+                    </select>
+                </div>
+            </div>
             
-            <div class="bg-white p-4 rounded-lg shadow space-y-3 border-2 border-blue-900">
+            <!-- Reportes Semanales / Acumulados -->
+            <div class="bg-white p-4 rounded-lg shadow space-y-3 border">
                 <h3 class="text-base font-semibold text-blue-900 flex items-center gap-2">
                     <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
@@ -212,6 +223,7 @@
                 </div>
             </div>
 
+            <!-- Reporte General de Ventas -->
             <div class="bg-white rounded-lg shadow border overflow-hidden">
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
@@ -240,6 +252,7 @@
                 </div>
             </div>
 
+            <!-- Reporte General Por Cliente E Incidencias -->
             <div class="bg-white rounded-lg shadow border overflow-hidden">
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
@@ -265,6 +278,35 @@
                             </thead>
                             <tbody id="tbody-reporte-incidencias" class="text-xs">
                                 <tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte por Producto Filtrado por Semana -->
+            <div class="bg-white rounded-lg shadow border overflow-hidden">
+                <div onclick="toggleReporte('producto_semana')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
+                        Reporte por Producto (Según Semana Seleccionada)
+                    </span>
+                    <button onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+                <div id="body-producto_semana" class="hidden p-4 border-t bg-white space-y-3">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 text-xs">
+                                    <th class="p-2 border">Producto</th>
+                                    <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                    <th class="p-2 border text-right">Valor Total (L.)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-reporte-producto-semana" class="text-xs">
+                                <tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -423,7 +465,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             sincronizarGoogleSheets();
             
-            // Restaurar borrador en pantalla si existía
             if (pedidoActualCliente) {
                 document.getElementById('input-buscar-cliente').value = `[${pedidoActualCliente.codigo}] ${pedidoActualCliente.nombre}`;
             }
@@ -432,6 +473,7 @@
             renderHistorial();
             renderResumenGeneral();
             renderResumenProducto();
+            poblarSelectorSemanasExportar();
             renderReportesExportacion();
         });
 
@@ -740,7 +782,6 @@
 
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             
-            // Limpiar borrador temporal al guardar con éxito
             pedidoActualCliente = null;
             itemsPedidoActual = [];
             guardarBorrador();
@@ -750,6 +791,7 @@
             renderHistorial();
             renderResumenGeneral();
             renderResumenProducto();
+            poblarSelectorSemanasExportar();
             renderReportesExportacion();
             
             cambiarPestana('crear');
@@ -873,6 +915,7 @@
             renderHistorial();
             renderResumenGeneral();
             renderResumenProducto();
+            poblarSelectorSemanasExportar();
             renderReportesExportacion();
             alert(`¡Pedidos asignados correctamente a ${semanaInput} y movidos al Reporte Semanal!`);
         }
@@ -897,6 +940,7 @@
                 renderHistorial();
                 renderResumenGeneral();
                 renderResumenProducto();
+                poblarSelectorSemanasExportar();
                 renderReportesExportacion();
             }
         }
@@ -1057,14 +1101,47 @@
             `).join('');
         }
 
+        function poblarSelectorSemanasExportar() {
+            const select = document.getElementById('select-semana-exportar');
+            let valorActual = select.value;
+            let semanasKeys = Object.keys(reportesSemanales);
+            
+            select.innerHTML = `<option value="TODAS">TODAS LAS SEMANAS</option>` + 
+                semanasKeys.map(sem => `<option value="${sem}">${sem}</option>`).join('');
+            
+            if(semanasKeys.includes(valorActual) || valorActual === "TODAS") {
+                select.value = valorActual;
+            }
+        }
+
+        function actualizarReportesExportacionPorSemana() {
+            renderReportesExportacion();
+        }
+
+        function obtenerPedidosFiltradosExportar() {
+            let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
+            if(semanaSeleccionada === "TODAS") {
+                let todos = [...historialPedidos];
+                Object.values(reportesSemanales).forEach(arr => todos.push(...arr));
+                return todos;
+            } else {
+                return reportesSemanales[semanaSeleccionada] || [];
+            }
+        }
+
         function renderReportesExportacion() {
+            poblarSelectorSemanasExportar();
             const contSemanal = document.getElementById('contenedor-reporte-semanal');
             const semanasKeys = Object.keys(reportesSemanales);
+            let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
+
+            // 1. Renderizar acordeones de Reportes Semanales
             if(semanasKeys.length === 0) {
                 contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>`;
             } else {
-                contSemanal.innerHTML = semanasKeys.map(semana => {
-                    let pedidosSemana = reportesSemanales[semana];
+                let semanasFiltradas = semanaSeleccionada === "TODAS" ? semanasKeys : [semanaSeleccionada];
+                contSemanal.innerHTML = semanasFiltradas.map(semana => {
+                    let pedidosSemana = reportesSemanales[semana] || [];
                     let totalSemana = pedidosSemana.reduce((acc, p) => acc + p.total, 0);
                     let safeId = semana.replace(/[^a-zA-Z0-9]/g, '_');
                     return `
@@ -1092,7 +1169,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="text-xs">
-                                            ${pedidosSemana.map(p => `
+                                            ${pedidosSemana.length === 0 ? `<tr><td colspan="3" class="p-3 text-center text-gray-400">Sin pedidos en esta semana</td></tr>` : pedidosSemana.map(p => `
                                                 <tr class="border-b">
                                                     <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                                                     <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
@@ -1108,45 +1185,73 @@
                 }).join('');
             }
 
-            let todosPedidosParaReporte = [...historialPedidos];
-            Object.values(reportesSemanales).forEach(arr => todosPedidosParaReporte.push(...arr));
+            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
 
+            // 2. Reporte General de Ventas filtrado
             const tbodyGen = document.getElementById('tbody-reporte-general');
-            const tbodyInc = document.getElementById('tbody-reporte-incidencias');
-
-            if(todosPedidosParaReporte.length === 0) {
-                tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>`;
-                tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
-                return;
+            if(pedidosParaReporte.length === 0) {
+                tbodyGen.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos para esta selección</td></tr>`;
+            } else {
+                tbodyGen.innerHTML = pedidosParaReporte.map(p => `
+                    <tr class="border-b">
+                        <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                        <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                        <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
+                    </tr>
+                `).join('');
             }
 
-            tbodyGen.innerHTML = todosPedidosParaReporte.map(p => `
-                <tr class="border-b">
-                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                    <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
-                    <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
-                </tr>
-            `).join('');
+            // 3. Reporte de Incidencias filtrado
+            const tbodyInc = document.getElementById('tbody-reporte-incidencias');
+            if(pedidosParaReporte.length === 0) {
+                tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
+            } else {
+                let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                tbodyInc.innerHTML = pedidosAsc.map(p => `
+                    <tr class="border-b">
+                        <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                        <td class="p-2 border">${p.cliente.nombre}</td>
+                        <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
+                        <td class="p-2 border text-right">
+                            <input type="number" value="${Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
+                        </td>
+                        <td class="p-2 border">
+                            <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                        </td>
+                        <td class="p-2 border text-center text-lg">
+                            <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
+                                ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
 
-            let pedidosAsc = [...todosPedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
-            tbodyInc.innerHTML = pedidosAsc.map(p => `
-                <tr class="border-b">
-                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                    <td class="p-2 border">${p.cliente.nombre}</td>
-                    <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
-                    <td class="p-2 border text-right">
-                        <input type="number" value="${Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
-                    </td>
-                    <td class="p-2 border">
-                        <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
-                    </td>
-                    <td class="p-2 border text-center text-lg">
-                        <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
-                            ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
+            // 4. Reporte por Producto Filtrado por Semana
+            const tbodyProdSem = document.getElementById('tbody-reporte-producto-semana');
+            let mapaProdSem = {};
+            pedidosParaReporte.forEach(p => {
+                p.items.forEach(item => {
+                    if(!mapaProdSem[item.codigo]) {
+                        mapaProdSem[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
+                    }
+                    mapaProdSem[item.codigo].unidades += item.cantidad;
+                    mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
+                });
+            });
+            let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
+
+            if(rankingProdSemArray.length === 0) {
+                tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta semana</td></tr>`;
+            } else {
+                tbodyProdSem.innerHTML = rankingProdSemArray.map(r => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
+                        <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
+                        <td class="p-2 border text-right font-bold text-green-600">${formatLempiras(r.valor)}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function toggleReporte(id) {
@@ -1229,17 +1334,17 @@
         }
 
         function exportarPdfGeneral() {
-            let todosPedidos = [...historialPedidos];
-            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+            let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("Reporte General de Ventas – App Ventas Ch", 14, 20);
+            doc.text(`Reporte General de Ventas (${semanaSeleccionada})`, 14, 20);
 
-            let datosTabla = todosPedidos.map(p => [
+            let datosTabla = pedidosParaReporte.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 formatLempiras(p.total)
@@ -1258,20 +1363,20 @@
                 headStyles: { fillColor: [30, 64, 175] }
             });
 
-            doc.save("Reporte_General_Ventas.pdf");
+            doc.save(`Reporte_General_Ventas_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
         }
 
         function exportarPdfIncidencias() {
-            let todosPedidos = [...historialPedidos];
-            Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+            let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("Reporte General Por Cliente E Incidencias", 14, 20);
+            doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
 
-            let pedidosAsc = [...todosPedidos].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
             let datosTabla = pedidosAsc.map(p => [
                 p.numeroPedido,
                 p.cliente.nombre,
@@ -1295,7 +1400,51 @@
                 headStyles: { fillColor: [30, 64, 175] }
             });
 
-            doc.save("Reporte_Clientes_Incidencias.pdf");
+            doc.save(`Reporte_Clientes_Incidencias_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function exportarPdfProductoSemana() {
+            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+            let semanaSeleccionada = document.getElementById('select-semana-exportar').value;
+
+            let mapaProdSem = {};
+            pedidosParaReporte.forEach(p => {
+                p.items.forEach(item => {
+                    if(!mapaProdSem[item.codigo]) {
+                        mapaProdSem[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
+                    }
+                    mapaProdSem[item.codigo].unidades += item.cantidad;
+                    mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
+                });
+            });
+            let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text(`Reporte por Producto (${semanaSeleccionada})`, 14, 20);
+
+            let datosTabla = rankingProdSemArray.map(r => [
+                `[${r.codigo}] ${r.nombre}`,
+                r.unidades,
+                formatLempiras(r.valor)
+            ]);
+
+            doc.autoTable({
+                startY: 25,
+                head: [['Producto', 'Unidades', 'Valor Total']],
+                body: datosTabla,
+                columnStyles: {
+                    0: { cellWidth: 110 },
+                    1: { cellWidth: 35, halign: 'right' },
+                    2: { cellWidth: 45, halign: 'right' }
+                },
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [30, 64, 175] }
+            });
+
+            doc.save(`Reporte_Productos_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
         }
     </script>
 </body>
