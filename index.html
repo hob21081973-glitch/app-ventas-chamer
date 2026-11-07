@@ -123,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Controles de selección y rangos -->
                 <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-sm">
                     <div class="flex items-center gap-2">
                         <button onclick="seleccionarTodos(true)" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded font-semibold hover:bg-gray-300 text-xs">Seleccionar Todos</button>
@@ -160,14 +159,14 @@
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
-                    <div class="overflow-x-auto">
-                        <div id="resumen-venta-fecha" class="text-xs text-gray-800 max-h-48 overflow-y-auto space-y-1">Sin ventas registradas</div>
+                    <div class="overflow-y-auto max-h-96">
+                        <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
                     <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente (Más reciente a más antiguo)</div>
-                    <div class="overflow-x-auto">
-                        <div id="resumen-venta-cliente" class="text-xs text-gray-800 max-h-48 overflow-y-auto">Sin ventas registradas</div>
+                    <div class="overflow-y-auto max-h-96">
+                        <div id="resumen-venta-cliente" class="text-xs text-gray-800">Sin ventas registradas</div>
                     </div>
                 </div>
             </div>
@@ -338,9 +337,9 @@
     <!-- MODAL DETALLE ADICIONAL -->
     <div id="modal-detalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full space-y-4">
-            <h3 class="text-lg font-bold text-gray-800">Agregar Detalle</h3>
-            <p class="text-sm text-gray-600">Especifique el detalle:</p>
-            <input type="text" id="input-detalle-extra" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="detalle">
+            <h3 class="text-lg font-bold text-gray-800">Agregar Detalle Adicional</h3>
+            <p class="text-sm text-gray-600">Especifique color, talla u otro:</p>
+            <input type="text" id="input-detalle-extra" class="uppercase-input w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="EJ: TALLA L - COLOR ROJO">
             <div class="flex justify-end gap-2">
                 <button onclick="cerrarModalDetalle()" class="px-4 py-2 bg-gray-300 rounded font-semibold text-gray-700">Cancelar</button>
                 <button onclick="guardarDetalleExtra()" class="px-4 py-2 bg-blue-900 text-white rounded font-semibold hover:bg-blue-800">Guardar</button>
@@ -1031,36 +1030,42 @@
                 contSemanal.innerHTML = semanasKeys.map(semana => {
                     let pedidosSemana = reportesSemanales[semana];
                     let totalSemana = pedidosSemana.reduce((acc, p) => acc + p.total, 0);
+                    let safeId = semana.replace(/[^a-zA-Z0-9]/g, '_');
                     return `
-                        <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
-                            <div class="flex justify-between items-center border-b pb-2">
-                                <span class="font-bold text-blue-900 text-base">${semana} (${pedidosSemana.length} pedidos)</span>
+                        <div class="bg-gray-50 rounded-lg border overflow-hidden">
+                            <div onclick="toggleReporte('${safeId}')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                                <span class="font-bold text-blue-900 text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-${safeId}"></i>
+                                    ${semana} (${pedidosSemana.length} pedidos)
+                                </span>
                                 <div class="flex items-center gap-4">
                                     <span class="font-bold text-gray-800">Total: ${formatLempiras(totalSemana)}</span>
-                                    <button onclick="exportarPdfSemanal('${semana}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
-                                        <i class="fa-solid fa-file-pdf"></i> PDF ${semana}
+                                    <button onclick="event.stopPropagation(); exportarPdfSemanal('${semana}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                                        <i class="fa-solid fa-file-pdf"></i> PDF
                                     </button>
                                 </div>
                             </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse min-w-[500px]">
-                                    <thead>
-                                        <tr class="bg-gray-200 text-gray-700 text-xs">
-                                            <th class="p-2 border">Pedido No.</th>
-                                            <th class="p-2 border">Cliente</th>
-                                            <th class="p-2 border text-right">Valor Venta</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-xs">
-                                        ${pedidosSemana.map(p => `
-                                            <tr class="border-b">
-                                                <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                                                <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
-                                                <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
+                            <div id="body-${safeId}" class="hidden p-4 border-t bg-white space-y-3">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse min-w-[500px]">
+                                        <thead>
+                                            <tr class="bg-gray-200 text-gray-700 text-xs">
+                                                <th class="p-2 border">Pedido No.</th>
+                                                <th class="p-2 border">Cliente</th>
+                                                <th class="p-2 border text-right">Valor Venta</th>
                                             </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody class="text-xs">
+                                            ${pedidosSemana.map(p => `
+                                                <tr class="border-b">
+                                                    <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                                                    <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                                                    <td class="p-2 border text-right font-medium">${formatLempiras(p.total)}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -1106,6 +1111,18 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function toggleReporte(id) {
+            const body = document.getElementById('body-' + id);
+            const icon = document.getElementById('icon-' + id);
+            if(body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                icon.classList.add('rotate-90');
+            } else {
+                body.classList.add('hidden');
+                icon.classList.remove('rotate-90');
+            }
         }
 
         function actualizarValorEntrega(id, val) {
