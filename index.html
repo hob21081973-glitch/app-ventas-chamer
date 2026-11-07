@@ -200,61 +200,78 @@
         </div>
 
         <!-- 5. EXPORTAR REPORTES A PDFS -->
-        <div id="panel-exportar" class="tab-panel space-y-6">
+        <div id="panel-exportar" class="tab-panel space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Exportar Reportes A PDFs</h2>
             
-            <div class="bg-white p-6 rounded-lg shadow space-y-4 border-2 border-blue-900">
-                <h3 class="text-lg font-semibold text-blue-900 flex items-center gap-2">
+            <!-- Reportes Semanales -->
+            <div class="bg-white p-4 rounded-lg shadow space-y-3 border-2 border-blue-900">
+                <h3 class="text-base font-semibold text-blue-900 flex items-center gap-2">
                     <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
-                <div id="contenedor-reporte-semanal" class="space-y-4">
+                <div id="contenedor-reporte-semanal" class="space-y-3">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">Reporte General de Ventas – App Ventas Ch</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Pedido No.</th>
-                                <th class="p-2 border">Nombre Cliente</th>
-                                <th class="p-2 border text-right">Valor Venta</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-reporte-general" class="text-sm">
-                            <tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>
-                        </tbody>
-                    </table>
+            <!-- Reporte General de Ventas -->
+            <div class="bg-white rounded-lg shadow border overflow-hidden">
+                <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
+                        Reporte General de Ventas – App Ventas Ch
+                    </span>
+                    <button onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-pdf"></i> PDF
+                    </button>
                 </div>
-                <button onclick="exportarPdfGeneral()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Reporte General
-                </button>
+                <div id="body-general_ventas" class="hidden p-4 border-t bg-white space-y-3">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 text-xs">
+                                    <th class="p-2 border">Pedido No.</th>
+                                    <th class="p-2 border">Nombre Cliente</th>
+                                    <th class="p-2 border text-right">Valor Venta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-reporte-general" class="text-xs">
+                                <tr><td colspan="3" class="p-4 text-center text-gray-400">No hay pedidos recientes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">Reporte General Por Cliente E Incidencias</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[800px]">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Pedido No.</th>
-                                <th class="p-2 border">Nombre Cliente</th>
-                                <th class="p-2 border text-right">Valor Venta</th>
-                                <th class="p-2 border text-right">Valor Entrega</th>
-                                <th class="p-2 border">Comentario / Incidencia</th>
-                                <th class="p-2 border text-center">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-reporte-incidencias" class="text-sm">
-                            <tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
-                        </tbody>
-                    </table>
+            <!-- Reporte General Por Cliente E Incidencias -->
+            <div class="bg-white rounded-lg shadow border overflow-hidden">
+                <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
+                        Reporte General Por Cliente E Incidencias
+                    </span>
+                    <button onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-pdf"></i> PDF
+                    </button>
                 </div>
-                <button onclick="exportarPdfIncidencias()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Generar PDF Incidencias y Entregas
-                </button>
+                <div id="body-incidencias" class="hidden p-4 border-t bg-white space-y-3">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 text-xs">
+                                    <th class="p-2 border">Pedido No.</th>
+                                    <th class="p-2 border">Nombre Cliente</th>
+                                    <th class="p-2 border text-right">Valor Venta</th>
+                                    <th class="p-2 border text-right">Valor Entrega</th>
+                                    <th class="p-2 border">Comentario / Incidencia</th>
+                                    <th class="p-2 border text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-reporte-incidencias" class="text-xs">
+                                <tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1033,19 +1050,19 @@
                     let safeId = semana.replace(/[^a-zA-Z0-9]/g, '_');
                     return `
                         <div class="bg-gray-50 rounded-lg border overflow-hidden">
-                            <div onclick="toggleReporte('${safeId}')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-100 transition-colors">
-                                <span class="font-bold text-blue-900 text-base flex items-center gap-2">
+                            <div onclick="toggleReporte('${safeId}')" class="flex justify-between items-center p-3 cursor-pointer hover:bg-gray-100 transition-colors">
+                                <span class="font-bold text-blue-900 text-sm flex items-center gap-2">
                                     <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-${safeId}"></i>
                                     ${semana} (${pedidosSemana.length} pedidos)
                                 </span>
-                                <div class="flex items-center gap-4">
-                                    <span class="font-bold text-gray-800">Total: ${formatLempiras(totalSemana)}</span>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-gray-800 text-xs">Total: ${formatLempiras(totalSemana)}</span>
                                     <button onclick="event.stopPropagation(); exportarPdfSemanal('${semana}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                                         <i class="fa-solid fa-file-pdf"></i> PDF
                                     </button>
                                 </div>
                             </div>
-                            <div id="body-${safeId}" class="hidden p-4 border-t bg-white space-y-3">
+                            <div id="body-${safeId}" class="hidden p-3 border-t bg-white space-y-3">
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left border-collapse min-w-[500px]">
                                         <thead>
