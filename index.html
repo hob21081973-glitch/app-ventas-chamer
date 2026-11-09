@@ -420,6 +420,21 @@
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
 
+        // Reorganiza los pedidos existentes de 2 dígitos (01, 02... 09)
+        function corregirNumeracionExistente() {
+            if (historialPedidos.length === 0) return;
+
+            let pedidosOrdenados = [...historialPedidos].reverse();
+            pedidosOrdenados.forEach((p, idx) => {
+                let numSecuencial = (idx + 1).toString().padStart(2, '0');
+                p.id = numSecuencial;
+                p.numeroPedido = `Pedido #${numSecuencial}`;
+            });
+
+            historialPedidos = pedidosOrdenados.reverse();
+            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+        }
+
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
             localStorage.setItem('app_ventas_ch_borrador_items', JSON.stringify(itemsPedidoActual));
@@ -463,6 +478,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            corregirNumeracionExistente();
             sincronizarGoogleSheets();
             
             if (pedidoActualCliente) {
@@ -763,13 +779,15 @@
                 }
                 editandoPedidoId = null;
             } else {
-                // Generar ID numérico secuencial de 2 dígitos (ej: 01, 02, 03...)
-                let maxId = historialPedidos.reduce((max, p) => Math.max(max, parseInt(p.id) || 0), 0);
-                Object.values(reportesSemanales).forEach(arr => {
-                    arr.forEach(p => {
-                        maxId = Math.max(maxId, parseInt(p.id) || 0);
-                    });
+                // Genera el ID correlativo secuencial directo de los pedidos activos
+                let maxId = 0;
+                historialPedidos.forEach(p => {
+                    let idNum = parseInt(p.id, 10);
+                    if (!isNaN(idNum) && idNum > maxId) {
+                        maxId = idNum;
+                    }
                 });
+
                 let nuevoIdNum = maxId + 1;
                 let nuevoId = String(nuevoIdNum).padStart(2, '0');
 
@@ -868,14 +886,14 @@
         }
 
         function seleccionarRangoPedidos() {
-            let min = parseInt(document.getElementById('rango-min').value);
-            let max = parseInt(document.getElementById('rango-max').value);
+            let min = parseInt(document.getElementById('rango-min').value, 10);
+            let max = parseInt(document.getElementById('rango-max').value, 10);
             if(isNaN(min) || isNaN(max)) {
                 alert("Por favor ingrese un rango válido de números de pedido.");
                 return;
             }
             document.querySelectorAll('.check-pedido').forEach(cb => {
-                let numId = parseInt(cb.value);
+                let numId = parseInt(cb.value, 10);
                 cb.checked = (numId >= min && numId <= max);
             });
         }
@@ -1075,7 +1093,6 @@
         }
 
         function renderResumenProducto() {
-            // Ranking de productos SOLO con los pedidos activos (historialPedidos)
             let mapaProductos = {};
             historialPedidos.forEach(p => {
                 p.items.forEach(item => {
@@ -1210,7 +1227,7 @@
             if(pedidosParaReporte.length === 0) {
                 tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos para gestionar entregas</td></tr>`;
             } else {
-                let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
                 tbodyInc.innerHTML = pedidosAsc.map(p => `
                     <tr class="border-b">
                         <td class="p-2 border font-semibold">${p.numeroPedido}</td>
@@ -1379,7 +1396,7 @@
             doc.setFontSize(14);
             doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
 
-            let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            let pedidosAsc = [...pedidosParaReporte].sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
             let datosTabla = pedidosAsc.map(p => [
                 p.numeroPedido,
                 p.cliente.nombre,
