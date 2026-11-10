@@ -93,7 +93,7 @@
                                 <th class="p-2 border">Cant.</th>
                                 <th class="p-2 border">P. Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
-                                <th class="p-2 border text-center">Opciones</th>
+                                <th class="p-2 border text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-pedido-detalle" class="text-sm">
@@ -486,7 +486,8 @@
             if(panelActivo) panelActivo.classList.add('active');
             
             document.querySelectorAll('.nav-btn').forEach(b => {
-                if(b.getAttribute('onclick') && b.getAttribute('onclick'].includes(id)) {
+                const onclickAttr = b.getAttribute('onclick') || '';
+                if(onclickAttr.includes("'" + id + "'") || onclickAttr.includes('"' + id + '"')) {
                     b.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
                     b.classList.remove('text-gray-600', 'font-medium');
                 }
@@ -535,7 +536,6 @@
             return result;
         }
 
-        // Sincronización con respaldo offline automático
         async function sincronizarGoogleSheets() {
             const statusEl = document.getElementById('sync-status');
             
@@ -553,7 +553,6 @@
                 const resP = await fetch(URL_PRODUCTOS);
                 const textP = await resP.text();
 
-                // Guardar respaldo local por si se corta la red después
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
 
