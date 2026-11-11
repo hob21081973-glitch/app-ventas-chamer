@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -84,12 +84,12 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
+                                <th class="p-2 border">Código & Producto/Detalle</th>
                                 <th class="p-2 border">Cantidad</th>
                                 <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
@@ -484,7 +484,6 @@
             return f;
         }
 
-        // ASEGURAR QUE LA FUNCIÓN ESTÉ DISPONIBLE GLOBALMENTE EN WINDOW
         window.cambiarPestana = function(id) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -871,7 +870,7 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-2 border cursor-pointer hover:bg-blue-50 transition-colors whitespace-nowrap" onclick="abrirModalDetalle(${idx})" title="Toca para agregar/editar detalle">
                             <div><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</div>
-                            ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-8 mt-0.5">${item.detalleExtra}</div>` : '<div class="text-xs text-gray-400 italic pl-8 mt-0.5">+ Toca para agregar detalle</div>'}
+                            ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-8 mt-0.5">${item.detalleExtra}</div>` : '<div class="text-xs text-gray-400 italic pl-8 mt-0.5">agregar detalle</div>'}
                         </td>
                         <td class="p-2 border font-bold text-blue-900 cursor-pointer hover:underline whitespace-nowrap" onclick="abrirEditarCantidad(${idx})" title="Click para editar cantidad">
                             ${item.cantidad}
@@ -988,13 +987,14 @@
                 return;
             }
 
-            let pedidosOrdenadosAsc = [...historialPedidos].sort((a, b) => {
+            // ORDEN VISUAL EN HISTORIAL: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
+            let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
+                return numB - numA;
             });
 
-            contenedor.innerHTML = pedidosOrdenadosAsc.map(p => `
+            contenedor.innerHTML = pedidosOrdenadosDesc.map(p => `
                 <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900 flex items-start gap-3">
                     <input type="checkbox" value="${p.id}" class="check-pedido mt-1.5 w-5 h-5 accent-blue-900 cursor-pointer" title="Seleccionar pedido">
                     <div class="flex-grow space-y-3">
@@ -1224,13 +1224,14 @@
                 mapaClientes[cod].total += p.total;
             });
 
+            // ORDEN VISUAL EN RESUMEN DE FECHAS: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
                 let dateA = new Date(a);
                 let dateB = new Date(b);
                 if(!isNaN(dateA) && !isNaN(dateB)) {
-                    return dateA - dateB;
+                    return dateB - dateA;
                 }
-                return a.localeCompare(b);
+                return b.localeCompare(a);
             });
 
             contenedorFecha.innerHTML = ordenFechas.map(f => `
@@ -1329,10 +1330,11 @@
                 listaPedidos = reportesSemanales[semanaSeleccionada] || [];
             }
             
+            // ORDEN VISUAL EN REPORTES: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             return listaPedidos.sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
+                return numB - numA;
             });
         }
 
@@ -1352,7 +1354,7 @@
                         let pedidosSemana = [...(reportesSemanales[semana] || [])].sort((a, b) => {
                             let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                             let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                            return numA - numB;
+                            return numB - numA;
                         });
                         let totalSemana = pedidosSemana.reduce((acc, p) => acc + p.total, 0);
                         let safeId = semana.replace(/[^a-zA-Z0-9]/g, '_');
@@ -1509,7 +1511,7 @@
             let pedidosOrdenados = [...pedidosSemana].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
+                return numB - numA;
             });
 
             const { jsPDF } = window.jspdf;
