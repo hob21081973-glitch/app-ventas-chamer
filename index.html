@@ -9,8 +9,8 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- jsPDF & jsPDF AutoTable Plugin -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
     <style>
         .uppercase-input { text-transform: uppercase; }
         .tab-panel { display: none; }
@@ -26,7 +26,7 @@
                 <i class="fa-solid fa-store"></i> App Ventas Ch
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
-                <i class="fa-solid fa-cloud"></i> Google Sheets Conectado
+                <i class="fa-solid fa-cloud"></i> Verificando conexión...
             </div>
         </div>
     </header>
@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -84,12 +84,12 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos Agregados</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto / Detalle</th>
+                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
                                 <th class="p-2 border">Cantidad</th>
                                 <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
@@ -97,7 +97,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-pedido-detalle" class="text-sm">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos en pedido</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -405,6 +405,14 @@
 
     <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado correctamente'))
+                    .catch(err => console.log('Fallo al registrar Service Worker:', err));
+            });
+        }
+
         const URL_CLIENTES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=0&single=true&output=csv';
         const URL_PRODUCTOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=1903712481&single=true&output=csv';
 
@@ -420,26 +428,36 @@
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
 
-        // Limpia y normaliza IDs a 2 dígitos eliminando valores ruidosos (ej. de semanas)
+        // Función de limpieza estricta y reasignación correlativa para evitar saltos anómalos
         function corregirNumerosPedidosExistentes() {
             let modificado = false;
 
-            function procesarPedido(p) {
-                if (!p.id) return;
-                let numClean = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
-                // Si el número era mayor a 30 por error de lectura previa, lo ajustamos al correlativo real si aplica
-                if (numClean > 0 && numClean < 100) {
-                    let idFormat = String(numClean).padStart(2, '0');
-                    if (p.id !== idFormat || p.numeroPedido !== `Pedido #${idFormat}`) {
-                        p.id = idFormat;
-                        p.numeroPedido = `Pedido #${idFormat}`;
-                        modificado = true;
-                    }
-                }
-            }
+            // Recolectar todos los pedidos de historial y reportes semanales en una sola lista temporal con sus referencias
+            let todosLosPedidos = [...historialPedidos];
+            Object.keys(reportesSemanales).forEach(sem => {
+                todosLosPedidos.push(...reportesSemanales[sem]);
+            });
 
-            historialPedidos.forEach(procesarPedido);
-            Object.values(reportesSemanales).forEach(arr => arr.forEach(procesarPedido));
+            // Ordenar por el número de ID actual o limpiando etiquetas
+            todosLosPedidos.sort((a, b) => {
+                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
+                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
+                return numA - numB;
+            });
+
+            // Reasignar de manera estrictamente correlativa del 1 en adelante si hay anomalías mayores a 99
+            let contadorCorrelativo = 1;
+            todosLosPedidos.forEach(p => {
+                let numActual = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
+                // Si el número es excesivamente alto (ej: por leer una semana o un error previo > 30), lo reasignamos secuencialmente
+                if (numActual > 30 || numActual <= 0) {
+                    let idFormat = String(contadorCorrelativo).padStart(2, '0');
+                    p.id = idFormat;
+                    p.numeroPedido = `Pedido #${idFormat}`;
+                    modificado = true;
+                }
+                contadorCorrelativo++;
+            });
 
             if (modificado) {
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
@@ -482,7 +500,8 @@
             if(panelActivo) panelActivo.classList.add('active');
             
             document.querySelectorAll('.nav-btn').forEach(b => {
-                if(b.getAttribute('onclick') && b.getAttribute('onclick').includes(id)) {
+                const onclickAttr = b.getAttribute('onclick') || '';
+                if(onclickAttr.includes("'" + id + "'") || onclickAttr.includes('"' + id + '"')) {
                     b.classList.add('border-b-2', 'border-blue-900', 'text-blue-900', 'font-bold');
                     b.classList.remove('text-gray-600', 'font-medium');
                 }
@@ -533,68 +552,65 @@
 
         async function sincronizarGoogleSheets() {
             const statusEl = document.getElementById('sync-status');
+            
+            if (!navigator.onLine) {
+                statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Sin conexión (Modo Local)';
+                cargarDatosDesdeRespaldoLocal();
+                return;
+            }
+
             statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
             try {
                 const resC = await fetch(URL_CLIENTES);
                 const textC = await resC.text();
-                const rowsC = parseCSV(textC);
-                listaClientes = [];
-                for(let i=1; i<rowsC.length; i++) {
-                    if(rowsC[i].length >= 2 && rowsC[i][0]) {
-                        listaClientes.push({ codigo: rowsC[i][0], nombre: rowsC[i][1] });
-                    }
-                }
-
+                
                 const resP = await fetch(URL_PRODUCTOS);
                 const textP = await resP.text();
-                const rowsP = parseCSV(textP);
-                listaProductos = [];
-                for(let i=1; i<rowsP.length; i++) {
-                    if(rowsP[i].length >= 3 && rowsP[i][0]) {
-                        listaProductos.push({ 
-                            codigo: rowsP[i][0], 
-                            nombre: rowsP[i][1], 
-                            precio: parseFloat(rowsP[i][2].replace(/[^0-9.]/g, '')) || 0 
-                        });
-                    }
-                }
 
+                localStorage.setItem('respaldo_csv_clientes', textC);
+                localStorage.setItem('respaldo_csv_productos', textP);
+
+                procesarDatosCSV(textC, textP);
                 statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
-                renderGestionClientes();
-                renderGestionProductos();
             } catch (error) {
-                console.error("Error sincronizando:", error);
-                statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Error de conexión';
+                console.warn("Fallo de red, usando respaldo local...", error);
+                statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Usando datos locales';
+                cargarDatosDesdeRespaldoLocal();
             }
         }
 
-        function renderGestionClientes() {
-            const tbody = document.getElementById('tabla-gestion-clientes');
-            if(listaClientes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-gray-400">No hay clientes sincronizados</td></tr>`;
-                return;
+        function cargarDatosDesdeRespaldoLocal() {
+            const textC = localStorage.getItem('respaldo_csv_clientes');
+            const textP = localStorage.getItem('respaldo_csv_productos');
+            if (textC && textP) {
+                procesarDatosCSV(textC, textP);
+            } else {
+                alert("No hay internet y no se encontró un respaldo previo en este navegador.");
             }
-            tbody.innerHTML = listaClientes.map(c => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2 border font-semibold text-blue-900">[${c.codigo}]</td>
-                    <td class="p-2 border">${c.nombre}</td>
-                </tr>
-            `).join('');
         }
 
-        function renderGestionProductos() {
-            const tbody = document.getElementById('tabla-gestion-productos');
-            if(listaProductos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No hay productos sincronizados</td></tr>`;
-                return;
+        function procesarDatosCSV(textC, textP) {
+            const rowsC = parseCSV(textC);
+            listaClientes = [];
+            for(let i=1; i<rowsC.length; i++) {
+                if(rowsC[i].length >= 2 && rowsC[i][0]) {
+                    listaClientes.push({ codigo: rowsC[i][0], nombre: rowsC[i][1] });
+                }
             }
-            tbody.innerHTML = listaProductos.map(p => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2 border font-semibold text-blue-600">[${p.codigo}]</td>
-                    <td class="p-2 border">${p.nombre}</td>
-                    <td class="p-2 border text-right font-medium">${formatLempiras(p.precio)}</td>
-                </tr>
-            `).join('');
+
+            const rowsP = parseCSV(textP);
+            listaProductos = [];
+            for(let i=1; i<rowsP.length; i++) {
+                if(rowsP[i].length >= 3 && rowsP[i][0]) {
+                    listaProductos.push({ 
+                        codigo: rowsP[i][0], 
+                        nombre: rowsP[i][1], 
+                        precio: parseFloat(rowsP[i][2].replace(/[^0-9.]/g, '')) || 0 
+                    });
+                }
+            }
+            renderGestionClientes();
+            renderGestionProductos();
         }
 
         function filtrarClientes() {
@@ -791,9 +807,12 @@
                 }
                 editandoPedidoId = null;
             } else {
-                // Cálculo estricto del ID correlativo más alto extraído exclusivamente del número del pedido
+                // Búsqueda segura del siguiente número estricto (ignorando números de semanas o valores altos desproporcionados)
                 let maxId = 0;
-                let obtenerNumStrict = (idStr) => parseInt(String(idStr).replace(/[^0-9]/g, '')) || 0;
+                let obtenerNumStrict = (idStr) => {
+                    let n = parseInt(String(idStr).replace(/[^0-9]/g, '')) || 0;
+                    return (n > 0 && n < 100) ? n : 0; // Solo considera IDs válidos menores a 100 para evitar saltos por nombres de semanas
+                };
 
                 historialPedidos.forEach(p => {
                     let num = obtenerNumStrict(p.id);
@@ -1111,7 +1130,6 @@
         }
 
         function renderResumenProducto() {
-            // Ranking de productos SOLO con los pedidos activos (historialPedidos)
             let mapaProductos = {};
             historialPedidos.forEach(p => {
                 p.items.forEach(item => {
