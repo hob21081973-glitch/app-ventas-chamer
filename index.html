@@ -384,7 +384,7 @@
                 <button onclick="tecladoPress('9')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">9</button>
                 <button onclick="tecladoPress('C')" class="bg-red-100 py-3 text-xl font-bold rounded text-red-600 hover:bg-red-200">C</button>
                 <button onclick="tecladoPress('0')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">0</button>
-                <button onclick="tecladoOk()" class="bg-green-600 py-3 text-xl font-bold rounded text-white hover:bg-green-700">OK</button>
+                <button onclick="tecladoOk(event)" class="bg-green-600 py-3 text-xl font-bold rounded text-white hover:bg-green-700">OK</button>
             </div>
             <button onclick="cerrarTeclado()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
         </div>
@@ -669,7 +669,11 @@
             document.getElementById('modal-teclado').classList.add('hidden');
         }
 
-        function tecladoOk() {
+        function tecladoOk(event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
             const cantidad = parseInt(numeroCantidadActual) || 1;
             cerrarTeclado();
             if(indiceItemEditandoCantidad !== null) {
@@ -772,12 +776,12 @@
                 let maxId = 0;
                 historialPedidos.forEach(p => {
                     let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
-                    if (num > maxId && num < 100) maxId = num; // Ignora números extraños y busca el correlativo real menor a 100
+                    if (num > maxId && num < 1000) maxId = num;
                 });
                 Object.values(reportesSemanales).forEach(arr => {
                     arr.forEach(p => {
                         let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
-                        if (num > maxId && num < 100) maxId = num;
+                        if (num > maxId && num < 1000) maxId = num;
                     });
                 });
 
@@ -830,7 +834,7 @@
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
-                                <button onclick="cambiarNumeroPedido('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border" title="Editar número de pedido"><i class="fa-solid fa-pen"></i> Editar No.</button>
+                                <button onclick="cambiarNumeroPedido('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border flex items-center gap-1" title="Editar número de pedido"><i class="fa-solid fa-pen"></i> Editar No.</button>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
@@ -865,11 +869,11 @@
             `).join('');
         }
 
-        // Nueva función para editar manualmente el número/correlativo del pedido
         function cambiarNumeroPedido(id) {
             let p = historialPedidos.find(item => item.id === id);
             if(!p) return;
-            let nuevoNum = prompt("Ingrese el nuevo número de pedido (Ej: 10, 11...):", parseInt(p.id) || "");
+            let actualNum = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 1;
+            let nuevoNum = prompt("Ingrese el nuevo número de pedido:", actualNum);
             if(nuevoNum !== null && nuevoNum.trim() !== "") {
                 let numClean = parseInt(nuevoNum.replace(/[^0-9]/g, '')) || 1;
                 let idFormat = String(numClean).padStart(2, '0');
@@ -877,6 +881,10 @@
                 p.numeroPedido = `Pedido #${idFormat}`;
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
                 renderHistorial();
+                renderResumenGeneral();
+                renderResumenProducto();
+                poblarSelectorSemanasExportar();
+                renderReportesExportacion();
             }
         }
 
