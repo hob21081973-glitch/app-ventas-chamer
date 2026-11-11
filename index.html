@@ -84,7 +84,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
@@ -846,16 +846,15 @@
                 }
                 editandoPedidoId = null;
             } else {
-                // CORRECCIÓN: Buscar el número más alto exacto considerando TODOS los pedidos (historial y reportes semanales)
                 let maxId = 0;
                 
-                // Recorrer historial actual
+                // Recorrer historial actual (ignorando IDs mayores a 1000 para evitar desajustes)
                 historialPedidos.forEach(p => {
                     let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
                     if (num > maxId && num < 1000) maxId = num;
                 });
 
-                // Recorrer reportes semanales guardados
+                // Recorrer reportes semanales
                 Object.values(reportesSemanales).forEach(arr => {
                     arr.forEach(p => {
                         let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
@@ -906,10 +905,11 @@
                 return;
             }
 
+            // ORDEN CORREGIDO: Del más reciente al más antiguo (Mayor número arriba, menor número abajo)
             let pedidosOrdenados = [...historialPedidos].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
+                return numB - numA;
             });
 
             contenedor.innerHTML = pedidosOrdenados.map(p => `
