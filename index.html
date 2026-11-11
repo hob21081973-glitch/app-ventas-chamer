@@ -84,7 +84,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
@@ -390,7 +390,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDITAR NÚMERO DE PEDIDO (NUEVO PARA EVITAR PROBLEMAS DE TECLADO) -->
+    <!-- MODAL EDITAR NÚMERO DE PEDIDO -->
     <div id="modal-editar-numero" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
             <h3 class="text-lg font-bold text-gray-800 text-center">Editar No. de Pedido</h3>
@@ -451,7 +451,6 @@
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
         
-        // Variables para editar número de pedido con teclado en pantalla
         let pedidoIdEditandoNumero = null;
         let numeroPedidoTemporalInput = "";
 
@@ -722,7 +721,6 @@
             guardarBorrador();
         }
 
-        // FUNCIONES PARA EL TECLADO NUMÉRICO DEL NÚMERO DE PEDIDO
         function abrirModalNumeroPedido(id) {
             let p = historialPedidos.find(item => item.id === id);
             if(!p) return;
@@ -848,11 +846,16 @@
                 }
                 editandoPedidoId = null;
             } else {
+                // CORRECCIÓN: Buscar el número más alto exacto considerando TODOS los pedidos (historial y reportes semanales)
                 let maxId = 0;
+                
+                // Recorrer historial actual
                 historialPedidos.forEach(p => {
                     let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
                     if (num > maxId && num < 1000) maxId = num;
                 });
+
+                // Recorrer reportes semanales guardados
                 Object.values(reportesSemanales).forEach(arr => {
                     arr.forEach(p => {
                         let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
@@ -902,7 +905,14 @@
                 contenedor.innerHTML = `<div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
                 return;
             }
-            contenedor.innerHTML = historialPedidos.map(p => `
+
+            let pedidosOrdenados = [...historialPedidos].sort((a, b) => {
+                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
+                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
+                return numA - numB;
+            });
+
+            contenedor.innerHTML = pedidosOrdenados.map(p => `
                 <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900 flex items-start gap-3">
                     <input type="checkbox" value="${p.id}" class="check-pedido mt-1.5 w-5 h-5 accent-blue-900 cursor-pointer" title="Seleccionar pedido">
                     <div class="flex-grow space-y-3">
