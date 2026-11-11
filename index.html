@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas</title>
+    <title>App Ventas Ch</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -23,7 +23,7 @@
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-store"></i> App Ventas
+                <i class="fa-solid fa-store"></i> App Ventas Ch
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
                 <i class="fa-solid fa-cloud"></i> Verificando conexión...
@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -84,14 +84,14 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto/Detalle</th>
-                                <th class="p-2 border">Cant.</th>
-                                <th class="p-2 border">P. Unit.</th>
+                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
+                                <th class="p-2 border">Cantidad</th>
+                                <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
                                 <th class="p-2 border text-center">Acciones</th>
                             </tr>
@@ -228,7 +228,7 @@
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
-                        Reporte General de Ventas – App Ventas
+                        Reporte General de Ventas – App Ventas Ch
                     </span>
                     <button onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -367,7 +367,7 @@
 
     </main>
 
-    <!-- MODAL TECLADO NUMÉRICO -->
+    <!-- MODAL TECLADO NUMÉRICO CANTIDAD -->
     <div id="modal-teclado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
             <h3 class="text-lg font-bold text-gray-800 text-center">Digite la Cantidad</h3>
@@ -387,6 +387,29 @@
                 <button onclick="tecladoOk(event)" class="bg-green-600 py-3 text-xl font-bold rounded text-white hover:bg-green-700">OK</button>
             </div>
             <button onclick="cerrarTeclado()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR NÚMERO DE PEDIDO (NUEVO PARA EVITAR PROBLEMAS DE TECLADO) -->
+    <div id="modal-editar-numero" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
+            <h3 class="text-lg font-bold text-gray-800 text-center">Editar No. de Pedido</h3>
+            <div id="display-numero-pedido" class="text-3xl font-bold text-center bg-gray-100 p-3 rounded-md border min-h-[55px] text-blue-900">0</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="tecladoNumeroPress('1')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">1</button>
+                <button onclick="tecladoNumeroPress('2')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">2</button>
+                <button onclick="tecladoNumeroPress('3')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">3</button>
+                <button onclick="tecladoNumeroPress('4')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">4</button>
+                <button onclick="tecladoNumeroPress('5')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">5</button>
+                <button onclick="tecladoNumeroPress('6')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">6</button>
+                <button onclick="tecladoNumeroPress('7')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">7</button>
+                <button onclick="tecladoNumeroPress('8')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">8</button>
+                <button onclick="tecladoNumeroPress('9')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">9</button>
+                <button onclick="tecladoNumeroPress('C')" class="bg-red-100 py-3 text-xl font-bold rounded text-red-600 hover:bg-red-200">C</button>
+                <button onclick="tecladoNumeroPress('0')" class="bg-gray-200 py-3 text-xl font-bold rounded hover:bg-gray-300">0</button>
+                <button onclick="tecladoNumeroOk(event)" class="bg-green-600 py-3 text-xl font-bold rounded text-white hover:bg-green-700">OK</button>
+            </div>
+            <button onclick="cerrarModalNumero()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
         </div>
     </div>
 
@@ -427,6 +450,10 @@
         let numeroCantidadActual = "";
         let editandoPedidoId = null;
         let indiceItemEditandoCantidad = null;
+        
+        // Variables para editar número de pedido con teclado en pantalla
+        let pedidoIdEditandoNumero = null;
+        let numeroPedidoTemporalInput = "";
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -695,6 +722,54 @@
             guardarBorrador();
         }
 
+        // FUNCIONES PARA EL TECLADO NUMÉRICO DEL NÚMERO DE PEDIDO
+        function abrirModalNumeroPedido(id) {
+            let p = historialPedidos.find(item => item.id === id);
+            if(!p) return;
+            pedidoIdEditandoNumero = id;
+            numeroPedidoTemporalInput = String(parseInt(String(p.id).replace(/[^0-9]/g, '')) || 1);
+            document.getElementById('display-numero-pedido').innerText = numeroPedidoTemporalInput;
+            document.getElementById('modal-editar-numero').classList.remove('hidden');
+        }
+
+        function tecladoNumeroPress(val) {
+            if(val === 'C') {
+                numeroPedidoTemporalInput = "";
+                document.getElementById('display-numero-pedido').innerText = "0";
+            } else {
+                numeroPedidoTemporalInput += val;
+                document.getElementById('display-numero-pedido').innerText = numeroPedidoTemporalInput;
+            }
+        }
+
+        function cerrarModalNumero() {
+            document.getElementById('modal-editar-numero').classList.add('hidden');
+            pedidoIdEditandoNumero = null;
+        }
+
+        function tecladoNumeroOk(event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            if(pedidoIdEditandoNumero !== null && numeroPedidoTemporalInput.trim() !== "") {
+                let p = historialPedidos.find(item => item.id === pedidoIdEditandoNumero);
+                if(p) {
+                    let numClean = parseInt(numeroPedidoTemporalInput.replace(/[^0-9]/g, '')) || 1;
+                    let idFormat = String(numClean).padStart(2, '0');
+                    p.id = idFormat;
+                    p.numeroPedido = `Pedido #${idFormat}`;
+                    localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                    renderHistorial();
+                    renderResumenGeneral();
+                    renderResumenProducto();
+                    poblarSelectorSemanasExportar();
+                    renderReportesExportacion();
+                }
+            }
+            cerrarModalNumero();
+        }
+
         function renderTablaPedidoActual() {
             const tbody = document.getElementById('tabla-pedido-detalle');
             if(itemsPedidoActual.length === 0) {
@@ -834,7 +909,7 @@
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-lg text-blue-900">${p.numeroPedido}</span>
-                                <button onclick="cambiarNumeroPedido('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border flex items-center gap-1" title="Editar número de pedido"><i class="fa-solid fa-pen"></i> Editar No.</button>
+                                <button onclick="abrirModalNumeroPedido('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border flex items-center gap-1" title="Editar número de pedido"><i class="fa-solid fa-pen"></i> Editar No.</button>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'} font-bold text-lg" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
@@ -867,25 +942,6 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        function cambiarNumeroPedido(id) {
-            let p = historialPedidos.find(item => item.id === id);
-            if(!p) return;
-            let actualNum = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 1;
-            let nuevoNum = prompt("Ingrese el nuevo número de pedido:", actualNum);
-            if(nuevoNum !== null && nuevoNum.trim() !== "") {
-                let numClean = parseInt(nuevoNum.replace(/[^0-9]/g, '')) || 1;
-                let idFormat = String(numClean).padStart(2, '0');
-                p.id = idFormat;
-                p.numeroPedido = `Pedido #${idFormat}`;
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                renderHistorial();
-                renderResumenGeneral();
-                renderResumenProducto();
-                poblarSelectorSemanasExportar();
-                renderReportesExportacion();
-            }
         }
 
         function cambiarFechaPedido(id) {
@@ -999,7 +1055,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("App Ventas - Comprobante de Pedido", 14, 20);
+            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
@@ -1348,7 +1404,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte - ${semana} – App Ventas`, 14, 20);
+            doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
 
             let datosTabla = pedidosSemana.map(p => [
                 p.numeroPedido,
