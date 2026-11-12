@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas Chamer</title>
+    <title>App Ventas Ch</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -23,7 +23,7 @@
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-store"></i> App Ventas Chamer
+                <i class="fa-solid fa-store"></i> App Ventas Ch
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
                 <i class="fa-solid fa-cloud"></i> Verificando conexión...
@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -84,12 +84,12 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto/Detalle</th>
+                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
                                 <th class="p-2 border">Cantidad</th>
                                 <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
@@ -262,7 +262,7 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada)
+                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -431,6 +431,42 @@
         </div>
     </div>
 
+    <!-- MODAL GESTIONAR INCIDENCIA / ENTREGA -->
+    <div id="modal-incidencia" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full space-y-4">
+            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-blue-900"></i> Gestionar Entrega e Incidencia
+            </h3>
+            <input type="hidden" id="incidencia-pedido-id">
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Número de Pedido</label>
+                    <input type="text" id="incidencia-num" readonly class="w-full p-2 bg-gray-100 border rounded font-bold text-blue-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Cliente</label>
+                    <input type="text" id="incidencia-cliente" readonly class="w-full p-2 bg-gray-100 border rounded bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Facturado (Original)</label>
+                    <input type="text" id="incidencia-valor-facturado" readonly class="w-full p-2 bg-gray-100 border rounded font-semibold text-green-600 bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor de Entrega (Editable)</label>
+                    <input type="number" id="incidencia-valor-entrega" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-blue-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Comentario / Incidencia (Editable)</label>
+                    <textarea id="incidencia-comentario" rows="3" class="uppercase-input w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs" placeholder="Escriba la incidencia o comentario de entrega..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button type="button" onclick="cerrarModalIncidencia()" class="px-4 py-2 bg-gray-300 rounded font-semibold text-gray-700 text-sm">Cancelar</button>
+                <button type="button" onclick="guardarModalIncidencia()" class="px-4 py-2 bg-blue-900 text-white rounded font-semibold hover:bg-blue-800 text-sm">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -458,6 +494,7 @@
         
         let pedidoIdEditandoNumero = null;
         let numeroPedidoTemporalInput = "";
+        let incidenciaPedidoActualId = null;
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -870,7 +907,7 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-2 border cursor-pointer hover:bg-blue-50 transition-colors whitespace-nowrap" onclick="abrirModalDetalle(${idx})" title="Toca para agregar/editar detalle">
                             <div><span class="font-bold text-blue-600">[${item.codigo}]</span> ${item.nombre}</div>
-                            ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-8 mt-0.5">${item.detalleExtra}</div>` : '<div class="text-xs text-gray-400 italic pl-8 mt-0.5">agregar detalle</div>'}
+                            ${item.detalleExtra ? `<div class="text-xs italic text-gray-600 pl-8 mt-0.5">${item.detalleExtra}</div>` : '<div class="text-xs text-gray-400 italic pl-8 mt-0.5">+ Toca para agregar detalle</div>'}
                         </td>
                         <td class="p-2 border font-bold text-blue-900 cursor-pointer hover:underline whitespace-nowrap" onclick="abrirEditarCantidad(${idx})" title="Click para editar cantidad">
                             ${item.cantidad}
@@ -987,7 +1024,6 @@
                 return;
             }
 
-            // ORDEN VISUAL EN HISTORIAL: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
@@ -1152,7 +1188,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("App Ventas Chamer - Comprobante de Pedido", 14, 20);
+            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
@@ -1224,7 +1260,6 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // ORDEN VISUAL EN RESUMEN DE FECHAS: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
                 let dateA = new Date(a);
                 let dateB = new Date(b);
@@ -1330,7 +1365,6 @@
                 listaPedidos = reportesSemanales[semanaSeleccionada] || [];
             }
             
-            // ORDEN VISUAL EN REPORTES: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             return listaPedidos.sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
@@ -1417,22 +1451,25 @@
                 }
             }
 
+            // REPORTE DE INCIDENCIAS ORDENADO ASCENDENTE (DEL PEDIDO 01 AL ÚLTIMO) Y CLICKEABLE
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
-                if(pedidosParaReporte.length === 0) {
+                let pedidosIncidenciasOrdenadosAsc = [...pedidosParaReporte].sort((a, b) => {
+                    let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
+                    let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
+                    return numA - numB;
+                });
+
+                if(pedidosIncidenciasOrdenadosAsc.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
                 } else {
-                    tbodyInc.innerHTML = pedidosParaReporte.map(p => `
-                        <tr class="border-b">
+                    tbodyInc.innerHTML = pedidosIncidenciasOrdenadosAsc.map(p => `
+                        <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="abrirModalIncidencia('${p.id}')" title="Toca para editar entrega e incidencia">
                             <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                            <td class="p-2 border">${p.cliente.nombre}</td>
+                            <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
                             <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
-                            <td class="p-2 border text-right">
-                                <input type="number" value="${Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
-                            </td>
-                            <td class="p-2 border">
-                                <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
-                            </td>
+                            <td class="p-2 border text-right font-bold text-blue-950">${formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}</td>
+                            <td class="p-2 border">${p.comentarioEntrega || '<span class="text-gray-400 italic">Sin incidencia</span>'}</td>
                             <td class="p-2 border text-center text-lg">
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
                                     ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
@@ -1484,23 +1521,47 @@
             }
         }
 
-        function actualizarValorEntrega(id, val) {
-            Object.values(reportesSemanales).forEach(arr => {
-                let encontrado = arr.find(item => item.id === id);
-                if(encontrado) encontrado.valorEntrega = parseFloat(val) || 0;
-            });
-            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+        // FUNCIONES PARA EL CUADRO DE DIÁLOGO DE INCIDENCIAS / ENTREGA
+        function abrirModalIncidencia(id) {
+            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+            let p = pedidosParaReporte.find(item => item.id === id);
+            if(!p) return;
+            incidenciaPedidoActualId = id;
+
+            document.getElementById('incidencia-pedido-id').value = p.id;
+            document.getElementById('incidencia-num').value = p.numeroPedido;
+            document.getElementById('incidencia-cliente').value = `[${p.cliente.codigo}] ${p.cliente.nombre}`;
+            document.getElementById('incidencia-valor-facturado').value = formatLempiras(p.total);
+            document.getElementById('incidencia-valor-entrega').value = Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total);
+            document.getElementById('incidencia-comentario').value = p.comentarioEntrega || "";
+
+            const modal = document.getElementById('modal-incidencia');
+            if(modal) modal.classList.remove('hidden');
         }
 
-        function actualizarComentarioEntrega(id, val) {
+        function cerrarModalIncidencia() {
+            const modal = document.getElementById('modal-incidencia');
+            if(modal) modal.classList.add('hidden');
+            incidenciaPedidoActualId = null;
+        }
+
+        function guardarModalIncidencia() {
+            if(incidenciaPedidoActualId === null) return;
+            let valEntregaInput = document.getElementById('incidencia-valor-entrega').value;
+            let comentarioInput = document.getElementById('incidencia-comentario').value.toUpperCase().trim();
+            let nuevoValorEntrega = parseFloat(valEntregaInput) || 0;
+
             Object.values(reportesSemanales).forEach(arr => {
-                let encontrado = arr.find(item => item.id === id);
+                let encontrado = arr.find(item => item.id === incidenciaPedidoActualId);
                 if(encontrado) {
-                    encontrado.comentarioEntrega = val.toUpperCase();
-                    encontrado.gestionado = val.trim() !== "";
+                    encontrado.valorEntrega = nuevoValorEntrega;
+                    encontrado.comentarioEntrega = comentarioInput;
+                    encontrado.gestionado = comentarioInput !== "";
                 }
             });
             localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+            
+            cerrarModalIncidencia();
             renderReportesExportacion();
         }
 
@@ -1519,7 +1580,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte - ${semana} – App Ventas Chamer`, 14, 20);
+            doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
 
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
@@ -1579,6 +1640,13 @@
 
         function exportarPdfIncidencias() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+            // Mantener el mismo orden ascendente (del pedido 01 al último) también en el PDF de incidencias
+            let pedidosOrdenadosAsc = [...pedidosParaReporte].sort((a, b) => {
+                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
+                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
+                return numA - numB;
+            });
+
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
 
@@ -1588,9 +1656,9 @@
             doc.setFontSize(14);
             doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
 
-            let datosTabla = pedidosParaReporte.map(p => [
+            let datosTabla = pedidosOrdenadosAsc.map(p => [
                 p.numeroPedido,
-                p.cliente.nombre,
+                `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 formatLempiras(p.total),
                 formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total),
                 p.comentarioEntrega || "Sin incidencia"
