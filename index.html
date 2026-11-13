@@ -18,6 +18,7 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
     <!-- HEADER -->
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -29,6 +30,7 @@
             </div>
         </div>
     </header>
+
     <!-- NAVEGACIÓN DE PESTAÑAS -->
     <nav class="bg-white shadow-sm border-b overflow-x-auto whitespace-nowrap">
         <div class="container mx-auto flex px-2 gap-1">
@@ -55,8 +57,10 @@
             </button>
         </div>
     </nav>
+
     <!-- CONTENIDO DE LAS PESTAÑAS -->
     <main class="container mx-auto p-4 flex-grow max-w-6xl">
+
         <!-- 1. CREAR PEDIDO -->
         <div id="panel-crear" class="tab-panel active space-y-4">
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
@@ -64,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -72,12 +76,13 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
             </div>
+
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
@@ -104,6 +109,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 2. HISTORIAL DE PEDIDOS -->
         <div id="panel-historial" class="tab-panel space-y-4">
             <div class="bg-white p-4 rounded-lg shadow space-y-3">
@@ -121,6 +127,7 @@
                         </button>
                     </div>
                 </div>
+
                 <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-sm">
                     <div class="flex items-center gap-2">
                         <button type="button" onclick="seleccionarTodos(true)" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded font-semibold hover:bg-gray-300 text-xs">Seleccionar Todos</button>
@@ -139,12 +146,14 @@
                     </div>
                 </div>
             </div>
+
             <div class="overflow-x-auto bg-white rounded-lg shadow p-2">
                 <div id="contenedor-historial" class="min-w-[700px] space-y-4">
                     <div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>
                 </div>
             </div>
         </div>
+
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
             <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
@@ -167,6 +176,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
@@ -193,6 +203,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 5. EXPORTAR REPORTES A PDFS CON SELECTOR DE SEMANA -->
         <div id="panel-exportar" class="tab-panel space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
@@ -216,6 +227,7 @@
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
                 </div>
             </div>
+
             <!-- Reporte General de Ventas -->
             <div class="bg-white rounded-lg shadow border overflow-hidden">
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
@@ -244,6 +256,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Reporte General Por Cliente E Incidencias -->
             <div class="bg-white rounded-lg shadow border overflow-hidden">
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
@@ -271,6 +284,7 @@
                             <span id="inc-diferencia" class="font-bold text-red-600 text-sm">L. 0</span>
                         </div>
                     </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
@@ -299,6 +313,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Reporte por Producto Filtrado por Semana -->
             <div class="bg-white rounded-lg shadow border overflow-hidden">
                 <div onclick="toggleReporte('producto_semana')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
@@ -334,6 +349,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 6. GESTIÓN DE CLIENTES -->
         <div id="panel-clientes" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
@@ -358,6 +374,7 @@
                 </div>
             </div>
         </div>
+
         <!-- 7. GESTIÓN DE PRODUCTOS -->
         <div id="panel-productos" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
@@ -383,7 +400,9 @@
                 </div>
             </div>
         </div>
+
     </main>
+
     <!-- MODAL TECLADO NUMÉRICO CANTIDAD -->
     <div id="modal-teclado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
@@ -406,6 +425,7 @@
             <button type="button" onclick="cerrarTeclado()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
         </div>
     </div>
+
     <!-- MODAL EDITAR NÚMERO DE PEDIDO -->
     <div id="modal-editar-numero" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full space-y-4">
@@ -428,6 +448,7 @@
             <button type="button" onclick="cerrarModalNumero()" class="w-full bg-gray-300 py-2 rounded font-semibold text-gray-700">Cancelar</button>
         </div>
     </div>
+
     <!-- MODAL DETALLE ADICIONAL -->
     <div id="modal-detalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full space-y-4">
@@ -440,6 +461,7 @@
             </div>
         </div>
     </div>
+
     <!-- MODAL GESTIONAR INCIDENCIA / ENTREGA -->
     <div id="modal-incidencia" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full space-y-4">
@@ -475,6 +497,7 @@
             </div>
         </div>
     </div>
+
     <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -484,9 +507,11 @@
                     .catch(err => console.log('Fallo al registrar Service Worker:', err));
             });
         }
+
         const URL_CLIENTES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=0&single=true&output=csv';
         const URL_PRODUCTOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=1903712481&single=true&output=csv';
-        const URL_API_PEDIDOS = 'https://script.google.com/macros/s/AKfycbypuO0_onZ548G_Wae294LY6jQSjbvwzN3yet-2tspVHtoUImw44Tx5a_Gr2b9J9c_n/exec';
+        const URL_API_PEDIDOS = 'AQUÍ_PEGAS_TU_URL_DE_APPS_SCRIPT';
+
         let listaClientes = [];
         let listaProductos = [];
         let pedidoActualCliente = JSON.parse(localStorage.getItem('app_ventas_ch_borrador_cliente')) || null;
@@ -503,13 +528,16 @@
         let numeroPedidoTemporalInput = "";
         let incidenciaPedidoActualId = null;
         let ordenRankingSemanaTipo = 'unidades';
+
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
             localStorage.setItem('app_ventas_ch_borrador_items', JSON.stringify(itemsPedidoActual));
         }
+
         function formatLempiras(monto) {
             return "L. " + Math.round(monto || 0).toLocaleString('en-US');
         }
+
         function formatearFechaStandard(strFecha) {
             if (!strFecha) return "SIN FECHA";
             let f = strFecha.trim().toUpperCase();
@@ -525,6 +553,7 @@
             }
             return f;
         }
+
         window.cambiarPestana = function(id) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -542,6 +571,7 @@
                 }
             });
         };
+
         window.addEventListener('DOMContentLoaded', () => {
             sincronizarGoogleSheets();
             cargarPedidosRemotos();
@@ -551,12 +581,14 @@
                 if(inputCliente) inputCliente.value = `[${pedidoActualCliente.codigo}] ${pedidoActualCliente.nombre}`;
             }
             renderTablaPedidoActual();
+
             renderHistorial();
             renderResumenGeneral();
             renderResumenProducto();
             poblarSelectorSemanasExportar();
             renderReportesExportacion();
         });
+
         async function cargarPedidosRemotos() {
             try {
                 let res = await fetch(URL_API_PEDIDOS + '?action=obtenerPedidos');
@@ -574,6 +606,7 @@
                 console.log("Usando historial local guardado offline", e);
             }
         }
+
         async function sincronizarPedidosEnNube() {
             try {
                 await fetch(URL_API_PEDIDOS, {
@@ -586,6 +619,7 @@
                 console.log("Error al sincronizar con la nube, guardado localmente", e);
             }
         }
+
         function parseCSV(text) {
             let lines = text.split('\n');
             let result = [];
@@ -611,6 +645,7 @@
             }
             return result;
         }
+
         async function sincronizarGoogleSheets() {
             const statusEl = document.getElementById('sync-status');
             
@@ -619,6 +654,7 @@
                 cargarDatosDesdeRespaldoLocal();
                 return;
             }
+
             if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
             try {
                 const resC = await fetch(URL_CLIENTES);
@@ -626,8 +662,10 @@
                 
                 const resP = await fetch(URL_PRODUCTOS);
                 const textP = await resP.text();
+
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
+
                 procesarDatosCSV(textC, textP);
                 if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
             } catch (error) {
@@ -636,6 +674,7 @@
                 cargarDatosDesdeRespaldoLocal();
             }
         }
+
         function cargarDatosDesdeRespaldoLocal() {
             const textC = localStorage.getItem('respaldo_csv_clientes');
             const textP = localStorage.getItem('respaldo_csv_productos');
@@ -643,6 +682,7 @@
                 procesarDatosCSV(textC, textP);
             }
         }
+
         function procesarDatosCSV(textC, textP) {
             const rowsC = parseCSV(textC);
             listaClientes = [];
@@ -651,6 +691,7 @@
                     listaClientes.push({ codigo: rowsC[i][0], nombre: rowsC[i][1] });
                 }
             }
+
             const rowsP = parseCSV(textP);
             listaProductos = [];
             for(let i=1; i<rowsP.length; i++) {
@@ -665,6 +706,7 @@
             renderGestionClientes();
             renderGestionProductos();
         }
+
         function renderGestionClientes() {
             const tbody = document.getElementById('tabla-gestion-clientes');
             if(!tbody) return;
@@ -679,6 +721,7 @@
                 </tr>
             `).join('');
         }
+
         function renderGestionProductos() {
             const tbody = document.getElementById('tabla-gestion-productos');
             if(!tbody) return;
@@ -694,6 +737,7 @@
                 </tr>
             `).join('');
         }
+
         function filtrarClientes() {
             const inputEl = document.getElementById('input-buscar-cliente');
             const contenedor = document.getElementById('lista-clientes-sugeridos');
@@ -715,6 +759,7 @@
             }
             contenedor.classList.remove('hidden');
         }
+
         function limpiarCliente() {
             pedidoActualCliente = null;
             const inputCliente = document.getElementById('input-buscar-cliente');
@@ -724,6 +769,7 @@
             guardarBorrador();
             renderResumenGeneral();
         }
+
         function seleccionarCliente(codigo, nombre) {
             pedidoActualCliente = { codigo, nombre };
             const inputCliente = document.getElementById('input-buscar-cliente');
@@ -733,6 +779,7 @@
             guardarBorrador();
             renderResumenGeneral();
         }
+
         function filtrarProductos() {
             const inputProd = document.getElementById('input-buscar-producto');
             const contenedor = document.getElementById('lista-productos-sugeridos');
@@ -754,6 +801,7 @@
             }
             contenedor.classList.remove('hidden');
         }
+
         function limpiarProducto() {
             const inputProd = document.getElementById('input-buscar-producto');
             if(inputProd) inputProd.value = "";
@@ -761,6 +809,7 @@
             if(sugeridos) sugeridos.classList.add('hidden');
             productoSeleccionadoTemporal = null;
         }
+
         function iniciarSeleccionCantidad(codigo, nombre, precio) {
             productoSeleccionadoTemporal = { codigo, nombre, precio };
             indiceItemEditandoCantidad = null;
@@ -774,6 +823,7 @@
             const modal = document.getElementById('modal-teclado');
             if(modal) modal.classList.remove('hidden');
         }
+
         function abrirEditarCantidad(index) {
             indiceItemEditandoCantidad = index;
             productoSeleccionadoTemporal = null;
@@ -783,6 +833,7 @@
             const modal = document.getElementById('modal-teclado');
             if(modal) modal.classList.remove('hidden');
         }
+
         function tecladoPress(val) {
             if(val === 'C') {
                 numeroCantidadActual = "";
@@ -792,10 +843,12 @@
             const disp = document.getElementById('display-cantidad');
             if(disp) disp.innerText = numeroCantidadActual === "" ? "0" : numeroCantidadActual;
         }
+
         function cerrarTeclado() {
             const modal = document.getElementById('modal-teclado');
             if(modal) modal.classList.add('hidden');
         }
+
         function tecladoOk(event) {
             if (event) {
                 event.stopPropagation();
@@ -821,6 +874,7 @@
             }
             guardarBorrador();
         }
+
         function abrirModalNumeroPedido(id) {
             let p = historialPedidos.find(item => item.id === id);
             if(!p) return;
@@ -831,6 +885,7 @@
             const modal = document.getElementById('modal-editar-numero');
             if(modal) modal.classList.remove('hidden');
         }
+
         function tecladoNumeroPress(val) {
             if(val === 'C') {
                 numeroPedidoTemporalInput = "";
@@ -840,11 +895,13 @@
             const disp = document.getElementById('display-numero-pedido');
             if(disp) disp.innerText = numeroPedidoTemporalInput === "" ? "0" : numeroPedidoTemporalInput;
         }
+
         function cerrarModalNumero() {
             const modal = document.getElementById('modal-editar-numero');
             if(modal) modal.classList.add('hidden');
             pedidoIdEditandoNumero = null;
         }
+
         function tecladoNumeroOk(event) {
             if (event) {
                 event.stopPropagation();
@@ -868,6 +925,7 @@
             }
             cerrarModalNumero();
         }
+
         function reordenarNumeracionSecuencial() {
             if(historialPedidos.length === 0) {
                 alert("No hay pedidos en el historial para reordenar.");
@@ -879,14 +937,17 @@
                     let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                     return numA - numB;
                 });
+
                 pedidosOrdenadosAsc.forEach((p, idx) => {
                     let numNuevo = String(idx + 1).padStart(2, '0');
                     p.id = numNuevo;
                     p.numeroPedido = `Pedido #${numNuevo}`;
                 });
+
                 historialPedidos = pedidosOrdenadosAsc;
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
                 sincronizarPedidosEnNube();
+
                 renderHistorial();
                 renderResumenGeneral();
                 renderResumenProducto();
@@ -895,6 +956,7 @@
                 alert("¡Numeración reordenada con éxito de 01 en adelante sin saltos!");
             }
         }
+
         function renderTablaPedidoActual() {
             const tbody = document.getElementById('tabla-pedido-detalle');
             const totalLabel = document.getElementById('label-gran-total-pedido');
@@ -928,11 +990,13 @@
             }).join('');
             if(totalLabel) totalLabel.innerText = formatLempiras(granTotalGeneral);
         }
+
         function eliminarItemPedido(index) {
             itemsPedidoActual.splice(index, 1);
             renderTablaPedidoActual();
             guardarBorrador();
         }
+
         function abrirModalDetalle(index) {
             indiceItemEditandoDetalle = index;
             const inputDetalle = document.getElementById('input-detalle-extra');
@@ -940,11 +1004,13 @@
             const modal = document.getElementById('modal-detalle');
             if(modal) modal.classList.remove('hidden');
         }
+
         function cerrarModalDetalle() {
             const modal = document.getElementById('modal-detalle');
             if(modal) modal.classList.add('hidden');
             indiceItemEditandoDetalle = null;
         }
+
         function guardarDetalleExtra() {
             if(indiceItemEditandoDetalle !== null) {
                 const inputDetalle = document.getElementById('input-detalle-extra');
@@ -954,6 +1020,7 @@
             }
             cerrarModalDetalle();
         }
+
         function guardarPedidoActual() {
             if(!pedidoActualCliente) {
                 alert("Debe seleccionar un cliente para el pedido.");
@@ -964,6 +1031,7 @@
                 return;
             }
             let totalPedido = itemsPedidoActual.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
             if(editandoPedidoId !== null) {
                 let pedido = historialPedidos.find(p => p.id === editandoPedidoId);
                 if(pedido) {
@@ -978,8 +1046,10 @@
                     let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
                     if (num > maxId) maxId = num;
                 });
+
                 let nuevoIdNum = maxId + 1;
                 let nuevoId = String(nuevoIdNum).padStart(2, '0');
+
                 let fechaHoyRaw = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 let fechaHoy = formatearFechaStandard(fechaHoyRaw);
                 let nuevoPedido = {
@@ -995,12 +1065,14 @@
                 };
                 historialPedidos.push(nuevoPedido);
             }
+
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             sincronizarPedidosEnNube();
             
             pedidoActualCliente = null;
             itemsPedidoActual = [];
             guardarBorrador();
+
             limpiarCliente();
             renderTablaPedidoActual();
             renderHistorial();
@@ -1011,6 +1083,7 @@
             
             window.cambiarPestana('crear');
         }
+
         function renderHistorial() {
             const contenedor = document.getElementById('contenedor-historial');
             if(!contenedor) return;
@@ -1018,11 +1091,13 @@
                 contenedor.innerHTML = `<div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
                 return;
             }
+
             let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                 return numB - numA;
             });
+
             contenedor.innerHTML = pedidosOrdenadosDesc.map(p => `
                 <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900 flex items-start gap-3">
                     <input type="checkbox" value="${p.id}" class="check-pedido mt-1.5 w-5 h-5 accent-blue-900 cursor-pointer" title="Seleccionar pedido">
@@ -1064,6 +1139,7 @@
                 </div>
             `).join('');
         }
+
         function cambiarFechaPedido(id) {
             let p = historialPedidos.find(item => item.id === id);
             if(!p) return;
@@ -1076,9 +1152,11 @@
                 renderResumenGeneral();
             }
         }
+
         function seleccionarTodos(estado) {
             document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = estado);
         }
+
         function seleccionarRangoPedidos() {
             let minInput = document.getElementById('rango-min');
             let maxInput = document.getElementById('rango-max');
@@ -1093,6 +1171,7 @@
                 cb.checked = (numId >= min && numId <= max);
             });
         }
+
         function seleccionarPorFecha() {
             let fechaInput = document.getElementById('rango-fecha');
             let fechaFiltro = fechaInput ? fechaInput.value.toUpperCase().trim() : "";
@@ -1109,6 +1188,7 @@
                 }
             });
         }
+
         function enviarPedidosASemana() {
             const checkboxes = document.querySelectorAll('.check-pedido:checked');
             if(checkboxes.length === 0) {
@@ -1121,17 +1201,20 @@
                 alert("Por favor ingrese el número de semana (Ej: SEMANA 44).");
                 return;
             }
+
             let idsSeleccionados = Array.from(checkboxes).map(cb => cb.value);
             let pedidosAMover = historialPedidos.filter(p => idsSeleccionados.includes(p.id));
             
             historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             sincronizarPedidosEnNube();
+
             if(!reportesSemanales[semanaInput]) {
                 reportesSemanales[semanaInput] = [];
             }
             reportesSemanales[semanaInput].push(...pedidosAMover);
             localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+
             if(semanaInputEl) semanaInputEl.value = "";
             renderHistorial();
             renderResumenGeneral();
@@ -1140,6 +1223,7 @@
             renderReportesExportacion();
             alert(`¡Pedidos asignados correctamente a ${semanaInput} y movidos al Reporte Semanal!`);
         }
+
         function editarPedido(id) {
             let pedido = historialPedidos.find(p => p.id === id);
             if(!pedido) return;
@@ -1153,24 +1237,20 @@
             
             window.cambiarPestana('crear');
         }
+
         function eliminarPedido(id) {
-            if(confirm("¿Está seguro de eliminar este pedido?")) {
-                historialPedidos = historialPedidos.filter(p => String(p.id) !== String(id));
+            if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
+                historialPedidos = historialPedidos.filter(p => p.id !== id);
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                
-                if (typeof sincronizarPedidosEnNube === 'function') {
-                    sincronizarPedidosEnNube();
-                }
-                
-                if (typeof renderHistorial === 'function') renderHistorial();
-                if (typeof renderResumenGeneral === 'function') renderResumenGeneral();
-                if (typeof renderResumenProducto === 'function') renderResumenProducto();
-                if (typeof poblarSelectorSemanasExportar === 'function') poblarSelectorSemanasExportar();
-                if (typeof renderReportesExportacion === 'function') renderReportesExportacion();
-                
-                console.log("Pedido con ID " + id + " eliminado correctamente.");
+                sincronizarPedidosEnNube();
+                renderHistorial();
+                renderResumenGeneral();
+                renderResumenProducto();
+                poblarSelectorSemanasExportar();
+                renderReportesExportacion();
             }
         }
+
         function generarPdfPedidoIndividual(id) {
             let pedido = historialPedidos.find(p => p.id === id);
             if(!pedido) return;
@@ -1197,6 +1277,7 @@
                 let lineaProd = `- [${item.codigo}] ${item.nombre} (Cant: ${item.cantidad}) ${formatLempiras(item.precio * item.cantidad)}`;
                 doc.text(lineaProd, 14, y);
                 y += 6;
+
                 if(item.detalleExtra && item.detalleExtra.trim() !== "") {
                     doc.setFont("helvetica", "italic");
                     doc.setTextColor(100, 100, 100);
@@ -1212,6 +1293,7 @@
             doc.text(`Gran Total: ${formatLempiras(pedido.total)}`, 14, y);
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
+
         function parseFechaTimestamp(strFecha) {
             if (!strFecha || strFecha === "SIN FECHA") return 0;
             const meses = {
@@ -1239,6 +1321,7 @@
             let d = new Date(strFecha).getTime();
             return isNaN(d) ? 0 : d;
         }
+
         function renderResumenGeneral() {
             let ventaGeneralActiva = historialPedidos.reduce((acc, p) => acc + p.total, 0);
             const resGen = document.getElementById('resumen-venta-general');
@@ -1246,14 +1329,17 @@
             
             let todosPedidos = [...historialPedidos];
             Object.values(reportesSemanales).forEach(arr => todosPedidos.push(...arr));
+
             const contenedorFecha = document.getElementById('resumen-venta-fecha');
             const contenedorCliente = document.getElementById('resumen-venta-cliente');
             if(!contenedorFecha || !contenedorCliente) return;
+
             if(todosPedidos.length === 0) {
                 contenedorFecha.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
                 contenedorCliente.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
                 return;
             }
+
             let mapaFechas = {};
             let mapaClientes = {};
             let ordenClientes = [];
@@ -1268,6 +1354,7 @@
                         mapaFechas[fechaStd] += p.total;
                     }
                 }
+
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
                     mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
@@ -1275,10 +1362,12 @@
                 }
                 mapaClientes[cod].total += p.total;
             });
+
             let top6Fechas = Object.keys(mapaFechas)
                 .filter(f => mapaFechas[f] > 0)
                 .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
                 .slice(0, 6);
+
             if (top6Fechas.length === 0) {
                 contenedorFecha.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
             } else {
@@ -1289,6 +1378,7 @@
                     </div>
                 `).join('');
             }
+
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -1308,11 +1398,13 @@
                 </table>
             `;
         }
+
         let ordenRankingTipo = 'unidades';
         function ordenarRanking(tipo) {
             ordenRankingTipo = tipo;
             renderResumenProducto();
         }
+
         function renderResumenProducto() {
             let mapaProductos = {};
             historialPedidos.forEach(p => {
@@ -1324,12 +1416,14 @@
                     mapaProductos[item.codigo].valor += (item.precio * item.cantidad);
                 });
             });
+
             let rankingArray = Object.values(mapaProductos);
             if(ordenRankingTipo === 'unidades') {
                 rankingArray.sort((a, b) => b.unidades - a.unidades);
             } else {
                 rankingArray.sort((a, b) => b.valor - a.valor);
             }
+
             const tbody = document.getElementById('tabla-ranking-productos');
             if(!tbody) return;
             if(rankingArray.length === 0) {
@@ -1344,6 +1438,7 @@
                 </tr>
             `).join('');
         }
+
         function poblarSelectorSemanasExportar() {
             const select = document.getElementById('select-semana-exportar');
             if(!select) return;
@@ -1357,9 +1452,11 @@
                 select.value = valorActual;
             }
         }
+
         function actualizarReportesExportacionPorSemana() {
             renderReportesExportacion();
         }
+
         function obtenerPedidosFiltradosExportar() {
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
@@ -1377,16 +1474,19 @@
                 return numB - numA;
             });
         }
+
         function ordenarRankingSemana(tipo) {
             ordenRankingSemanaTipo = tipo;
             renderReportesExportacion();
         }
+
         function renderReportesExportacion() {
             poblarSelectorSemanasExportar();
             const contSemanal = document.getElementById('contenedor-reporte-semanal');
             const semanasKeys = Object.keys(reportesSemanales);
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
+
             if(contSemanal) {
                 if(semanasKeys.length === 0) {
                     contSemanal.innerHTML = `<div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>`;
@@ -1441,7 +1541,9 @@
                     }).join('');
                 }
             }
+
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
+
             const tbodyGen = document.getElementById('tbody-reporte-general');
             if(tbodyGen) {
                 if(pedidosParaReporte.length === 0) {
@@ -1456,6 +1558,7 @@
                     `).join('');
                 }
             }
+
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
                 let pedidosIncidenciasOrdenados = [...pedidosParaReporte].sort((a, b) => {
@@ -1468,9 +1571,11 @@
                     let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                     return numA - numB;
                 });
+
                 let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
                 let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
                 let diferenciaMontos = sumaFacturado - sumaEntrega;
+
                 const incTotFactEl = document.getElementById('inc-total-facturado');
                 const incTotEntEl = document.getElementById('inc-total-entrega');
                 const incDifEl = document.getElementById('inc-diferencia');
@@ -1480,6 +1585,7 @@
                     incDifEl.innerText = formatLempiras(diferenciaMontos);
                     incDifEl.className = `font-bold text-sm ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
                 }
+
                 const thTotFactEl = document.getElementById('th-total-facturado');
                 const thTotEntEl = document.getElementById('th-total-entrega');
                 const thDifEl = document.getElementById('th-diferencia');
@@ -1489,6 +1595,7 @@
                     thDifEl.innerText = `Dif: ${formatLempiras(diferenciaMontos)}`;
                     thDifEl.className = `text-[11px] font-bold mt-0.5 ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
                 }
+
                 if(pedidosIncidenciasOrdenados.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
                 } else {
@@ -1508,6 +1615,7 @@
                     `).join('');
                 }
             }
+
             const tbodyProdSem = document.getElementById('tbody-reporte-producto-semana');
             if(tbodyProdSem) {
                 let mapaProdSem = {};
@@ -1526,6 +1634,7 @@
                 } else {
                     rankingProdSemArray.sort((a, b) => b.valor - a.valor);
                 }
+
                 if(rankingProdSemArray.length === 0) {
                     tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta semana</td></tr>`;
                 } else {
@@ -1539,6 +1648,7 @@
                 }
             }
         }
+
         function toggleReporte(id) {
             const body = document.getElementById('body-' + id);
             const icon = document.getElementById('icon-' + id);
@@ -1551,30 +1661,36 @@
                 icon.classList.remove('rotate-90');
             }
         }
+
         function abrirModalIncidencia(id) {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
             let p = pedidosParaReporte.find(item => item.id === id);
             if(!p) return;
             incidenciaPedidoActualId = id;
+
             document.getElementById('incidencia-pedido-id').value = p.id;
             document.getElementById('incidencia-num').value = p.numeroPedido;
             document.getElementById('incidencia-cliente').value = `[${p.cliente.codigo}] ${p.cliente.nombre}`;
             document.getElementById('incidencia-valor-facturado').value = formatLempiras(p.total);
             document.getElementById('incidencia-valor-entrega').value = Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total);
             document.getElementById('incidencia-comentario').value = p.comentarioEntrega || "";
+
             const modal = document.getElementById('modal-incidencia');
             if(modal) modal.classList.remove('hidden');
         }
+
         function cerrarModalIncidencia() {
             const modal = document.getElementById('modal-incidencia');
             if(modal) modal.classList.add('hidden');
             incidenciaPedidoActualId = null;
         }
+
         function guardarModalIncidencia() {
             if(incidenciaPedidoActualId === null) return;
             let valEntregaInput = document.getElementById('incidencia-valor-entrega').value;
             let comentarioInput = document.getElementById('incidencia-comentario').value.toUpperCase().trim();
             let nuevoValorEntrega = parseFloat(valEntregaInput) || 0;
+
             Object.values(reportesSemanales).forEach(arr => {
                 let encontrado = arr.find(item => item.id === incidenciaPedidoActualId);
                 if(encontrado) {
@@ -1588,25 +1704,30 @@
             cerrarModalIncidencia();
             renderReportesExportacion();
         }
+
         function exportarPdfSemanal(semana) {
             let pedidosSemana = reportesSemanales[semana];
             if(!pedidosSemana || pedidosSemana.length === 0) return;
+
             let pedidosOrdenados = [...pedidosSemana].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                 return numB - numA;
             });
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
+
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 formatLempiras(p.total)
             ]);
+
             doc.autoTable({
                 startY: 25,
                 head: [['Pedido No.', 'Nombre Cliente', 'Valor Venta']],
@@ -1619,23 +1740,28 @@
                 styles: { fontSize: 10, cellPadding: 3 },
                 headStyles: { fillColor: [30, 64, 175] }
             });
+
             doc.save(`Reporte_${semana.replace(/\s+/g, '_')}.pdf`);
         }
+
         function exportarPdfGeneral() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.text(`Reporte General de Ventas (${semanaSeleccionada})`, 14, 20);
+
             let datosTabla = pedidosParaReporte.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 formatLempiras(p.total)
             ]);
+
             doc.autoTable({
                 startY: 25,
                 head: [['Pedido No.', 'Nombre Cliente', 'Valor Venta']],
@@ -1648,8 +1774,10 @@
                 styles: { fontSize: 10, cellPadding: 3 },
                 headStyles: { fillColor: [30, 64, 175] }
             });
+
             doc.save(`Reporte_General_Ventas_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
         }
+
         function exportarPdfIncidencias() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
             let pedidosOrdenados = [...pedidosParaReporte].sort((a, b) => {
@@ -1662,19 +1790,24 @@
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                 return numA - numB;
             });
+
             let sumaFacturado = pedidosOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
             let sumaEntrega = pedidosOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
             let diferenciaMontos = sumaFacturado - sumaEntrega;
+
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 18);
+
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
             doc.text(`Total Facturado: ${formatLempiras(sumaFacturado)}   |   Total Entrega: ${formatLempiras(sumaEntrega)}   |   Diferencia: ${formatLempiras(diferenciaMontos)}`, 14, 25);
+
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
@@ -1682,6 +1815,7 @@
                 formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total),
                 p.comentarioEntrega || "Sin incidencia"
             ]);
+
             doc.autoTable({
                 startY: 30,
                 head: [[
@@ -1702,12 +1836,15 @@
                 styles: { fontSize: 9, cellPadding: 3 },
                 headStyles: { fillColor: [30, 64, 175] }
             });
+
             doc.save(`Reporte_Clientes_Incidencias_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
         }
+
         function exportarPdfProductoSemana() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
+
             let mapaProdSem = {};
             pedidosParaReporte.forEach(p => {
                 p.items.forEach(item => {
@@ -1724,16 +1861,19 @@
             } else {
                 rankingProdSemArray.sort((a, b) => b.valor - a.valor);
             }
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
             doc.text(`Reporte por Producto (${semanaSeleccionada})`, 14, 20);
+
             let datosTabla = rankingProdSemArray.map(r => [
                 `[${r.codigo}] ${r.nombre}`,
                 r.unidades,
                 formatLempiras(r.valor)
             ]);
+
             doc.autoTable({
                 startY: 25,
                 head: [['Producto', 'Unidades', 'Valor Total']],
@@ -1746,6 +1886,7 @@
                 styles: { fontSize: 10, cellPadding: 3 },
                 headStyles: { fillColor: [30, 64, 175] }
             });
+
             doc.save(`Reporte_Productos_${semanaSeleccionada.replace(/\s+/g, '_')}.pdf`);
         }
     </script>
