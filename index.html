@@ -321,9 +321,15 @@
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
                         Reporte por Producto (Según Semana Seleccionada)
                     </span>
-                    <button type="button" onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
-                        <i class="fa-solid fa-file-pdf"></i> PDF
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1">
+                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('unidades')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Unidades">U</button>
+                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('valor')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Valor L.">L.</button>
+                        </div>
+                        <button type="button" onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
                 </div>
                 <div id="body-producto_semana" class="hidden p-4 border-t bg-white space-y-3">
                     <div class="overflow-x-auto">
@@ -520,6 +526,7 @@
         let pedidoIdEditandoNumero = null;
         let numeroPedidoTemporalInput = "";
         let incidenciaPedidoActualId = null;
+        let ordenRankingSemanaTipo = 'unidades';
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -1397,6 +1404,11 @@
             });
         }
 
+        function ordenarRankingSemana(tipo) {
+            ordenRankingSemanaTipo = tipo;
+            renderReportesExportacion();
+        }
+
         function renderReportesExportacion() {
             poblarSelectorSemanasExportar();
             const contSemanal = document.getElementById('contenedor-reporte-semanal');
@@ -1476,7 +1488,6 @@
                 }
             }
 
-            // REPORTE DE INCIDENCIAS CON TOTALES DE FACTURADO, ENTREGA Y DIFERENCIA EN ENCABEZADO
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
                 let pedidosIncidenciasOrdenados = [...pedidosParaReporte].sort((a, b) => {
@@ -1490,12 +1501,10 @@
                     return numA - numB;
                 });
 
-                // CÁLCULO DE TOTALES FACTURADO, ENTREGA Y DIFERENCIA
                 let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
                 let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
                 let diferenciaMontos = sumaFacturado - sumaEntrega;
 
-                // Actualizar etiquetas en resumen superior
                 const incTotFactEl = document.getElementById('inc-total-facturado');
                 const incTotEntEl = document.getElementById('inc-total-entrega');
                 const incDifEl = document.getElementById('inc-diferencia');
@@ -1506,7 +1515,6 @@
                     incDifEl.className = `font-bold text-sm ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
                 }
 
-                // Actualizar encabezados de columnas de la tabla
                 const thTotFactEl = document.getElementById('th-total-facturado');
                 const thTotEntEl = document.getElementById('th-total-entrega');
                 const thDifEl = document.getElementById('th-diferencia');
@@ -1549,7 +1557,12 @@
                         mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
                     });
                 });
-                let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
+                let rankingProdSemArray = Object.values(mapaProdSem);
+                if(ordenRankingSemanaTipo === 'unidades') {
+                    rankingProdSemArray.sort((a, b) => b.unidades - a.unidades);
+                } else {
+                    rankingProdSemArray.sort((a, b) => b.valor - a.valor);
+                }
 
                 if(rankingProdSemArray.length === 0) {
                     tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta semana</td></tr>`;
@@ -1771,7 +1784,12 @@
                     mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
                 });
             });
-            let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
+            let rankingProdSemArray = Object.values(mapaProdSem);
+            if(ordenRankingSemanaTipo === 'unidades') {
+                rankingProdSemArray.sort((a, b) => b.unidades - a.unidades);
+            } else {
+                rankingProdSemArray.sort((a, b) => b.valor - a.valor);
+            }
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
