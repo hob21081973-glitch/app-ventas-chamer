@@ -163,7 +163,7 @@
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha (Top 6 Recientes)</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
@@ -1255,6 +1255,35 @@
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
 
+        // UTILIDAD PARA PARSEAR FECHAS EN ESPAÑOL/INGLÉS A TIMESTAMP PARA ORDENAR EXACTAMENTE
+        function parseFechaTimestamp(strFecha) {
+            if (!strFecha || strFecha === "SIN FECHA") return 0;
+            const meses = {
+                'ENE': 0, 'JAN': 0,
+                'FEB': 1,
+                'MAR': 2,
+                'ABR': 3, 'APR': 3,
+                'MAY': 4,
+                'JUN': 5,
+                'JUL': 6,
+                'AGO': 7, 'AUG': 7,
+                'SEP': 8, 'SET': 8,
+                'OCT': 9,
+                'NOV': 10,
+                'DIC': 11, 'DEC': 11
+            };
+            let partes = strFecha.trim().toUpperCase().replace(/\./g, '').split(/\s+/);
+            if (partes.length === 3) {
+                let dia = parseInt(partes[0]) || 1;
+                let mesTxt = partes[1].substring(0, 3);
+                let mes = meses[mesTxt] !== undefined ? meses[mesTxt] : 0;
+                let anio = parseInt(partes[2]) || 2026;
+                return new Date(anio, mes, dia).getTime();
+            }
+            let d = new Date(strFecha).getTime();
+            return isNaN(d) ? 0 : d;
+        }
+
         function renderResumenGeneral() {
             let ventaGeneralActiva = historialPedidos.reduce((acc, p) => acc + p.total, 0);
             const resGen = document.getElementById('resumen-venta-general');
@@ -1278,11 +1307,16 @@
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
-                let fechaStd = formatearFechaStandard(p.fecha);
-                if(!mapaFechas[fechaStd]) {
-                    mapaFechas[fechaStd] = 0;
+                // Solo incluir fechas donde haya pedidos con venta > 0 y fecha válida
+                if (p && p.total > 0 && p.fecha) {
+                    let fechaStd = formatearFechaStandard(p.fecha);
+                    if (fechaStd && fechaStd !== "SIN FECHA") {
+                        if(!mapaFechas[fechaStd]) {
+                            mapaFechas[fechaStd] = 0;
+                        }
+                        mapaFechas[fechaStd] += p.total;
+                    }
                 }
-                mapaFechas[fechaStd] += p.total;
 
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
@@ -1292,21 +1326,22 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
-                let dateA = new Date(a);
-                let dateB = new Date(b);
-                if(!isNaN(dateA) && !isNaN(dateB)) {
-                    return dateB - dateA;
-                }
-                return b.localeCompare(a);
-            });
+            // Ordenar fechas de más reciente a más antigua y limitar estrictamente al TOP 6
+            let top6Fechas = Object.keys(mapaFechas)
+                .filter(f => mapaFechas[f] > 0)
+                .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
+                .slice(0, 6);
 
-            contenedorFecha.innerHTML = ordenFechas.map(f => `
-                <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
-                    <span class="text-gray-700">${f}</span>
-                    <span class="text-blue-900">-------> ${formatLempiras(mapaFechas[f])}</span>
-                </div>
-            `).join('');
+            if (top6Fechas.length === 0) {
+                contenedorFecha.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
+            } else {
+                contenedorFecha.innerHTML = top6Fechas.map(f => `
+                    <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
+                        <span class="text-gray-700">${f}</span>
+                        <span class="text-blue-900">-------> ${formatLempiras(mapaFechas[f])}</span>
+                    </div>
+                `).join('');
+            }
 
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
