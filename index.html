@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -510,7 +510,6 @@
 
         const URL_CLIENTES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=0&single=true&output=csv';
         const URL_PRODUCTOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmtKhEE5ziDtm_BQdAeOy8c-Z6H6_GbyKcPOvtdjfKtXgxYObBUB-PlK0ldsiwrW78aabDzei-R2Cd/pub?gid=1903712481&single=true&output=csv';
-        const URL_API_PEDIDOS = 'AQUÍ_PEGAS_TU_URL_DE_APPS_SCRIPT';
 
         let listaClientes = [];
         let listaProductos = [];
@@ -574,7 +573,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             sincronizarGoogleSheets();
-            cargarPedidosRemotos();
             
             if (pedidoActualCliente) {
                 const inputCliente = document.getElementById('input-buscar-cliente');
@@ -588,37 +586,6 @@
             poblarSelectorSemanasExportar();
             renderReportesExportacion();
         });
-
-        async function cargarPedidosRemotos() {
-            try {
-                let res = await fetch(URL_API_PEDIDOS + '?action=obtenerPedidos');
-                let data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    historialPedidos = data;
-                    localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                    renderHistorial();
-                    renderResumenGeneral();
-                    renderResumenProducto();
-                    poblarSelectorSemanasExportar();
-                    renderReportesExportacion();
-                }
-            } catch (e) {
-                console.log("Usando historial local guardado offline", e);
-            }
-        }
-
-        async function sincronizarPedidosEnNube() {
-            try {
-                await fetch(URL_API_PEDIDOS, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(historialPedidos)
-                });
-            } catch (e) {
-                console.log("Error al sincronizar con la nube, guardado localmente", e);
-            }
-        }
 
         function parseCSV(text) {
             let lines = text.split('\n');
@@ -915,7 +882,6 @@
                     p.id = idFormat;
                     p.numeroPedido = `Pedido #${idFormat}`;
                     localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                    sincronizarPedidosEnNube();
                     renderHistorial();
                     renderResumenGeneral();
                     renderResumenProducto();
@@ -946,7 +912,6 @@
 
                 historialPedidos = pedidosOrdenadosAsc;
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                sincronizarPedidosEnNube();
 
                 renderHistorial();
                 renderResumenGeneral();
@@ -1067,7 +1032,6 @@
             }
 
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-            sincronizarPedidosEnNube();
             
             pedidoActualCliente = null;
             itemsPedidoActual = [];
@@ -1147,7 +1111,6 @@
             if(nuevaFecha !== null && nuevaFecha.trim() !== "") {
                 p.fecha = formatearFechaStandard(nuevaFecha);
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                sincronizarPedidosEnNube();
                 renderHistorial();
                 renderResumenGeneral();
             }
@@ -1207,7 +1170,6 @@
             
             historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-            sincronizarPedidosEnNube();
 
             if(!reportesSemanales[semanaInput]) {
                 reportesSemanales[semanaInput] = [];
@@ -1242,7 +1204,6 @@
             if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
                 historialPedidos = historialPedidos.filter(p => p.id !== id);
                 localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                sincronizarPedidosEnNube();
                 renderHistorial();
                 renderResumenGeneral();
                 renderResumenProducto();
@@ -1294,6 +1255,7 @@
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
 
+        // UTILIDAD PARA PARSEAR FECHAS EN ESPAÑOL/INGLÉS A TIMESTAMP PARA ORDENAR EXACTAMENTE
         function parseFechaTimestamp(strFecha) {
             if (!strFecha || strFecha === "SIN FECHA") return 0;
             const meses = {
@@ -1345,6 +1307,7 @@
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
+                // Solo incluir fechas donde haya pedidos con venta > 0 y fecha válida
                 if (p && p.total > 0 && p.fecha) {
                     let fechaStd = formatearFechaStandard(p.fecha);
                     if (fechaStd && fechaStd !== "SIN FECHA") {
@@ -1363,6 +1326,7 @@
                 mapaClientes[cod].total += p.total;
             });
 
+            // Ordenar fechas de más reciente a más antigua y limitar estrictamente al TOP 6
             let top6Fechas = Object.keys(mapaFechas)
                 .filter(f => mapaFechas[f] > 0)
                 .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
