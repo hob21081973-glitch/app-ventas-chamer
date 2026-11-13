@@ -68,7 +68,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -76,7 +76,7 @@
                 <div class="bg-white p-4 rounded-lg shadow relative">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
@@ -163,7 +163,7 @@
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha (Top 6 Recientes)</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
@@ -262,47 +262,22 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
+                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada)
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
                     </button>
                 </div>
                 <div id="body-incidencias" class="hidden p-4 border-t bg-white space-y-3">
-                    <!-- RESUMEN DE TOTALES EN EL ENCABEZADO DEL REPORTE -->
-                    <div id="resumen-totales-incidencias" class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs">
-                        <div class="flex justify-between sm:flex-col">
-                            <span class="text-gray-600 font-semibold">Total Facturado:</span>
-                            <span id="inc-total-facturado" class="font-bold text-gray-900 text-sm">L. 0</span>
-                        </div>
-                        <div class="flex justify-between sm:flex-col">
-                            <span class="text-gray-600 font-semibold">Total Entrega:</span>
-                            <span id="inc-total-entrega" class="font-bold text-blue-900 text-sm">L. 0</span>
-                        </div>
-                        <div class="flex justify-between sm:flex-col">
-                            <span class="text-gray-600 font-semibold">Diferencia (Facturado - Entrega):</span>
-                            <span id="inc-diferencia" class="font-bold text-red-600 text-sm">L. 0</span>
-                        </div>
-                    </div>
-
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr class="bg-gray-100 text-gray-600 text-xs">
                                     <th class="p-2 border">Pedido No.</th>
                                     <th class="p-2 border">Nombre Cliente</th>
-                                    <th class="p-2 border text-right">
-                                        <div>Valor Facturado</div>
-                                        <div id="th-total-facturado" class="text-[11px] font-bold text-gray-900 mt-0.5">L. 0</div>
-                                    </th>
-                                    <th class="p-2 border text-right">
-                                        <div>Valor Entrega</div>
-                                        <div id="th-total-entrega" class="text-[11px] font-bold text-blue-900 mt-0.5">L. 0</div>
-                                    </th>
-                                    <th class="p-2 border">
-                                        <div>Comentario / Incidencia</div>
-                                        <div id="th-diferencia" class="text-[11px] font-bold text-red-600 mt-0.5">Dif: L. 0</div>
-                                    </th>
+                                    <th class="p-2 border text-right">Valor Venta</th>
+                                    <th class="p-2 border text-right">Valor Entrega</th>
+                                    <th class="p-2 border">Comentario / Incidencia</th>
                                     <th class="p-2 border text-center">Estado</th>
                                 </tr>
                             </thead>
@@ -321,15 +296,9 @@
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
                         Reporte por Producto (Según Semana Seleccionada)
                     </span>
-                    <div class="flex items-center gap-2">
-                        <div class="flex gap-1">
-                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('unidades')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Unidades">U</button>
-                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('valor')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Valor L.">L.</button>
-                        </div>
-                        <button type="button" onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
-                            <i class="fa-solid fa-file-pdf"></i> PDF
-                        </button>
-                    </div>
+                    <button type="button" onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-pdf"></i> PDF
+                    </button>
                 </div>
                 <div id="body-producto_semana" class="hidden p-4 border-t bg-white space-y-3">
                     <div class="overflow-x-auto">
@@ -462,42 +431,6 @@
         </div>
     </div>
 
-    <!-- MODAL GESTIONAR INCIDENCIA / ENTREGA -->
-    <div id="modal-incidencia" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full space-y-4">
-            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-blue-900"></i> Gestionar Entrega e Incidencia
-            </h3>
-            <input type="hidden" id="incidencia-pedido-id">
-            <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Número de Pedido</label>
-                    <input type="text" id="incidencia-num" readonly class="w-full p-2 bg-gray-100 border rounded font-bold text-blue-900">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Cliente</label>
-                    <input type="text" id="incidencia-cliente" readonly class="w-full p-2 bg-gray-100 border rounded bg-gray-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Facturado (Original)</label>
-                    <input type="text" id="incidencia-valor-facturado" readonly class="w-full p-2 bg-gray-100 border rounded font-semibold text-green-600 bg-gray-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor de Entrega (Editable)</label>
-                    <input type="number" id="incidencia-valor-entrega" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-blue-900">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Comentario / Incidencia (Editable)</label>
-                    <textarea id="incidencia-comentario" rows="3" class="uppercase-input w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs" placeholder="Escriba la incidencia o comentario de entrega..."></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="cerrarModalIncidencia()" class="px-4 py-2 bg-gray-300 rounded font-semibold text-gray-700 text-sm">Cancelar</button>
-                <button type="button" onclick="guardarModalIncidencia()" class="px-4 py-2 bg-blue-900 text-white rounded font-semibold hover:bg-blue-800 text-sm">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-
     <!-- SCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -525,8 +458,6 @@
         
         let pedidoIdEditandoNumero = null;
         let numeroPedidoTemporalInput = "";
-        let incidenciaPedidoActualId = null;
-        let ordenRankingSemanaTipo = 'unidades';
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -1056,6 +987,7 @@
                 return;
             }
 
+            // ORDEN VISUAL EN HISTORIAL: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
@@ -1255,35 +1187,6 @@
             doc.save(`Pedido_${pedido.id}_${pedido.cliente.nombre.substring(0, 15)}.pdf`);
         }
 
-        // UTILIDAD PARA PARSEAR FECHAS EN ESPAÑOL/INGLÉS A TIMESTAMP PARA ORDENAR EXACTAMENTE
-        function parseFechaTimestamp(strFecha) {
-            if (!strFecha || strFecha === "SIN FECHA") return 0;
-            const meses = {
-                'ENE': 0, 'JAN': 0,
-                'FEB': 1,
-                'MAR': 2,
-                'ABR': 3, 'APR': 3,
-                'MAY': 4,
-                'JUN': 5,
-                'JUL': 6,
-                'AGO': 7, 'AUG': 7,
-                'SEP': 8, 'SET': 8,
-                'OCT': 9,
-                'NOV': 10,
-                'DIC': 11, 'DEC': 11
-            };
-            let partes = strFecha.trim().toUpperCase().replace(/\./g, '').split(/\s+/);
-            if (partes.length === 3) {
-                let dia = parseInt(partes[0]) || 1;
-                let mesTxt = partes[1].substring(0, 3);
-                let mes = meses[mesTxt] !== undefined ? meses[mesTxt] : 0;
-                let anio = parseInt(partes[2]) || 2026;
-                return new Date(anio, mes, dia).getTime();
-            }
-            let d = new Date(strFecha).getTime();
-            return isNaN(d) ? 0 : d;
-        }
-
         function renderResumenGeneral() {
             let ventaGeneralActiva = historialPedidos.reduce((acc, p) => acc + p.total, 0);
             const resGen = document.getElementById('resumen-venta-general');
@@ -1307,16 +1210,11 @@
             let ordenClientes = [];
             
             todosPedidos.forEach(p => {
-                // Solo incluir fechas donde haya pedidos con venta > 0 y fecha válida
-                if (p && p.total > 0 && p.fecha) {
-                    let fechaStd = formatearFechaStandard(p.fecha);
-                    if (fechaStd && fechaStd !== "SIN FECHA") {
-                        if(!mapaFechas[fechaStd]) {
-                            mapaFechas[fechaStd] = 0;
-                        }
-                        mapaFechas[fechaStd] += p.total;
-                    }
+                let fechaStd = formatearFechaStandard(p.fecha);
+                if(!mapaFechas[fechaStd]) {
+                    mapaFechas[fechaStd] = 0;
                 }
+                mapaFechas[fechaStd] += p.total;
 
                 let cod = p.cliente.codigo;
                 if(!mapaClientes[cod]) {
@@ -1326,22 +1224,22 @@
                 mapaClientes[cod].total += p.total;
             });
 
-            // Ordenar fechas de más reciente a más antigua y limitar estrictamente al TOP 6
-            let top6Fechas = Object.keys(mapaFechas)
-                .filter(f => mapaFechas[f] > 0)
-                .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
-                .slice(0, 6);
+            // ORDEN VISUAL EN RESUMEN DE FECHAS: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
+            let ordenFechas = Object.keys(mapaFechas).sort((a, b) => {
+                let dateA = new Date(a);
+                let dateB = new Date(b);
+                if(!isNaN(dateA) && !isNaN(dateB)) {
+                    return dateB - dateA;
+                }
+                return b.localeCompare(a);
+            });
 
-            if (top6Fechas.length === 0) {
-                contenedorFecha.innerHTML = `<span class="text-gray-400">Sin ventas registradas</span>`;
-            } else {
-                contenedorFecha.innerHTML = top6Fechas.map(f => `
-                    <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
-                        <span class="text-gray-700">${f}</span>
-                        <span class="text-blue-900">-------> ${formatLempiras(mapaFechas[f])}</span>
-                    </div>
-                `).join('');
-            }
+            contenedorFecha.innerHTML = ordenFechas.map(f => `
+                <div class="flex justify-between items-center py-1 border-b text-xs font-semibold">
+                    <span class="text-gray-700">${f}</span>
+                    <span class="text-blue-900">-------> ${formatLempiras(mapaFechas[f])}</span>
+                </div>
+            `).join('');
 
             contenedorCliente.innerHTML = `
                 <table class="w-full text-left border-collapse">
@@ -1432,16 +1330,12 @@
                 listaPedidos = reportesSemanales[semanaSeleccionada] || [];
             }
             
+            // ORDEN VISUAL EN REPORTES: DEL MÁS RECIENTE AL MÁS ANTIGUO (DESCENDENTE)
             return listaPedidos.sort((a, b) => {
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                 return numB - numA;
             });
-        }
-
-        function ordenarRankingSemana(tipo) {
-            ordenRankingSemanaTipo = tipo;
-            renderReportesExportacion();
         }
 
         function renderReportesExportacion() {
@@ -1525,51 +1419,20 @@
 
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
-                let pedidosIncidenciasOrdenados = [...pedidosParaReporte].sort((a, b) => {
-                    let gestionA = a.gestionado ? 1 : 0;
-                    let gestionB = b.gestionado ? 1 : 0;
-                    if (gestionA !== gestionB) {
-                        return gestionA - gestionB;
-                    }
-                    let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                    let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                    return numA - numB;
-                });
-
-                let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
-                let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
-                let diferenciaMontos = sumaFacturado - sumaEntrega;
-
-                const incTotFactEl = document.getElementById('inc-total-facturado');
-                const incTotEntEl = document.getElementById('inc-total-entrega');
-                const incDifEl = document.getElementById('inc-diferencia');
-                if(incTotFactEl) incTotFactEl.innerText = formatLempiras(sumaFacturado);
-                if(incTotEntEl) incTotEntEl.innerText = formatLempiras(sumaEntrega);
-                if(incDifEl) {
-                    incDifEl.innerText = formatLempiras(diferenciaMontos);
-                    incDifEl.className = `font-bold text-sm ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
-                }
-
-                const thTotFactEl = document.getElementById('th-total-facturado');
-                const thTotEntEl = document.getElementById('th-total-entrega');
-                const thDifEl = document.getElementById('th-diferencia');
-                if(thTotFactEl) thTotFactEl.innerText = formatLempiras(sumaFacturado);
-                if(thTotEntEl) thTotEntEl.innerText = formatLempiras(sumaEntrega);
-                if(thDifEl) {
-                    thDifEl.innerText = `Dif: ${formatLempiras(diferenciaMontos)}`;
-                    thDifEl.className = `text-[11px] font-bold mt-0.5 ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
-                }
-
-                if(pedidosIncidenciasOrdenados.length === 0) {
+                if(pedidosParaReporte.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
                 } else {
-                    tbodyInc.innerHTML = pedidosIncidenciasOrdenados.map(p => `
-                        <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="abrirModalIncidencia('${p.id}')" title="Toca para editar entrega e incidencia">
+                    tbodyInc.innerHTML = pedidosParaReporte.map(p => `
+                        <tr class="border-b">
                             <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                            <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                            <td class="p-2 border">${p.cliente.nombre}</td>
                             <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
-                            <td class="p-2 border text-right font-bold text-blue-950">${formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}</td>
-                            <td class="p-2 border">${p.comentarioEntrega || '<span class="text-gray-400 italic">Sin incidencia</span>'}</td>
+                            <td class="p-2 border text-right">
+                                <input type="number" value="${Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}" onchange="actualizarValorEntrega('${p.id}', this.value)" class="w-24 p-1 border rounded text-right">
+                            </td>
+                            <td class="p-2 border">
+                                <input type="text" value="${p.comentarioEntrega || ''}" placeholder="Escribe incidencia..." onchange="actualizarComentarioEntrega('${p.id}', this.value)" class="uppercase-input w-full p-1 border rounded">
+                            </td>
                             <td class="p-2 border text-center text-lg">
                                 <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
                                     ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
@@ -1592,12 +1455,7 @@
                         mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
                     });
                 });
-                let rankingProdSemArray = Object.values(mapaProdSem);
-                if(ordenRankingSemanaTipo === 'unidades') {
-                    rankingProdSemArray.sort((a, b) => b.unidades - a.unidades);
-                } else {
-                    rankingProdSemArray.sort((a, b) => b.valor - a.valor);
-                }
+                let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
 
                 if(rankingProdSemArray.length === 0) {
                     tbodyProdSem.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de productos para esta semana</td></tr>`;
@@ -1626,46 +1484,23 @@
             }
         }
 
-        function abrirModalIncidencia(id) {
-            let pedidosParaReporte = obtenerPedidosFiltradosExportar();
-            let p = pedidosParaReporte.find(item => item.id === id);
-            if(!p) return;
-            incidenciaPedidoActualId = id;
-
-            document.getElementById('incidencia-pedido-id').value = p.id;
-            document.getElementById('incidencia-num').value = p.numeroPedido;
-            document.getElementById('incidencia-cliente').value = `[${p.cliente.codigo}] ${p.cliente.nombre}`;
-            document.getElementById('incidencia-valor-facturado').value = formatLempiras(p.total);
-            document.getElementById('incidencia-valor-entrega').value = Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total);
-            document.getElementById('incidencia-comentario').value = p.comentarioEntrega || "";
-
-            const modal = document.getElementById('modal-incidencia');
-            if(modal) modal.classList.remove('hidden');
-        }
-
-        function cerrarModalIncidencia() {
-            const modal = document.getElementById('modal-incidencia');
-            if(modal) modal.classList.add('hidden');
-            incidenciaPedidoActualId = null;
-        }
-
-        function guardarModalIncidencia() {
-            if(incidenciaPedidoActualId === null) return;
-            let valEntregaInput = document.getElementById('incidencia-valor-entrega').value;
-            let comentarioInput = document.getElementById('incidencia-comentario').value.toUpperCase().trim();
-            let nuevoValorEntrega = parseFloat(valEntregaInput) || 0;
-
+        function actualizarValorEntrega(id, val) {
             Object.values(reportesSemanales).forEach(arr => {
-                let encontrado = arr.find(item => item.id === incidenciaPedidoActualId);
+                let encontrado = arr.find(item => item.id === id);
+                if(encontrado) encontrado.valorEntrega = parseFloat(val) || 0;
+            });
+            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+        }
+
+        function actualizarComentarioEntrega(id, val) {
+            Object.values(reportesSemanales).forEach(arr => {
+                let encontrado = arr.find(item => item.id === id);
                 if(encontrado) {
-                    encontrado.valorEntrega = nuevoValorEntrega;
-                    encontrado.comentarioEntrega = comentarioInput;
-                    encontrado.gestionado = comentarioInput !== "";
+                    encontrado.comentarioEntrega = val.toUpperCase();
+                    encontrado.gestionado = val.trim() !== "";
                 }
             });
             localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
-            
-            cerrarModalIncidencia();
             renderReportesExportacion();
         }
 
@@ -1744,21 +1579,6 @@
 
         function exportarPdfIncidencias() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
-            let pedidosOrdenados = [...pedidosParaReporte].sort((a, b) => {
-                let gestionA = a.gestionado ? 1 : 0;
-                let gestionB = b.gestionado ? 1 : 0;
-                if (gestionA !== gestionB) {
-                    return gestionA - gestionB;
-                }
-                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
-            });
-
-            let sumaFacturado = pedidosOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
-            let sumaEntrega = pedidosOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
-            let diferenciaMontos = sumaFacturado - sumaEntrega;
-
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
 
@@ -1766,29 +1586,19 @@
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 18);
+            doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
 
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Total Facturado: ${formatLempiras(sumaFacturado)}   |   Total Entrega: ${formatLempiras(sumaEntrega)}   |   Diferencia: ${formatLempiras(diferenciaMontos)}`, 14, 25);
-
-            let datosTabla = pedidosOrdenados.map(p => [
+            let datosTabla = pedidosParaReporte.map(p => [
                 p.numeroPedido,
-                `[${p.cliente.codigo}] ${p.cliente.nombre}`,
+                p.cliente.nombre,
                 formatLempiras(p.total),
                 formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total),
                 p.comentarioEntrega || "Sin incidencia"
             ]);
 
             doc.autoTable({
-                startY: 30,
-                head: [[
-                    'Pedido',
-                    'Cliente',
-                    `Facturado\n(${formatLempiras(sumaFacturado)})`,
-                    `Entrega\n(${formatLempiras(sumaEntrega)})`,
-                    `Comentario\n(Dif: ${formatLempiras(diferenciaMontos)})`
-                ]],
+                startY: 25,
+                head: [['Pedido', 'Cliente', 'Venta', 'Entrega', 'Comentario']],
                 body: datosTabla,
                 columnStyles: {
                     0: { cellWidth: 22 },
@@ -1819,12 +1629,7 @@
                     mapaProdSem[item.codigo].valor += (item.precio * item.cantidad);
                 });
             });
-            let rankingProdSemArray = Object.values(mapaProdSem);
-            if(ordenRankingSemanaTipo === 'unidades') {
-                rankingProdSemArray.sort((a, b) => b.unidades - a.unidades);
-            } else {
-                rankingProdSemArray.sort((a, b) => b.valor - a.valor);
-            }
+            let rankingProdSemArray = Object.values(mapaProdSem).sort((a, b) => b.unidades - a.unidades);
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
