@@ -1451,19 +1451,24 @@
                 }
             }
 
-            // REPORTE DE INCIDENCIAS ORDENADO ASCENDENTE (DEL PEDIDO 01 AL ÚLTIMO) Y CLICKEABLE
+            // ORDEN INTELIGENTE DE INCIDENCIAS: NO GESTIONADOS (ARRIBA) Y GESTIONADOS (ABAJO), ORDENADOS POR NÚMERO DE PEDIDO
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
-                let pedidosIncidenciasOrdenadosAsc = [...pedidosParaReporte].sort((a, b) => {
+                let pedidosIncidenciasOrdenados = [...pedidosParaReporte].sort((a, b) => {
+                    let gestionA = a.gestionado ? 1 : 0;
+                    let gestionB = b.gestionado ? 1 : 0;
+                    if (gestionA !== gestionB) {
+                        return gestionA - gestionB; // Los no gestionados (0) van antes que los gestionados (1)
+                    }
                     let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                     let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                    return numA - numB;
+                    return numA - numB; // Dentro del mismo grupo, orden ascendente por número
                 });
 
-                if(pedidosIncidenciasOrdenadosAsc.length === 0) {
+                if(pedidosIncidenciasOrdenados.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
                 } else {
-                    tbodyInc.innerHTML = pedidosIncidenciasOrdenadosAsc.map(p => `
+                    tbodyInc.innerHTML = pedidosIncidenciasOrdenados.map(p => `
                         <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="abrirModalIncidencia('${p.id}')" title="Toca para editar entrega e incidencia">
                             <td class="p-2 border font-semibold">${p.numeroPedido}</td>
                             <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
@@ -1521,7 +1526,6 @@
             }
         }
 
-        // FUNCIONES PARA EL CUADRO DE DIÁLOGO DE INCIDENCIAS / ENTREGA
         function abrirModalIncidencia(id) {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
             let p = pedidosParaReporte.find(item => item.id === id);
@@ -1640,8 +1644,13 @@
 
         function exportarPdfIncidencias() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
-            // Mantener el mismo orden ascendente (del pedido 01 al último) también en el PDF de incidencias
-            let pedidosOrdenadosAsc = [...pedidosParaReporte].sort((a, b) => {
+            // Mantener el mismo orden inteligente (pendientes arriba, gestionados abajo) en el PDF también
+            let pedidosOrdenados = [...pedidosParaReporte].sort((a, b) => {
+                let gestionA = a.gestionado ? 1 : 0;
+                let gestionB = b.gestionado ? 1 : 0;
+                if (gestionA !== gestionB) {
+                    return gestionA - gestionB;
+                }
                 let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                 let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
                 return numA - numB;
@@ -1656,7 +1665,7 @@
             doc.setFontSize(14);
             doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
 
-            let datosTabla = pedidosOrdenadosAsc.map(p => [
+            let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
                 formatLempiras(p.total),
