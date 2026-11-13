@@ -269,15 +269,40 @@
                     </button>
                 </div>
                 <div id="body-incidencias" class="hidden p-4 border-t bg-white space-y-3">
+                    <!-- RESUMEN DE TOTALES EN EL ENCABEZADO DEL REPORTE -->
+                    <div id="resumen-totales-incidencias" class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs">
+                        <div class="flex justify-between sm:flex-col">
+                            <span class="text-gray-600 font-semibold">Total Facturado:</span>
+                            <span id="inc-total-facturado" class="font-bold text-gray-900 text-sm">L. 0</span>
+                        </div>
+                        <div class="flex justify-between sm:flex-col">
+                            <span class="text-gray-600 font-semibold">Total Entrega:</span>
+                            <span id="inc-total-entrega" class="font-bold text-blue-900 text-sm">L. 0</span>
+                        </div>
+                        <div class="flex justify-between sm:flex-col">
+                            <span class="text-gray-600 font-semibold">Diferencia (Facturado - Entrega):</span>
+                            <span id="inc-diferencia" class="font-bold text-red-600 text-sm">L. 0</span>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr class="bg-gray-100 text-gray-600 text-xs">
                                     <th class="p-2 border">Pedido No.</th>
                                     <th class="p-2 border">Nombre Cliente</th>
-                                    <th class="p-2 border text-right">Valor Venta</th>
-                                    <th class="p-2 border text-right">Valor Entrega</th>
-                                    <th class="p-2 border">Comentario / Incidencia</th>
+                                    <th class="p-2 border text-right">
+                                        <div>Valor Facturado</div>
+                                        <div id="th-total-facturado" class="text-[11px] font-bold text-gray-900 mt-0.5">L. 0</div>
+                                    </th>
+                                    <th class="p-2 border text-right">
+                                        <div>Valor Entrega</div>
+                                        <div id="th-total-entrega" class="text-[11px] font-bold text-blue-900 mt-0.5">L. 0</div>
+                                    </th>
+                                    <th class="p-2 border">
+                                        <div>Comentario / Incidencia</div>
+                                        <div id="th-diferencia" class="text-[11px] font-bold text-red-600 mt-0.5">Dif: L. 0</div>
+                                    </th>
                                     <th class="p-2 border text-center">Estado</th>
                                 </tr>
                             </thead>
@@ -1451,19 +1476,46 @@
                 }
             }
 
-            // ORDEN INTELIGENTE DE INCIDENCIAS: NO GESTIONADOS (ARRIBA) Y GESTIONADOS (ABAJO), ORDENADOS POR NÚMERO DE PEDIDO
+            // REPORTE DE INCIDENCIAS CON TOTALES DE FACTURADO, ENTREGA Y DIFERENCIA EN ENCABEZADO
             const tbodyInc = document.getElementById('tbody-reporte-incidencias');
             if(tbodyInc) {
                 let pedidosIncidenciasOrdenados = [...pedidosParaReporte].sort((a, b) => {
                     let gestionA = a.gestionado ? 1 : 0;
                     let gestionB = b.gestionado ? 1 : 0;
                     if (gestionA !== gestionB) {
-                        return gestionA - gestionB; // Los no gestionados (0) van antes que los gestionados (1)
+                        return gestionA - gestionB;
                     }
                     let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
                     let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                    return numA - numB; // Dentro del mismo grupo, orden ascendente por número
+                    return numA - numB;
                 });
+
+                // CÁLCULO DE TOTALES FACTURADO, ENTREGA Y DIFERENCIA
+                let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
+                let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
+                let diferenciaMontos = sumaFacturado - sumaEntrega;
+
+                // Actualizar etiquetas en resumen superior
+                const incTotFactEl = document.getElementById('inc-total-facturado');
+                const incTotEntEl = document.getElementById('inc-total-entrega');
+                const incDifEl = document.getElementById('inc-diferencia');
+                if(incTotFactEl) incTotFactEl.innerText = formatLempiras(sumaFacturado);
+                if(incTotEntEl) incTotEntEl.innerText = formatLempiras(sumaEntrega);
+                if(incDifEl) {
+                    incDifEl.innerText = formatLempiras(diferenciaMontos);
+                    incDifEl.className = `font-bold text-sm ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
+                }
+
+                // Actualizar encabezados de columnas de la tabla
+                const thTotFactEl = document.getElementById('th-total-facturado');
+                const thTotEntEl = document.getElementById('th-total-entrega');
+                const thDifEl = document.getElementById('th-diferencia');
+                if(thTotFactEl) thTotFactEl.innerText = formatLempiras(sumaFacturado);
+                if(thTotEntEl) thTotEntEl.innerText = formatLempiras(sumaEntrega);
+                if(thDifEl) {
+                    thDifEl.innerText = `Dif: ${formatLempiras(diferenciaMontos)}`;
+                    thDifEl.className = `text-[11px] font-bold mt-0.5 ${diferenciaMontos === 0 ? 'text-green-600' : 'text-red-600'}`;
+                }
 
                 if(pedidosIncidenciasOrdenados.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
@@ -1644,7 +1696,6 @@
 
         function exportarPdfIncidencias() {
             let pedidosParaReporte = obtenerPedidosFiltradosExportar();
-            // Mantener el mismo orden inteligente (pendientes arriba, gestionados abajo) en el PDF también
             let pedidosOrdenados = [...pedidosParaReporte].sort((a, b) => {
                 let gestionA = a.gestionado ? 1 : 0;
                 let gestionB = b.gestionado ? 1 : 0;
@@ -1656,6 +1707,10 @@
                 return numA - numB;
             });
 
+            let sumaFacturado = pedidosOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
+            let sumaEntrega = pedidosOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
+            let diferenciaMontos = sumaFacturado - sumaEntrega;
+
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
 
@@ -1663,7 +1718,11 @@
             const doc = new jsPDF();
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 20);
+            doc.text(`Reporte Clientes e Incidencias (${semanaSeleccionada})`, 14, 18);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Total Facturado: ${formatLempiras(sumaFacturado)}   |   Total Entrega: ${formatLempiras(sumaEntrega)}   |   Diferencia: ${formatLempiras(diferenciaMontos)}`, 14, 25);
 
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
@@ -1674,8 +1733,14 @@
             ]);
 
             doc.autoTable({
-                startY: 25,
-                head: [['Pedido', 'Cliente', 'Venta', 'Entrega', 'Comentario']],
+                startY: 30,
+                head: [[
+                    'Pedido',
+                    'Cliente',
+                    `Facturado\n(${formatLempiras(sumaFacturado)})`,
+                    `Entrega\n(${formatLempiras(sumaEntrega)})`,
+                    `Comentario\n(Dif: ${formatLempiras(diferenciaMontos)})`
+                ]],
                 body: datosTabla,
                 columnStyles: {
                     0: { cellWidth: 22 },
