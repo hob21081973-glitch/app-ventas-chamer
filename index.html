@@ -1239,20 +1239,28 @@
         }
 
         function eliminarPedido(id) {
-            if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
-                historialPedidos = historialPedidos.filter(p => p.id !== id);
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
-                sincronizarPedidosEnNube();
-                renderHistorial();
-                renderResumenGeneral();
-                renderResumenProducto();
-                poblarSelectorSemanasExportar();
-                renderReportesExportacion();
-            }
+    if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
+        // 1. Quitar el pedido del arreglo local
+        historialPedidos = historialPedidos.filter(p => p.id !== id);
+        
+        // 2. Guardar el nuevo historial en el almacenamiento local
+        localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+        
+        // 3. Enviar la lista actualizada a Google Sheets para que se refleje el cambio
+        if (typeof sincronizarPedidosEnNube === 'function') {
+            sincronizarPedidosEnNube();
         }
-
+        
+        // 4. Refrescar las vistas de la aplicación
+        renderHistorial();
+        renderResumenGeneral();
+        renderResumenProducto();
+        poblarSelectorSemanasExportar();
+        renderReportesExportacion();
+    }
+}
         function generarPdfPedidoIndividual(id) {
-            let pedido = historialPedidos.find(p => p.id === id);
+            let pedido = historialPedSidos.find(p => p.id === id);
             if(!pedido) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
