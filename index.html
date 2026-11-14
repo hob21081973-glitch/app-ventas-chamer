@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas Chamer</title>
+    <title>Ventas Chamer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -23,7 +23,7 @@
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-store"></i> App Ventas Chamer
+                <i class="fa-solid fa-store"></i> Ventas Chamer
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
                 <i class="fa-solid fa-cloud"></i> Verificando conexión...
@@ -513,10 +513,10 @@
 
         let listaClientes = [];
         let listaProductos = [];
-        let pedidoActualCliente = JSON.parse(localStorage.getItem('app_ventas_ch_borrador_cliente')) || null;
-        let itemsPedidoActual = JSON.parse(localStorage.getItem('app_ventas_ch_borrador_items')) || [];
-        let historialPedidos = JSON.parse(localStorage.getItem('app_ventas_ch_pedidos')) || [];
-        let reportesSemanales = JSON.parse(localStorage.getItem('app_ventas_ch_semanales')) || {};
+        let pedidoActualCliente = JSON.parse(localStorage.getItem('app_ventas_chamer_borrador_cliente')) || null;
+        let itemsPedidoActual = JSON.parse(localStorage.getItem('app_ventas_chamer_borrador_items')) || [];
+        let historialPedidos = JSON.parse(localStorage.getItem('app_ventas_chamer_pedidos')) || [];
+        let reportesSemanales = JSON.parse(localStorage.getItem('app_ventas_chamer_semanales')) || {};
         let productoSeleccionadoTemporal = null;
         let indiceItemEditandoDetalle = null;
         let numeroCantidadActual = "";
@@ -529,8 +529,8 @@
         let ordenRankingSemanaTipo = 'unidades';
 
         function guardarBorrador() {
-            localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
-            localStorage.setItem('app_ventas_ch_borrador_items', JSON.stringify(itemsPedidoActual));
+            localStorage.setItem('app_ventas_chamer_borrador_cliente', JSON.stringify(pedidoActualCliente));
+            localStorage.setItem('app_ventas_chamer_borrador_items', JSON.stringify(itemsPedidoActual));
         }
 
         function formatLempiras(monto) {
@@ -881,7 +881,7 @@
                     let idFormat = String(numClean).padStart(2, '0');
                     p.id = idFormat;
                     p.numeroPedido = `Pedido #${idFormat}`;
-                    localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                    localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
                     renderHistorial();
                     renderResumenGeneral();
                     renderResumenProducto();
@@ -911,7 +911,7 @@
                 });
 
                 historialPedidos = pedidosOrdenadosAsc;
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
 
                 renderHistorial();
                 renderResumenGeneral();
@@ -1031,7 +1031,7 @@
                 historialPedidos.push(nuevoPedido);
             }
 
-            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
             
             pedidoActualCliente = null;
             itemsPedidoActual = [];
@@ -1110,7 +1110,7 @@
             let nuevaFecha = prompt("Ingrese la nueva fecha (Ej: 06 NOV 2026):", p.fecha);
             if(nuevaFecha !== null && nuevaFecha.trim() !== "") {
                 p.fecha = formatearFechaStandard(nuevaFecha);
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
                 renderHistorial();
                 renderResumenGeneral();
             }
@@ -1169,13 +1169,13 @@
             let pedidosAMover = historialPedidos.filter(p => idsSeleccionados.includes(p.id));
             
             historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
-            localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+            localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
 
             if(!reportesSemanales[semanaInput]) {
                 reportesSemanales[semanaInput] = [];
             }
             reportesSemanales[semanaInput].push(...pedidosAMover);
-            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+            localStorage.setItem('app_ventas_chamer_semanales', JSON.stringify(reportesSemanales));
 
             if(semanaInputEl) semanaInputEl.value = "";
             renderHistorial();
@@ -1203,7 +1203,7 @@
         function eliminarPedido(id) {
             if(confirm("¿Está seguro de eliminar este pedido? (Sí / No)")) {
                 historialPedidos = historialPedidos.filter(p => p.id !== id);
-                localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
+                localStorage.setItem('app_ventas_chamer_pedidos', JSON.stringify(historialPedidos));
                 renderHistorial();
                 renderResumenGeneral();
                 renderResumenProducto();
@@ -1220,7 +1220,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("App Ventas Chamer - Comprobante de Pedido", 14, 20);
+            doc.text("Ventas Chamer - Comprobante de Pedido", 14, 20);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
@@ -1663,7 +1663,7 @@
                     encontrado.gestionado = comentarioInput !== "";
                 }
             });
-            localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
+            localStorage.setItem('app_ventas_chamer_semanales', JSON.stringify(reportesSemanales));
             
             cerrarModalIncidencia();
             renderReportesExportacion();
@@ -1684,7 +1684,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte - ${semana} – App Ventas Chamer`, 14, 20);
+            doc.text(`Reporte - ${semana} – Ventas Chamer`, 14, 20);
 
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
