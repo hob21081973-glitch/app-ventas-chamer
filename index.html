@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas Chamer</title>
+    <title>App Ventas Ch</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -23,7 +23,7 @@
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-store"></i> Ventas Chamer
+                <i class="fa-solid fa-store"></i> App Ventas Ch
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
                 <i class="fa-solid fa-cloud"></i> Verificando conexión...
@@ -63,10 +63,10 @@
 
         <!-- 1. CREAR PEDIDO -->
         <div id="panel-crear" class="tab-panel active space-y-4">
-            <h2 class="text-xl font-bold text-gray-800">Nuevo Pedido</h2>
+            <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
                         <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -74,7 +74,7 @@
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
                         <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -84,20 +84,20 @@
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto/Detalle</th>
-                                <th class="p-2 border">Cant.</th>
-                                <th class="p-2 border">P. Unit.</th>
+                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
+                                <th class="p-2 border">Cantidad</th>
+                                <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
                                 <th class="p-2 border text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-pedido-detalle" class="text-sm">
-                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregar productos al pedido</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-gray-400">Agregue productos al pedido</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -121,7 +121,7 @@
                         </button>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                        <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 00" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <button type="button" onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
                             <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
                         </button>
@@ -141,7 +141,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-xs font-semibold text-gray-600">Rango Fecha:</span>
-                        <input type="text" id="rango-fecha" placeholder="EJ: 00 MES 0000" class="uppercase-input w-32 p-1 border rounded text-xs">
+                        <input type="text" id="rango-fecha" placeholder="EJ: 06 NOV 2026" class="uppercase-input w-32 p-1 border rounded text-xs">
                         <button type="button" onclick="seleccionarPorFecha()" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700">Aplicar Fecha</button>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
             <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
-                    <div class="text-sm text-gray-500 font-medium">Venta General (Semanal)</div>
+                    <div class="text-sm text-gray-500 font-medium">Venta General (Pedidos Activos)</div>
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
@@ -180,10 +180,10 @@
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Semanal)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
                 <div class="flex gap-2">
-                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Unidades</button>
-                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Valor L.</button>
+                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
+                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -192,7 +192,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Unidades Vendidas</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
                                 <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
                         </thead>
@@ -208,7 +208,7 @@
         <div id="panel-exportar" class="tab-panel space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Reportes y Exportación
+                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Centro de Reportes y Exportación
                 </h2>
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">Seleccionar Semana:</label>
@@ -221,7 +221,7 @@
             <!-- Reportes Semanales / Acumulados -->
             <div class="bg-white p-4 rounded-lg shadow space-y-3 border">
                 <h3 class="text-base font-semibold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-3">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
@@ -233,7 +233,7 @@
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
-                        Reporte General de Ventas (Semana Seleccionada)
+                        Reporte General de Ventas (Según Semana Seleccionada)
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -262,7 +262,7 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte General Por Cliente E Incidencias (Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
+                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -319,7 +319,7 @@
                 <div onclick="toggleReporte('producto_semana')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
-                        Reporte por Producto (Semana Seleccionada)
+                        Reporte por Producto (Según Semana Seleccionada)
                     </span>
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1">
@@ -1220,7 +1220,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("Ventas Chamer - Comprobante de Pedido", 14, 20);
+            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
@@ -1684,7 +1684,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte - ${semana} – Ventas Chamer`, 14, 20);
+            doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
 
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
