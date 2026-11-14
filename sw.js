@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-ventas-chamer-v31';
+const CACHE_NAME = 'app-ventas-chamer-v32';
 const assetsToCache = [
     './',
     './index.html',
