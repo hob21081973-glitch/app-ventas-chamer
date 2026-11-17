@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -97,7 +97,7 @@
                     </table>
                 </div>
                 <div class="mt-4 flex justify-between items-center border-t pt-3">
-                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0</span></div>
+                    <div class="text-xl font-bold text-gray-700">Gran Total: <span id="label-gran-total-pedido">L. 0</span></div>
                     <button type="button" onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
@@ -109,15 +109,15 @@
             <div class="bg-white p-4 rounded-lg shadow space-y-3">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                     <div class="flex items-center gap-3">
-                        <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Historial Pedidos</h2>
                         <button type="button" onclick="reordenarNumeracionSecuencial()" class="bg-amber-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-amber-700 shadow flex items-center gap-1" title="Renombra los pedidos 01, 02, 03... eliminando brincos">
-                            <i class="fa-solid fa-list-ol"></i> Reordenar Secuencia (01, 02...)
+                            <i class="fa-solid fa-list-ol"></i>Reordenar (01, 02...)
                         </button>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
                         <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <button type="button" onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
-                            <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
+                            <i class="fa-solid fa-calendar-week"></i> Asignar Reporte Semanal
                         </button>
                     </div>
                 </div>
@@ -147,14 +147,14 @@
         </div>
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
+            <h2 class="text-xl font-bold text-gray-800">Resumen General Semanal</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
-                    <div class="text-sm text-gray-500 font-medium">Venta General (Pedidos Activos)</div>
+                    <div class="text-sm text-gray-500 font-medium">Venta General (Historial)</div>
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha (Top 6 Recientes)</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
@@ -170,10 +170,10 @@
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Historial)</h2>
                 <div class="flex gap-2">
-                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Por Unidades</button>
-                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Por Valor L.</button>
+                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-600">Por Unidades</button>
+                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-600">Por Valor L.</button>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -182,7 +182,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Unidades Vendidas</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
                                 <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
                         </thead>
@@ -195,9 +195,28 @@
         </div>
         <!-- 5. EXPORTAR REPORTES A PDFS CON SELECTOR DE SEMANA -->
         <div id="panel-exportar" class="tab-panel space-y-4">
+            <!-- SECCIÓN NUEVA: RESPALDO Y RESTAURACIÓN DE DATOS -->
+            <div class="bg-white p-4 rounded-lg shadow border-2 border-emerald-700 flex flex-col md:flex-row justify-between items-center gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-emerald-800 flex items-center gap-2">
+                        <i class="fa-solid fa-database"></i> Respaldo y Seguridad de Datos
+                    </h3>
+                    <p class="text-xs text-gray-600 mt-0.5">Descarga un archivo con tus datos o restaura uno anterior para evitar pérdidas.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+                    <button type="button" onclick="exportarRespaldoLocal()" class="bg-emerald-700 text-white px-3 py-2 rounded-md font-semibold text-xs hover:bg-emerald-800 shadow flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Descargar Respaldo
+                    </button>
+                    <label class="bg-blue-700 text-white px-3 py-2 rounded-md font-semibold text-xs hover:bg-blue-800 shadow flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-upload"></i> Restaurar Respaldo
+                        <input type="file" id="input-archivo-respaldo" accept=".json" onchange="importarRespaldoLocal(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Centro de Reportes y Exportación
+                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Reportes y Exportación
                 </h2>
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">Seleccionar Semana:</label>
@@ -210,7 +229,7 @@
             <!-- Reportes Semanales / Acumulados -->
             <div class="bg-white p-4 rounded-lg shadow space-y-3 border">
                 <h3 class="text-base font-semibold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal Seleccionada
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-3">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
@@ -221,7 +240,7 @@
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
-                        Reporte General de Ventas (Según Semana Seleccionada)
+                        Reporte Gral de Ventas (Semana Seleccionada)
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -249,7 +268,7 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
+                        Reporte Gral Por Cliente E Incidencias (Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -304,7 +323,7 @@
                 <div onclick="toggleReporte('producto_semana')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
-                        Reporte por Producto (Según Semana Seleccionada)
+                        Reporte por Producto (Semana Seleccionada)
                     </span>
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1">
@@ -337,9 +356,9 @@
         <!-- 6. GESTIÓN DE CLIENTES -->
         <div id="panel-clientes" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes (Google Sheets)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes</h2>
                 <button type="button" onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
+                    <i class="fa-solid fa-rotate"></i>Sincronizar
                 </button>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -361,9 +380,9 @@
         <!-- 7. GESTIÓN DE PRODUCTOS -->
         <div id="panel-productos" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Gestión De Productos (Google Sheets)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Productos</h2>
                 <button type="button" onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
+                    <i class="fa-solid fa-rotate"></i>Sincronizar
                 </button>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -513,6 +532,44 @@
         function formatLempirasConDecimales(monto) {
             return "L. " + parseFloat(monto || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
+        
+        // FUNCIONES DE RESPALDO Y RESTAURACIÓN
+        function exportarRespaldoLocal() {
+            let datos = {
+                pedidos: JSON.parse(localStorage.getItem('app_ventas_ch_pedidos')) || [],
+                semanales: JSON.parse(localStorage.getItem('app_ventas_ch_semanales')) || {},
+                borradorItems: JSON.parse(localStorage.getItem('app_ventas_ch_borrador_items')) || [],
+                borradorCliente: JSON.parse(localStorage.getItem('app_ventas_ch_borrador_cliente')) || null
+            };
+            let blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `respaldo_ventas_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importarRespaldoLocal(event) {
+            let archivo = event.target.files[0];
+            if (!archivo) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let datos = JSON.parse(e.target.result);
+                    if (datos.pedidos) localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(datos.pedidos));
+                    if (datos.semanales) localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(datos.semanales));
+                    if (datos.borradorItems) localStorage.setItem('app_ventas_ch_borrador_items', JSON.stringify(datos.borradorItems));
+                    if (datos.borradorCliente) localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(datos.borradorCliente));
+                    alert("¡Respaldo restaurado con éxito!");
+                    location.reload();
+                } catch (err) {
+                    alert("El archivo de respaldo no es válido.");
+                }
+            };
+            reader.readAsText(archivo);
+        }
+
         function formatearFechaStandard(strFecha) {
             if (!strFecha) return "SIN FECHA";
             let f = strFecha.trim().toUpperCase();
@@ -632,7 +689,7 @@
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
                 procesarDatosCSV(textC, textP);
-                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
+                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Conectado';
             } catch (error) {
                 console.warn("Fallo de red, usando respaldo local...", error);
                 if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Usando datos locales';
@@ -1754,4 +1811,3 @@
     </script>
 </body>
 </html>
-```[cite: 2]
