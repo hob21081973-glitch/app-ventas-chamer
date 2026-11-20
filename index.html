@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Ventas Ch</title>
+    <title>Ventas Chamer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -22,7 +22,7 @@
     <header class="bg-blue-900 text-white shadow-md">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-store"></i> App Ventas Ch
+                <i class="fa-solid fa-store"></i> Ventas Chamer
             </h1>
             <div id="sync-status" class="text-xs bg-blue-800 px-3 py-1 rounded-full">
                 <i class="fa-solid fa-cloud"></i> Verificando conexión...
@@ -62,31 +62,31 @@
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow">
+            <div class="bg-white p-4 rounded-lg shadow relative">
                 <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto pb-2">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
-                                <th class="p-2 border">Cantidad</th>
-                                <th class="p-2 border">Precio Unit.</th>
+                                <th class="p-2 border">Código & Producto/Detalle</th>
+                                <th class="p-2 border">Cant.</th>
+                                <th class="p-2 border">P. Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
                                 <th class="p-2 border text-center">Acciones</th>
                             </tr>
@@ -96,9 +96,10 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 flex justify-between items-center border-t pt-3">
-                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0</span></div>
-                    <button type="button" onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
+                <!-- BARRA FIJA INFERIOR DE TOTAL Y GUARDAR -->
+                <div class="sticky bottom-0 z-20 bg-white border-t pt-3 pb-2 px-2 -mx-2 mt-2 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.08)] rounded-b-lg">
+                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido" class="text-blue-900">L. 0</span></div>
+                    <button type="button" onclick="guardarPedidoActual()" class="bg-green-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
                 </div>
@@ -115,7 +116,7 @@
                         </button>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                        <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <input type="text" id="input-numero-semana" placeholder="SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <button type="button" onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
                             <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
                         </button>
@@ -134,7 +135,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-xs font-semibold text-gray-600">Rango Fecha:</span>
-                        <input type="text" id="rango-fecha" placeholder="EJ: 06 NOV 2026" class="uppercase-input w-32 p-1 border rounded text-xs">
+                        <input type="text" id="rango-fecha" placeholder="00 MES 2026" class="uppercase-input w-32 p-1 border rounded text-xs">
                         <button type="button" onclick="seleccionarPorFecha()" class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-blue-700">Aplicar Fecha</button>
                     </div>
                 </div>
@@ -154,13 +155,13 @@
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha (Top 6 Recientes)</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente (Pedido 01 al Último)</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-cliente" class="text-xs text-gray-800">Sin ventas registradas</div>
                     </div>
@@ -170,7 +171,7 @@
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
                 <div class="flex gap-2">
                     <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
                     <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
@@ -199,13 +200,13 @@
             <div class="bg-white p-4 rounded-lg shadow border-2 border-emerald-700 flex flex-col md:flex-row justify-between items-center gap-3">
                 <div>
                     <h3 class="text-base font-bold text-emerald-800 flex items-center gap-2">
-                        <i class="fa-solid fa-database"></i> Respaldo y Seguridad de Datos
+                        <i class="fa-solid fa-database"></i>Respaldo y Seguridad
                     </h3>
                     <p class="text-xs text-gray-600 mt-0.5">Descarga un archivo con tus datos o restaura uno anterior para evitar pérdidas.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
                     <button type="button" onclick="exportarRespaldoLocal()" class="bg-emerald-700 text-white px-3 py-2 rounded-md font-semibold text-xs hover:bg-emerald-800 shadow flex items-center gap-2">
-                        <i class="fa-solid fa-download"></i> Descargar Respaldo
+                        <i class="fa-solid fa-download"></i>Descargar Respaldo
                     </button>
                     <label class="bg-blue-700 text-white px-3 py-2 rounded-md font-semibold text-xs hover:bg-blue-800 shadow flex items-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-upload"></i> Restaurar Respaldo
@@ -216,7 +217,7 @@
 
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Centro de Reportes y Exportación
+                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Reportes y Exportación
                 </h2>
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">Seleccionar Semana:</label>
@@ -240,7 +241,7 @@
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
-                        Reporte General de Ventas (Según Semana Seleccionada)
+                        Reporte Gral de Ventas (Semana Seleccionada)
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -268,7 +269,7 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para gestionar entrega/incidencia)</span>
+                        Reporte General Por Cliente E Incidencias (Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para gestionar entrega/incidencia)</span>
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -327,8 +328,8 @@
                     </span>
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1">
-                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('unidades')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Unidades">U</button>
-                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('valor')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Ordenar por Valor L.">L.</button>
+                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('unidades')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Unidades">U</button>
+                            <button type="button" onclick="event.stopPropagation(); ordenarRankingSemana('valor')" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 shadow" title="Valor L.">L.</button>
                         </div>
                         <button type="button" onclick="event.stopPropagation(); exportarPdfProductoSemana()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                             <i class="fa-solid fa-file-pdf"></i> PDF
@@ -341,7 +342,7 @@
                             <thead>
                                 <tr class="bg-gray-100 text-gray-600 text-xs">
                                     <th class="p-2 border">Producto</th>
-                                    <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                    <th class="p-2 border text-right">Unidades Vendidas</th>
                                     <th class="p-2 border text-right">Valor Total (L.)</th>
                                 </tr>
                             </thead>
@@ -693,7 +694,7 @@
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
                 procesarDatosCSV(textC, textP);
-                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
+                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i>Conectado';
             } catch (error) {
                 console.warn("Fallo de red, usando respaldo local...", error);
                 if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Usando datos locales';
@@ -1243,7 +1244,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("App Ventas Ch - Comprobante de Pedido", 14, 20);
+            doc.text("Ventas Chamer - Comprobante de Pedido", 14, 20);
             
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
@@ -1304,7 +1305,6 @@
             return isNaN(d) ? 0 : d;
         }
         function renderResumenGeneral() {
-            // Usa únicamente los pedidos activos (historialPedidos) para que se limpie al asignar semana
             let pedidosActivos = [...historialPedidos];
             let ventaGeneralActiva = pedidosActivos.reduce((acc, p) => acc + p.total, 0);
             const resGen = document.getElementById('resumen-venta-general');
@@ -1321,7 +1321,6 @@
             let mapaFechas = {};
             let mapaClientes = {};
 
-            // Ordenar desde el Pedido #01 al último para el reporte por cliente
             let pedidosOrdenAsc = [...pedidosActivos].sort((a, b) => getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b));
 
             pedidosOrdenAsc.forEach(p => {
@@ -1535,7 +1534,6 @@
                     return getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b);
                 });
                 let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
-                // Solo suma en Total Entrega los pedidos ya gestionados
                 let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => {
                     if (!p.gestionado || p.valorEntrega === null || p.valorEntrega === undefined || p.valorEntrega === "") return acc;
                     return acc + (parseFloat(p.valorEntrega) || 0);
@@ -1686,7 +1684,7 @@
             
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text(`Reporte - ${semana} – App Ventas Ch`, 14, 20);
+            doc.text(`Reporte - ${semana} – Ventas Chamer`, 14, 20);
             let datosTabla = pedidosOrdenados.map(p => [
                 p.numeroPedido,
                 `[${p.cliente.codigo}] ${p.cliente.nombre}`,
