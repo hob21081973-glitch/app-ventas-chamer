@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -59,34 +59,34 @@
     <main class="container mx-auto p-4 flex-grow max-w-6xl">
         <!-- 1. CREAR PEDIDO -->
         <div id="panel-crear" class="tab-panel active space-y-4">
-            <h2 class="text-xl font-bold text-gray-800">Nuevo Pedido</h2>
+            <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Cliente</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
+                        <input type="text" id="input-buscar-cliente" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Seleccionar Producto</label>
                     <div class="relative flex items-center">
-                        <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
+                        <input type="text" id="input-buscar-producto" placeholder="Buscar por código o nombre..." class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
                     </div>
                     <div id="lista-productos-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en Pedido</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">Productos en el Pedido</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Código & Producto/Detalle</th>
-                                <th class="p-2 border">Cant.</th>
-                                <th class="p-2 border">P. Unit.</th>
+                                <th class="p-2 border">Código & Producto / Detalle (Tocar para editar)</th>
+                                <th class="p-2 border">Cantidad</th>
+                                <th class="p-2 border">Precio Unit.</th>
                                 <th class="p-2 border">Gran Total</th>
                                 <th class="p-2 border text-center">Acciones</th>
                             </tr>
@@ -97,7 +97,7 @@
                     </table>
                 </div>
                 <div class="mt-4 flex justify-between items-center border-t pt-3">
-                    <div class="text-xl font-bold text-gray-700">Gran Total: <span id="label-gran-total-pedido">L. 0</span></div>
+                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido">L. 0</span></div>
                     <button type="button" onclick="guardarPedidoActual()" class="bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
@@ -109,15 +109,15 @@
             <div class="bg-white p-4 rounded-lg shadow space-y-3">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                     <div class="flex items-center gap-3">
-                        <h2 class="text-xl font-bold text-gray-800">Historial Pedidos</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Historial De Pedidos</h2>
                         <button type="button" onclick="reordenarNumeracionSecuencial()" class="bg-amber-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-amber-700 shadow flex items-center gap-1" title="Renombra los pedidos 01, 02, 03... eliminando brincos">
-                            <i class="fa-solid fa-list-ol"></i>Reordenar (01, 02...)
+                            <i class="fa-solid fa-list-ol"></i> Reordenar Secuencia (01, 02...)
                         </button>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
                         <input type="text" id="input-numero-semana" placeholder="EJ: SEMANA 44" class="uppercase-input p-2 border rounded-md text-sm w-full md:w-40 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <button type="button" onclick="enviarPedidosASemana()" class="bg-blue-900 text-white px-4 py-2 rounded-md font-semibold text-sm hover:bg-blue-800 shadow flex items-center gap-2 whitespace-nowrap">
-                            <i class="fa-solid fa-calendar-week"></i> Asignar Reporte Semanal
+                            <i class="fa-solid fa-calendar-week"></i> Asignar a Reporte Semanal
                         </button>
                     </div>
                 </div>
@@ -147,20 +147,20 @@
         </div>
         <!-- 3. RESUMEN GENERAL -->
         <div id="panel-general" class="tab-panel space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Resumen General Semanal</h2>
+            <h2 class="text-xl font-bold text-gray-800">Resumen General en Tiempo Real</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
-                    <div class="text-sm text-gray-500 font-medium">Venta General (Historial)</div>
+                    <div class="text-sm text-gray-500 font-medium">Venta General (Pedidos Activos)</div>
                     <div id="resumen-venta-general" class="text-2xl font-bold text-gray-800 mt-1">L. 0</div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Fecha (Top 6 Recientes)</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-fecha" class="text-xs text-gray-800 space-y-1">Sin ventas registradas</div>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente</div>
+                    <div class="text-sm text-gray-500 font-medium mb-2">Venta Por Cliente (Pedido 01 al Último)</div>
                     <div class="overflow-y-auto max-h-96">
                         <div id="resumen-venta-cliente" class="text-xs text-gray-800">Sin ventas registradas</div>
                     </div>
@@ -170,10 +170,10 @@
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Historial)</h2>
+                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos (Pedidos Activos)</h2>
                 <div class="flex gap-2">
-                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-600">Unidades</button>
-                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-600">Valor L.</button>
+                    <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Unidades</button>
+                    <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Ordenar por Valor L.</button>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -182,8 +182,8 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
                                 <th class="p-2 border">Producto</th>
-                                <th class="p-2 border text-right">Unidades</th>
-                                <th class="p-2 border text-right">Valores (L.)</th>
+                                <th class="p-2 border text-right">Unidades Acumuladas</th>
+                                <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-ranking-productos" class="text-sm">
@@ -195,11 +195,11 @@
         </div>
         <!-- 5. EXPORTAR REPORTES A PDFS CON SELECTOR DE SEMANA -->
         <div id="panel-exportar" class="tab-panel space-y-4">
-            <!-- SECCIÓN NUEVA: RESPALDO Y RESTAURACIÓN DE DATOS -->
+            <!-- RESPALDO Y RESTAURACIÓN DE DATOS -->
             <div class="bg-white p-4 rounded-lg shadow border-2 border-emerald-700 flex flex-col md:flex-row justify-between items-center gap-3">
                 <div>
                     <h3 class="text-base font-bold text-emerald-800 flex items-center gap-2">
-                        <i class="fa-solid fa-database"></i> Respaldo De Datos
+                        <i class="fa-solid fa-database"></i> Respaldo y Seguridad de Datos
                     </h3>
                     <p class="text-xs text-gray-600 mt-0.5">Descarga un archivo con tus datos o restaura uno anterior para evitar pérdidas.</p>
                 </div>
@@ -216,7 +216,7 @@
 
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Reportes y Exportación
+                    <i class="fa-solid fa-file-pdf text-blue-900"></i> Centro de Reportes y Exportación
                 </h2>
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">Seleccionar Semana:</label>
@@ -229,7 +229,7 @@
             <!-- Reportes Semanales / Acumulados -->
             <div class="bg-white p-4 rounded-lg shadow space-y-3 border">
                 <h3 class="text-base font-semibold text-blue-900 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal Seleccionada
+                    <i class="fa-solid fa-calendar-week"></i> Reporte Semanal / Mensual Acumulado
                 </h3>
                 <div id="contenedor-reporte-semanal" class="space-y-3">
                     <div class="p-4 text-center text-gray-400">No hay pedidos asignados al reporte semanal todavía.</div>
@@ -240,7 +240,7 @@
                 <div onclick="toggleReporte('general_ventas')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-general_ventas"></i>
-                        Reporte Gral de Ventas (Semana Seleccionada)
+                        Reporte General de Ventas (Según Semana Seleccionada)
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfGeneral()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -268,7 +268,7 @@
                 <div onclick="toggleReporte('incidencias')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-incidencias"></i>
-                        Reporte Gral Por Cliente E Incidencias (Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para editar entrega/incidencia)</span>
+                        Reporte General Por Cliente E Incidencias (Según Semana Seleccionada) - <span class="text-xs text-blue-600 font-normal">(Toca una línea para gestionar entrega/incidencia)</span>
                     </span>
                     <button type="button" onclick="event.stopPropagation(); exportarPdfIncidencias()" class="bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-pdf"></i> PDF
@@ -282,7 +282,7 @@
                             <span id="inc-total-facturado" class="font-bold text-gray-900 text-sm">L. 0</span>
                         </div>
                         <div class="flex justify-between sm:flex-col">
-                            <span class="text-gray-600 font-semibold">Total Entrega:</span>
+                            <span class="text-gray-600 font-semibold">Total Entrega (Gestionado):</span>
                             <span id="inc-total-entrega" class="font-bold text-blue-900 text-sm">L. 0</span>
                         </div>
                         <div class="flex justify-between sm:flex-col">
@@ -323,7 +323,7 @@
                 <div onclick="toggleReporte('producto_semana')" class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                     <span class="font-semibold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-chevron-right text-xs transition-transform duration-200" id="icon-producto_semana"></i>
-                        Reporte por Producto (Semana Seleccionada)
+                        Reporte por Producto (Según Semana Seleccionada)
                     </span>
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1">
@@ -356,9 +356,9 @@
         <!-- 6. GESTIÓN DE CLIENTES -->
         <div id="panel-clientes" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes</h2>
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Clientes (Google Sheets)</h2>
                 <button type="button" onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i>Sincronizar
+                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
                 </button>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -380,9 +380,9 @@
         <!-- 7. GESTIÓN DE PRODUCTOS -->
         <div id="panel-productos" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Gestión De Productos</h2>
+                <h2 class="text-xl font-bold text-gray-800">Gestión De Productos (Google Sheets)</h2>
                 <button type="button" onclick="sincronizarGoogleSheets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i>Sincronizar
+                    <i class="fa-solid fa-rotate"></i> Sincronizar desde Google Sheets
                 </button>
             </div>
             <div class="bg-white p-4 rounded-lg shadow">
@@ -481,7 +481,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Valor de Entrega (Editable)</label>
-                    <input type="number" id="incidencia-valor-entrega" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-blue-900">
+                    <input type="number" id="incidencia-valor-entrega" placeholder="Ingrese monto entregado" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-blue-900">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Comentario / Incidencia (Editable)</label>
@@ -522,6 +522,7 @@
         let numeroPedidoTemporalInput = "";
         let incidenciaPedidoActualId = null;
         let ordenRankingSemanaTipo = 'unidades';
+
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
             localStorage.setItem('app_ventas_ch_borrador_items', JSON.stringify(itemsPedidoActual));
@@ -531,6 +532,9 @@
         }
         function formatLempirasConDecimales(monto) {
             return "L. " + parseFloat(monto || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function getNumeroPedidoOrden(pedido) {
+            return parseInt(String(pedido?.id || pedido?.numeroPedido || '').replace(/[^0-9]/g, ''), 10) || 0;
         }
         
         // FUNCIONES DE RESPALDO Y RESTAURACIÓN
@@ -689,7 +693,7 @@
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
                 procesarDatosCSV(textC, textP);
-                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Conectado';
+                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
             } catch (error) {
                 console.warn("Fallo de red, usando respaldo local...", error);
                 if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Usando datos locales';
@@ -934,11 +938,7 @@
                 return;
             }
             if(confirm("¿Desea reordenar todos los pedidos consecutivamente (01, 02, 03...) para arreglar saltos de número?")) {
-                let pedidosOrdenadosAsc = [...historialPedidos].sort((a, b) => {
-                    let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                    let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                    return numA - numB;
-                });
+                let pedidosOrdenadosAsc = [...historialPedidos].sort((a, b) => getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b));
                 pedidosOrdenadosAsc.forEach((p, idx) => {
                     let numNuevo = String(idx + 1).padStart(2, '0');
                     p.id = numNuevo;
@@ -1030,12 +1030,15 @@
                     pedido.cliente = pedidoActualCliente;
                     pedido.items = [...itemsPedidoActual];
                     pedido.total = totalPedido;
+                    if (pedido.gestionado) {
+                        pedido.valorEntrega = totalPedido;
+                    }
                 }
                 editandoPedidoId = null;
             } else {
                 let maxId = 0;
                 historialPedidos.forEach(p => {
-                    let num = parseInt(String(p.id).replace(/[^0-9]/g, '')) || 0;
+                    let num = getNumeroPedidoOrden(p);
                     if (num > maxId) maxId = num;
                 });
                 let nuevoIdNum = maxId + 1;
@@ -1049,7 +1052,7 @@
                     items: [...itemsPedidoActual],
                     total: totalPedido,
                     fecha: fechaHoy,
-                    valorEntrega: totalPedido,
+                    valorEntrega: null,
                     comentarioEntrega: "",
                     gestionado: false
                 };
@@ -1078,11 +1081,7 @@
                 contenedor.innerHTML = `<div class="p-6 text-center text-gray-400">No hay pedidos registrados todavía.</div>`;
                 return;
             }
-            let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => {
-                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numB - numA;
-            });
+            let pedidosOrdenadosDesc = [...historialPedidos].sort((a, b) => getNumeroPedidoOrden(b) - getNumeroPedidoOrden(a));
             contenedor.innerHTML = pedidosOrdenadosDesc.map(p => `
                 <div class="bg-white p-4 rounded-lg shadow space-y-3 border-l-4 border-blue-900 flex items-start gap-3">
                     <input type="checkbox" value="${p.id}" class="check-pedido mt-1.5 w-5 h-5 accent-blue-900 cursor-pointer" title="Seleccionar pedido">
@@ -1182,7 +1181,14 @@
                 return;
             }
             let idsSeleccionados = Array.from(checkboxes).map(cb => cb.value);
-            let pedidosAMover = historialPedidos.filter(p => idsSeleccionados.includes(p.id));
+            let pedidosAMover = historialPedidos
+                .filter(p => idsSeleccionados.includes(p.id))
+                .map(p => ({
+                    ...p,
+                    valorEntrega: p.gestionado ? p.valorEntrega : null,
+                    comentarioEntrega: p.gestionado ? (p.comentarioEntrega || "") : "",
+                    gestionado: Boolean(p.gestionado)
+                }));
             
             historialPedidos = historialPedidos.filter(p => !idsSeleccionados.includes(p.id));
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
@@ -1227,8 +1233,6 @@
                 if (typeof renderResumenProducto === 'function') renderResumenProducto();
                 if (typeof poblarSelectorSemanasExportar === 'function') poblarSelectorSemanasExportar();
                 if (typeof renderReportesExportacion === 'function') renderReportesExportacion();
-                
-                console.log("Pedido con ID " + id + " eliminado correctamente.");
             }
         }
         function generarPdfPedidoIndividual(id) {
@@ -1316,9 +1320,11 @@
             }
             let mapaFechas = {};
             let mapaClientes = {};
-            let ordenClientes = [];
-            
-            todosPedidos.forEach(p => {
+
+            // Ordenar desde el Pedido #01 al último para el reporte por cliente
+            let pedidosOrdenAsc = [...todosPedidos].sort((a, b) => getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b));
+
+            pedidosOrdenAsc.forEach(p => {
                 if (p && p.total > 0 && p.fecha) {
                     let fechaStd = formatearFechaStandard(p.fecha);
                     if (fechaStd && fechaStd !== "SIN FECHA") {
@@ -1329,12 +1335,22 @@
                     }
                 }
                 let cod = p.cliente.codigo;
+                let numPedido = getNumeroPedidoOrden(p);
                 if(!mapaClientes[cod]) {
-                    mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0 };
-                    ordenClientes.push(cod);
+                    mapaClientes[cod] = { nombre: p.cliente.nombre, total: 0, primerPedido: numPedido };
+                } else if (numPedido > 0 && (mapaClientes[cod].primerPedido === 0 || numPedido < mapaClientes[cod].primerPedido)) {
+                    mapaClientes[cod].primerPedido = numPedido;
                 }
                 mapaClientes[cod].total += p.total;
             });
+
+            let clientesOrdenados = Object.keys(mapaClientes).sort((a, b) => {
+                let numA = mapaClientes[a].primerPedido || Number.MAX_SAFE_INTEGER;
+                let numB = mapaClientes[b].primerPedido || Number.MAX_SAFE_INTEGER;
+                if (numA !== numB) return numA - numB;
+                return a.localeCompare(b);
+            });
+
             let top6Fechas = Object.keys(mapaFechas)
                 .filter(f => mapaFechas[f] > 0)
                 .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
@@ -1358,7 +1374,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${ordenClientes.map(cod => `
+                        ${clientesOrdenados.map(cod => `
                             <tr class="border-b hover:bg-gray-50 text-xs">
                                 <td class="p-1.5 border font-medium text-gray-700">[${cod}] ${mapaClientes[cod].nombre}</td>
                                 <td class="p-1.5 border text-right font-bold text-blue-950 whitespace-nowrap">${formatLempiras(mapaClientes[cod].total)}</td>
@@ -1431,11 +1447,7 @@
                 listaPedidos = reportesSemanales[semanaSeleccionada] || [];
             }
             
-            return listaPedidos.sort((a, b) => {
-                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numB - numA;
-            });
+            return listaPedidos.sort((a, b) => getNumeroPedidoOrden(b) - getNumeroPedidoOrden(a));
         }
         function ordenarRankingSemana(tipo) {
             ordenRankingSemanaTipo = tipo;
@@ -1453,11 +1465,7 @@
                 } else {
                     let semanasFiltradas = semanaSeleccionada === "TODAS" ? semanasKeys : [semanaSeleccionada];
                     contSemanal.innerHTML = semanasFiltradas.map(semana => {
-                        let pedidosSemana = [...(reportesSemanales[semana] || [])].sort((a, b) => {
-                            let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                            let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                            return numB - numA;
-                        });
+                        let pedidosSemana = [...(reportesSemanales[semana] || [])].sort((a, b) => getNumeroPedidoOrden(b) - getNumeroPedidoOrden(a));
                         let totalSemana = pedidosSemana.reduce((acc, p) => acc + p.total, 0);
                         let safeId = semana.replace(/[^a-zA-Z0-9]/g, '_');
                         return `
@@ -1524,13 +1532,16 @@
                     if (gestionA !== gestionB) {
                         return gestionA - gestionB;
                     }
-                    let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                    let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                    return numA - numB;
+                    return getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b);
                 });
                 let sumaFacturado = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
-                let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
+                // Solo suma en Total Entrega los pedidos ya gestionados
+                let sumaEntrega = pedidosIncidenciasOrdenados.reduce((acc, p) => {
+                    if (!p.gestionado || p.valorEntrega === null || p.valorEntrega === undefined || p.valorEntrega === "") return acc;
+                    return acc + (parseFloat(p.valorEntrega) || 0);
+                }, 0);
                 let diferenciaMontos = sumaFacturado - sumaEntrega;
+
                 const incTotFactEl = document.getElementById('inc-total-facturado');
                 const incTotEntEl = document.getElementById('inc-total-entrega');
                 const incDifEl = document.getElementById('inc-diferencia');
@@ -1552,20 +1563,28 @@
                 if(pedidosIncidenciasOrdenados.length === 0) {
                     tbodyInc.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No hay pedidos asignados para esta semana</td></tr>`;
                 } else {
-                    tbodyInc.innerHTML = pedidosIncidenciasOrdenados.map(p => `
-                        <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="abrirModalIncidencia('${p.id}')" title="Toca para editar entrega e incidencia">
-                            <td class="p-2 border font-semibold">${p.numeroPedido}</td>
-                            <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
-                            <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
-                            <td class="p-2 border text-right font-bold text-blue-950">${formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total)}</td>
-                            <td class="p-2 border">${p.comentarioEntrega || '<span class="text-gray-400 italic">Sin incidencia</span>'}</td>
-                            <td class="p-2 border text-center text-lg">
-                                <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
-                                    ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('');
+                    tbodyInc.innerHTML = pedidosIncidenciasOrdenados.map(p => {
+                        let entregaTexto = (p.gestionado && p.valorEntrega !== null && p.valorEntrega !== undefined && p.valorEntrega !== "")
+                            ? formatLempiras(p.valorEntrega)
+                            : `<span class="text-gray-400 italic"></span>`;
+                        let comentarioTexto = p.gestionado
+                            ? (p.comentarioEntrega || '<span class="text-gray-400 italic">Sin incidencia</span>')
+                            : `<span class="text-gray-400 italic">Pendiente de gestionar</span>`;
+                        return `
+                            <tr class="border-b hover:bg-blue-50 cursor-pointer transition-colors" onclick="abrirModalIncidencia('${p.id}')" title="Toca para gestionar entrega e incidencia">
+                                <td class="p-2 border font-semibold">${p.numeroPedido}</td>
+                                <td class="p-2 border">[${p.cliente.codigo}] ${p.cliente.nombre}</td>
+                                <td class="p-2 border text-right">${formatLempiras(p.total)}</td>
+                                <td class="p-2 border text-right font-bold text-blue-950">${entregaTexto}</td>
+                                <td class="p-2 border">${comentarioTexto}</td>
+                                <td class="p-2 border text-center text-lg">
+                                    <span class="${p.gestionado ? 'text-green-600' : 'text-red-500'}" title="${p.gestionado ? 'Gestionado' : 'Pendiente'}">
+                                        ${p.gestionado ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
                 }
             }
             const tbodyProdSem = document.getElementById('tbody-reporte-producto-semana');
@@ -1620,7 +1639,9 @@
             document.getElementById('incidencia-num').value = p.numeroPedido;
             document.getElementById('incidencia-cliente').value = `[${p.cliente.codigo}] ${p.cliente.nombre}`;
             document.getElementById('incidencia-valor-facturado').value = formatLempiras(p.total);
-            document.getElementById('incidencia-valor-entrega').value = Math.round(p.valorEntrega !== undefined ? p.valorEntrega : p.total);
+            document.getElementById('incidencia-valor-entrega').value = (p.gestionado && p.valorEntrega !== null && p.valorEntrega !== undefined && p.valorEntrega !== "")
+                ? Math.round(p.valorEntrega)
+                : "";
             document.getElementById('incidencia-comentario').value = p.comentarioEntrega || "";
             const modal = document.getElementById('modal-incidencia');
             if(modal) modal.classList.remove('hidden');
@@ -1632,15 +1653,23 @@
         }
         function guardarModalIncidencia() {
             if(incidenciaPedidoActualId === null) return;
-            let valEntregaInput = document.getElementById('incidencia-valor-entrega').value;
+            let valEntregaInput = document.getElementById('incidencia-valor-entrega').value.trim();
             let comentarioInput = document.getElementById('incidencia-comentario').value.toUpperCase().trim();
-            let nuevoValorEntrega = parseFloat(valEntregaInput) || 0;
+            if (valEntregaInput === "") {
+                alert("Ingrese el valor de entrega para marcar el pedido como gestionado.");
+                return;
+            }
+            let nuevoValorEntrega = parseFloat(valEntregaInput);
+            if (isNaN(nuevoValorEntrega)) {
+                alert("Ingrese un monto válido para el valor de entrega.");
+                return;
+            }
             Object.values(reportesSemanales).forEach(arr => {
                 let encontrado = arr.find(item => item.id === incidenciaPedidoActualId);
                 if(encontrado) {
                     encontrado.valorEntrega = nuevoValorEntrega;
                     encontrado.comentarioEntrega = comentarioInput;
-                    encontrado.gestionado = comentarioInput !== "";
+                    encontrado.gestionado = true;
                 }
             });
             localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
@@ -1651,11 +1680,7 @@
         function exportarPdfSemanal(semana) {
             let pedidosSemana = reportesSemanales[semana];
             if(!pedidosSemana || pedidosSemana.length === 0) return;
-            let pedidosOrdenados = [...pedidosSemana].sort((a, b) => {
-                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numB - numA;
-            });
+            let pedidosOrdenados = [...pedidosSemana].sort((a, b) => getNumeroPedidoOrden(b) - getNumeroPedidoOrden(a));
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -1718,12 +1743,13 @@
                 if (gestionA !== gestionB) {
                     return gestionA - gestionB;
                 }
-                let numA = parseInt(String(a.id).replace(/[^0-9]/g, '')) || 0;
-                let numB = parseInt(String(b.id).replace(/[^0-9]/g, '')) || 0;
-                return numA - numB;
+                return getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b);
             });
             let sumaFacturado = pedidosOrdenados.reduce((acc, p) => acc + (p.total || 0), 0);
-            let sumaEntrega = pedidosOrdenados.reduce((acc, p) => acc + (p.valorEntrega !== undefined ? p.valorEntrega : (p.total || 0)), 0);
+            let sumaEntrega = pedidosOrdenados.reduce((acc, p) => {
+                if (!p.gestionado || p.valorEntrega === null || p.valorEntrega === undefined || p.valorEntrega === "") return acc;
+                return acc + (parseFloat(p.valorEntrega) || 0);
+            }, 0);
             let diferenciaMontos = sumaFacturado - sumaEntrega;
             const selectSemana = document.getElementById('select-semana-exportar');
             let semanaSeleccionada = selectSemana ? selectSemana.value : "TODAS";
@@ -1735,13 +1761,21 @@
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
             doc.text(`Total Facturado: ${formatLempiras(sumaFacturado)}   |   Total Entrega: ${formatLempiras(sumaEntrega)}   |   Diferencia: ${formatLempiras(diferenciaMontos)}`, 14, 25);
-            let datosTabla = pedidosOrdenados.map(p => [
-                p.numeroPedido,
-                `[${p.cliente.codigo}] ${p.cliente.nombre}`,
-                formatLempiras(p.total),
-                formatLempiras(p.valorEntrega !== undefined ? p.valorEntrega : p.total),
-                p.comentarioEntrega || "Sin incidencia"
-            ]);
+            let datosTabla = pedidosOrdenados.map(p => {
+                let entregaPdf = (p.gestionado && p.valorEntrega !== null && p.valorEntrega !== undefined && p.valorEntrega !== "")
+                    ? formatLempiras(p.valorEntrega)
+                    : "";
+                let comentarioPdf = p.gestionado
+                    ? (p.comentarioEntrega || "Sin incidencia")
+                    : "";
+                return [
+                    p.numeroPedido,
+                    `[${p.cliente.codigo}] ${p.cliente.nombre}`,
+                    formatLempiras(p.total),
+                    entregaPdf,
+                    comentarioPdf
+                ];
+            });
             doc.autoTable({
                 startY: 30,
                 head: [[
