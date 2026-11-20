@@ -62,7 +62,7 @@
             <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Pedido</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-500 mb-1"></label>
                     <div class="relative flex items-center">
                         <input type="text" id="input-buscar-cliente" placeholder="Buscar cliente" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarClientes()">
                         <button type="button" onclick="limpiarCliente()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar cliente"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -70,7 +70,7 @@
                     <div id="lista-clientes-sugeridos" class="absolute z-10 w-full left-0 bg-white border mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto hidden"></div>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow relative">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1"></label>
+                    <label class="block text-sm font-semibold text-gray-500 mb-1"></label>
                     <div class="relative flex items-center">
                         <input type="text" id="input-buscar-producto" placeholder="Buscar producto" class="uppercase-input w-full p-2 pr-10 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarProductos()">
                         <button type="button" onclick="limpiarProducto()" class="absolute right-2 text-gray-400 hover:text-red-600 p-1" title="Limpiar producto"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -98,7 +98,7 @@
                 </div>
                 <!-- BARRA FIJA INFERIOR DE TOTAL Y GUARDAR -->
                 <div class="sticky bottom-0 z-20 bg-white border-t pt-3 pb-2 px-2 -mx-2 mt-2 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.08)] rounded-b-lg">
-                    <div class="text-xl font-bold text-gray-800">Total Pedido: <span id="label-gran-total-pedido" class="text-blue-900">L. 0</span></div>
+                    <div class="text-xl font-bold text-gray-500">Total Pedido: <span id="label-gran-total-pedido" class="text-blue-600">L. 0</span></div>
                     <button type="button" onclick="guardarPedidoActual()" class="bg-green-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-green-700 shadow flex items-center justify-center" title="Guardar Pedido">
                         <i class="fa-solid fa-check text-xl"></i>
                     </button>
