@@ -694,7 +694,7 @@
                 localStorage.setItem('respaldo_csv_clientes', textC);
                 localStorage.setItem('respaldo_csv_productos', textP);
                 procesarDatosCSV(textC, textP);
-                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Google Sheets Conectado';
+                if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i>Conectado';
             } catch (error) {
                 console.warn("Fallo de red, usando respaldo local...", error);
                 if(statusEl) statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Usando datos locales';
