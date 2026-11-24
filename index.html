@@ -181,6 +181,20 @@
                 </div>
             </div>
             <div class="bg-white p-4 rounded-lg shadow space-y-4">
+                <!-- DETALLE DE PEDIDOS DEL PRODUCTO SELECCIONADO (ARRIBA DE LA TABLA) -->
+                <div id="detalle-pedidos-producto" class="hidden bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="space-y-1.5">
+                            <div class="text-xs font-bold uppercase text-blue-800">Pedidos del historial donde va el producto:</div>
+                            <div id="detalle-prod-titulo" class="text-sm font-bold text-gray-900"></div>
+                            <div id="detalle-prod-numeros" class="flex flex-wrap gap-1.5 pt-1"></div>
+                        </div>
+                        <button type="button" onclick="cerrarDetalleProducto()" class="text-gray-500 hover:text-red-600 px-2 py-1 text-base font-bold" title="Cerrar detalle">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div id="detalle-prod-lista" class="text-xs text-gray-700 bg-white rounded border divide-y"></div>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
@@ -194,20 +208,6 @@
                             <tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>
                         </tbody>
                     </table>
-                </div>
-                <!-- DETALLE DE PEDIDOS DEL PRODUCTO SELECCIONADO -->
-                <div id="detalle-pedidos-producto" class="hidden bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-3">
-                    <div class="flex justify-between items-start gap-2">
-                        <div class="space-y-1.5">
-                            <div class="text-xs font-bold uppercase text-blue-800">Pedidos del historial donde va el producto:</div>
-                            <div id="detalle-prod-titulo" class="text-sm font-bold text-gray-900"></div>
-                            <div id="detalle-prod-numeros" class="flex flex-wrap gap-1.5 pt-1"></div>
-                        </div>
-                        <button type="button" onclick="cerrarDetalleProducto()" class="text-gray-500 hover:text-red-600 px-2 py-1 text-sm" title="Cerrar detalle">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                    <div id="detalle-prod-lista" class="text-xs text-gray-700 bg-white rounded border divide-y"></div>
                 </div>
             </div>
         </div>
@@ -1487,7 +1487,7 @@
             if (productoSeleccionadoRanking) {
                 let prodActual = rankingArray.find(item => String(item.codigo) === String(productoSeleccionadoRanking));
                 if (prodActual) {
-                    mostrarDetalleProducto(prodActual, false);
+                    mostrarDetalleProducto(prodActual);
                 } else {
                     cerrarDetalleProducto(false);
                 }
@@ -1524,9 +1524,9 @@
                     }
                 });
             });
-            mostrarDetalleProducto({ codigo, nombre: nombreProd, apariciones }, true);
+            mostrarDetalleProducto({ codigo, nombre: nombreProd, apariciones });
         }
-        function mostrarDetalleProducto(prod, hacerScroll) {
+        function mostrarDetalleProducto(prod) {
             const panel = document.getElementById('detalle-pedidos-producto');
             const tituloEl = document.getElementById('detalle-prod-titulo');
             const numerosEl = document.getElementById('detalle-prod-numeros');
@@ -1562,9 +1562,6 @@
             `).join('');
 
             panel.classList.remove('hidden');
-            if (hacerScroll) {
-                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
         }
         function cerrarDetalleProducto(limpiarSeleccion = true) {
             if (limpiarSeleccion) {
