@@ -171,13 +171,16 @@
         <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
+                    <p class="text-xs text-gray-500">Toca un producto para ver en qué números de pedido está incluido.</p>
+                </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Unidades</button>
                     <button type="button" onclick="ordenarRanking('valor')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Valor L.</button>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow">
+            <div class="bg-white p-4 rounded-lg shadow space-y-4">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
@@ -191,6 +194,20 @@
                             <tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>
                         </tbody>
                     </table>
+                </div>
+                <!-- DETALLE DE PEDIDOS DEL PRODUCTO SELECCIONADO -->
+                <div id="detalle-pedidos-producto" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <div class="text-xs font-bold uppercase text-blue-700">Pedidos donde aparece el producto:</div>
+                            <div id="detalle-prod-titulo" class="text-sm font-bold text-gray-900 mt-0.5"></div>
+                            <div id="detalle-prod-numeros" class="flex flex-wrap gap-1.5 mt-2"></div>
+                        </div>
+                        <button type="button" onclick="cerrarDetalleProducto()" class="text-gray-500 hover:text-red-600 px-2 py-1 text-sm" title="Cerrar detalle">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div id="detalle-prod-lista" class="text-xs text-gray-700 bg-white rounded border divide-y"></div>
                 </div>
             </div>
         </div>
@@ -214,7 +231,6 @@
                     </label>
                 </div>
             </div>
-
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-lg shadow border-2 border-blue-900">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                     <i class="fa-solid fa-file-pdf text-blue-900"></i>Reportes y Exportación
@@ -523,6 +539,7 @@
         let numeroPedidoTemporalInput = "";
         let incidenciaPedidoActualId = null;
         let ordenRankingSemanaTipo = 'unidades';
+        let productoSeleccionadoRanking = null;
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -554,7 +571,6 @@
             a.click();
             URL.revokeObjectURL(url);
         }
-
         function importarRespaldoLocal(event) {
             let archivo = event.target.files[0];
             if (!archivo) return;
@@ -574,7 +590,6 @@
             };
             reader.readAsText(archivo);
         }
-
         function formatearFechaStandard(strFecha) {
             if (!strFecha) return "SIN FECHA";
             let f = strFecha.trim().toUpperCase();
@@ -1212,20 +1227,16 @@
             if (!Array.isArray(pedidosSemana)) return;
             let idx = pedidosSemana.findIndex(p => String(p.id) === String(pedidoId));
             if (idx === -1) return;
-
             let [pedidoDevuelto] = pedidosSemana.splice(idx, 1);
             if (pedidosSemana.length === 0) {
                 delete reportesSemanales[semana];
             }
-
             if (!historialPedidos.some(p => String(p.id) === String(pedidoDevuelto.id) && p.cliente?.codigo === pedidoDevuelto.cliente?.codigo && p.total === pedidoDevuelto.total)) {
                 historialPedidos.push(pedidoDevuelto);
             }
-
             localStorage.setItem('app_ventas_ch_semanales', JSON.stringify(reportesSemanales));
             localStorage.setItem('app_ventas_ch_pedidos', JSON.stringify(historialPedidos));
             sincronizarPedidosEnNube();
-
             renderHistorial();
             renderResumenGeneral();
             renderResumenProducto();
@@ -1346,9 +1357,7 @@
             }
             let mapaFechas = {};
             let mapaClientes = {};
-
             let pedidosOrdenAsc = [...pedidosActivos].sort((a, b) => getNumeroPedidoOrden(a) - getNumeroPedidoOrden(b));
-
             pedidosOrdenAsc.forEach(p => {
                 if (p && p.total > 0 && p.fecha) {
                     let fechaStd = formatearFechaStandard(p.fecha);
@@ -1368,14 +1377,12 @@
                 }
                 mapaClientes[cod].total += p.total;
             });
-
             let clientesOrdenados = Object.keys(mapaClientes).sort((a, b) => {
                 let numA = mapaClientes[a].primerPedido || Number.MAX_SAFE_INTEGER;
                 let numB = mapaClientes[b].primerPedido || Number.MAX_SAFE_INTEGER;
                 if (numA !== numB) return numA - numB;
                 return a.localeCompare(b);
             });
-
             let top6Fechas = Object.keys(mapaFechas)
                 .filter(f => mapaFechas[f] > 0)
                 .sort((a, b) => parseFechaTimestamp(b) - parseFechaTimestamp(a))
@@ -1417,12 +1424,28 @@
         function renderResumenProducto() {
             let mapaProductos = {};
             historialPedidos.forEach(p => {
+                let numLabel = p.numeroPedido || `Pedido #${String(getNumeroPedidoOrden(p)).padStart(2, '0')}`;
+                let numOrden = getNumeroPedidoOrden(p);
                 p.items.forEach(item => {
                     if(!mapaProductos[item.codigo]) {
-                        mapaProductos[item.codigo] = { codigo: item.codigo, nombre: item.nombre, unidades: 0, valor: 0 };
+                        mapaProductos[item.codigo] = {
+                            codigo: item.codigo,
+                            nombre: item.nombre,
+                            unidades: 0,
+                            valor: 0,
+                            apariciones: []
+                        };
                     }
                     mapaProductos[item.codigo].unidades += item.cantidad;
                     mapaProductos[item.codigo].valor += (item.precio * item.cantidad);
+                    mapaProductos[item.codigo].apariciones.push({
+                        id: p.id,
+                        numOrden: numOrden,
+                        numeroPedido: numLabel,
+                        cliente: p.cliente ? `[${p.cliente.codigo}] ${p.cliente.nombre}` : 'CLIENTE',
+                        cantidad: item.cantidad,
+                        subtotal: item.precio * item.cantidad
+                    });
                 });
             });
             let rankingArray = Object.values(mapaProductos);
@@ -1435,15 +1458,82 @@
             if(!tbody) return;
             if(rankingArray.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>`;
+                cerrarDetalleProducto();
                 return;
             }
-            tbody.innerHTML = rankingArray.map(r => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
-                    <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
-                    <td class="p-2 border text-right font-bold text-green-600">${formatLempiras(r.valor)}</td>
-                </tr>
+            tbody.innerHTML = rankingArray.map(r => {
+                let esSeleccionado = productoSeleccionadoRanking === r.codigo;
+                let codEscapado = String(r.codigo).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                return `
+                    <tr onclick="seleccionarProductoRanking('${codEscapado}')" class="border-b cursor-pointer transition-colors ${esSeleccionado ? 'bg-blue-100 ring-1 ring-inset ring-blue-400' : 'hover:bg-blue-50'}" title="Toca para ver los pedidos de este producto">
+                        <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
+                        <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
+                        <td class="p-2 border text-right font-bold text-green-600">${formatLempiras(r.valor)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (productoSeleccionadoRanking) {
+                let prodActual = rankingArray.find(item => item.codigo === productoSeleccionadoRanking);
+                if (prodActual) {
+                    mostrarDetalleProducto(prodActual);
+                } else {
+                    cerrarDetalleProducto();
+                }
+            }
+        }
+        function seleccionarProductoRanking(codigo) {
+            if (productoSeleccionadoRanking === codigo) {
+                cerrarDetalleProducto();
+                return;
+            }
+            productoSeleccionadoRanking = codigo;
+            renderResumenProducto();
+        }
+        function mostrarDetalleProducto(prod) {
+            const panel = document.getElementById('detalle-pedidos-producto');
+            const tituloEl = document.getElementById('detalle-prod-titulo');
+            const numerosEl = document.getElementById('detalle-prod-numeros');
+            const listaEl = document.getElementById('detalle-prod-lista');
+            if (!panel || !tituloEl || !numerosEl || !listaEl) return;
+
+            let aparicionesOrdenadas = [...prod.apariciones].sort((a, b) => a.numOrden - b.numOrden);
+            let numerosUnicos = [];
+            let vistos = new Set();
+            aparicionesOrdenadas.forEach(ap => {
+                let etiqueta = ap.numeroPedido || `#${String(ap.numOrden).padStart(2, '0')}`;
+                if (!vistos.has(etiqueta)) {
+                    vistos.add(etiqueta);
+                    numerosUnicos.push(etiqueta);
+                }
+            });
+
+            tituloEl.innerText = `[${prod.codigo}] ${prod.nombre}`;
+            numerosEl.innerHTML = numerosUnicos.map(num => `
+                <span class="bg-blue-900 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">${num}</span>
             `).join('');
+
+            listaEl.innerHTML = aparicionesOrdenadas.map(ap => `
+                <div class="p-2 flex justify-between items-center gap-2">
+                    <div>
+                        <span class="font-bold text-blue-900">${ap.numeroPedido}</span>
+                        <span class="text-gray-600">• ${ap.cliente}</span>
+                    </div>
+                    <div class="text-right whitespace-nowrap font-semibold text-gray-800">
+                        Cant: <span class="text-blue-600">${ap.cantidad}</span> (${formatLempiras(ap.subtotal)})
+                    </div>
+                </div>
+            `).join('');
+
+            panel.classList.remove('hidden');
+        }
+        function cerrarDetalleProducto() {
+            productoSeleccionadoRanking = null;
+            const panel = document.getElementById('detalle-pedidos-producto');
+            if (panel) panel.classList.add('hidden');
+            document.querySelectorAll('#tabla-ranking-productos tr').forEach(tr => {
+                tr.classList.remove('bg-blue-100', 'ring-1', 'ring-inset', 'ring-blue-400');
+            });
         }
         function poblarSelectorSemanasExportar() {
             const select = document.getElementById('select-semana-exportar');
@@ -1572,7 +1662,6 @@
                     return acc + (parseFloat(p.valorEntrega) || 0);
                 }, 0);
                 let diferenciaMontos = sumaFacturado - sumaEntrega;
-
                 const incTotFactEl = document.getElementById('inc-total-facturado');
                 const incTotEntEl = document.getElementById('inc-total-entrega');
                 const incDifEl = document.getElementById('inc-diferencia');
