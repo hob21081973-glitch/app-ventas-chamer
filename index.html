@@ -168,12 +168,12 @@
                 </div>
             </div>
         </div>
-        <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS) -->
+        <!-- 4. RESUMEN POR PRODUCTO (PEDIDOS ACTIVOS DEL HISTORIAL) -->
         <div id="panel-producto" class="tab-panel space-y-4">
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
-                    <p class="text-xs text-gray-500">Toca un producto para ver en qué números de pedido está incluido.</p>
+                    <p class="text-xs text-gray-500">Toca un producto para ver en qué números de pedido del historial va.</p>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Unidades</button>
@@ -196,12 +196,12 @@
                     </table>
                 </div>
                 <!-- DETALLE DE PEDIDOS DEL PRODUCTO SELECCIONADO -->
-                <div id="detalle-pedidos-producto" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <div id="detalle-pedidos-producto" class="hidden bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-3">
                     <div class="flex justify-between items-start gap-2">
-                        <div>
-                            <div class="text-xs font-bold uppercase text-blue-700">Pedidos donde aparece el producto:</div>
-                            <div id="detalle-prod-titulo" class="text-sm font-bold text-gray-900 mt-0.5"></div>
-                            <div id="detalle-prod-numeros" class="flex flex-wrap gap-1.5 mt-2"></div>
+                        <div class="space-y-1.5">
+                            <div class="text-xs font-bold uppercase text-blue-800">Pedidos del historial donde va el producto:</div>
+                            <div id="detalle-prod-titulo" class="text-sm font-bold text-gray-900"></div>
+                            <div id="detalle-prod-numeros" class="flex flex-wrap gap-1.5 pt-1"></div>
                         </div>
                         <button type="button" onclick="cerrarDetalleProducto()" class="text-gray-500 hover:text-red-600 px-2 py-1 text-sm" title="Cerrar detalle">
                             <i class="fa-solid fa-xmark"></i>
@@ -621,6 +621,9 @@
                     b.classList.remove('text-gray-600', 'font-medium');
                 }
             });
+            if (id === 'producto') {
+                renderResumenProducto();
+            }
         };
         window.addEventListener('DOMContentLoaded', () => {
             sincronizarGoogleSheets();
@@ -1421,30 +1424,38 @@
             ordenRankingTipo = tipo;
             renderResumenProducto();
         }
+        function recolectarPedidosParaRankingProducto() {
+            return [...historialPedidos];
+        }
         function renderResumenProducto() {
             let mapaProductos = {};
-            historialPedidos.forEach(p => {
-                let numLabel = p.numeroPedido || `Pedido #${String(getNumeroPedidoOrden(p)).padStart(2, '0')}`;
+            let fuentePedidos = recolectarPedidosParaRankingProducto();
+            fuentePedidos.forEach(p => {
+                if (!p || !Array.isArray(p.items)) return;
                 let numOrden = getNumeroPedidoOrden(p);
+                let numLabel = p.numeroPedido || `Pedido #${String(numOrden).padStart(2, '0')}`;
                 p.items.forEach(item => {
-                    if(!mapaProductos[item.codigo]) {
-                        mapaProductos[item.codigo] = {
-                            codigo: item.codigo,
-                            nombre: item.nombre,
+                    let codProd = String(item.codigo || item.nombre).trim();
+                    if(!mapaProductos[codProd]) {
+                        mapaProductos[codProd] = {
+                            codigo: item.codigo || codProd,
+                            nombre: item.nombre || '',
                             unidades: 0,
                             valor: 0,
                             apariciones: []
                         };
                     }
-                    mapaProductos[item.codigo].unidades += item.cantidad;
-                    mapaProductos[item.codigo].valor += (item.precio * item.cantidad);
-                    mapaProductos[item.codigo].apariciones.push({
+                    let cant = parseFloat(item.cantidad) || 0;
+                    let precio = parseFloat(item.precio) || 0;
+                    mapaProductos[codProd].unidades += cant;
+                    mapaProductos[codProd].valor += (precio * cant);
+                    mapaProductos[codProd].apariciones.push({
                         id: p.id,
                         numOrden: numOrden,
                         numeroPedido: numLabel,
                         cliente: p.cliente ? `[${p.cliente.codigo}] ${p.cliente.nombre}` : 'CLIENTE',
-                        cantidad: item.cantidad,
-                        subtotal: item.precio * item.cantidad
+                        cantidad: cant,
+                        subtotal: precio * cant
                     });
                 });
             });
@@ -1457,15 +1468,15 @@
             const tbody = document.getElementById('tabla-ranking-productos');
             if(!tbody) return;
             if(rankingArray.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas</td></tr>`;
-                cerrarDetalleProducto();
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas en el historial</td></tr>`;
+                cerrarDetalleProducto(false);
                 return;
             }
             tbody.innerHTML = rankingArray.map(r => {
-                let esSeleccionado = productoSeleccionadoRanking === r.codigo;
+                let esSeleccionado = String(productoSeleccionadoRanking) === String(r.codigo);
                 let codEscapado = String(r.codigo).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
                 return `
-                    <tr onclick="seleccionarProductoRanking('${codEscapado}')" class="border-b cursor-pointer transition-colors ${esSeleccionado ? 'bg-blue-100 ring-1 ring-inset ring-blue-400' : 'hover:bg-blue-50'}" title="Toca para ver los pedidos de este producto">
+                    <tr onclick="seleccionarProductoRanking('${codEscapado}')" class="border-b cursor-pointer transition-colors ${esSeleccionado ? 'bg-blue-100 ring-1 ring-inset ring-blue-400' : 'hover:bg-blue-50'}" title="Toca para ver en qué pedidos del historial va este producto">
                         <td class="p-2 border font-medium">[${r.codigo}] ${r.nombre}</td>
                         <td class="p-2 border text-right font-bold text-blue-600">${r.unidades}</td>
                         <td class="p-2 border text-right font-bold text-green-600">${formatLempiras(r.valor)}</td>
@@ -1474,30 +1485,55 @@
             }).join('');
 
             if (productoSeleccionadoRanking) {
-                let prodActual = rankingArray.find(item => item.codigo === productoSeleccionadoRanking);
+                let prodActual = rankingArray.find(item => String(item.codigo) === String(productoSeleccionadoRanking));
                 if (prodActual) {
-                    mostrarDetalleProducto(prodActual);
+                    mostrarDetalleProducto(prodActual, false);
                 } else {
-                    cerrarDetalleProducto();
+                    cerrarDetalleProducto(false);
                 }
             }
         }
         function seleccionarProductoRanking(codigo) {
-            if (productoSeleccionadoRanking === codigo) {
-                cerrarDetalleProducto();
+            if (String(productoSeleccionadoRanking) === String(codigo)) {
+                cerrarDetalleProducto(true);
                 return;
             }
             productoSeleccionadoRanking = codigo;
             renderResumenProducto();
+            let fuentePedidos = recolectarPedidosParaRankingProducto();
+            let apariciones = [];
+            let nombreProd = "";
+            fuentePedidos.forEach(p => {
+                if (!p || !Array.isArray(p.items)) return;
+                let numOrden = getNumeroPedidoOrden(p);
+                let numLabel = p.numeroPedido || `Pedido #${String(numOrden).padStart(2, '0')}`;
+                p.items.forEach(item => {
+                    let codItem = String(item.codigo || item.nombre).trim();
+                    if (codItem === String(codigo).trim()) {
+                        nombreProd = item.nombre || nombreProd;
+                        let cant = parseFloat(item.cantidad) || 0;
+                        let precio = parseFloat(item.precio) || 0;
+                        apariciones.push({
+                            id: p.id,
+                            numOrden: numOrden,
+                            numeroPedido: numLabel,
+                            cliente: p.cliente ? `[${p.cliente.codigo}] ${p.cliente.nombre}` : 'CLIENTE',
+                            cantidad: cant,
+                            subtotal: precio * cant
+                        });
+                    }
+                });
+            });
+            mostrarDetalleProducto({ codigo, nombre: nombreProd, apariciones }, true);
         }
-        function mostrarDetalleProducto(prod) {
+        function mostrarDetalleProducto(prod, hacerScroll) {
             const panel = document.getElementById('detalle-pedidos-producto');
             const tituloEl = document.getElementById('detalle-prod-titulo');
             const numerosEl = document.getElementById('detalle-prod-numeros');
             const listaEl = document.getElementById('detalle-prod-lista');
             if (!panel || !tituloEl || !numerosEl || !listaEl) return;
 
-            let aparicionesOrdenadas = [...prod.apariciones].sort((a, b) => a.numOrden - b.numOrden);
+            let aparicionesOrdenadas = [...(prod.apariciones || [])].sort((a, b) => a.numOrden - b.numOrden);
             let numerosUnicos = [];
             let vistos = new Set();
             aparicionesOrdenadas.forEach(ap => {
@@ -1509,9 +1545,9 @@
             });
 
             tituloEl.innerText = `[${prod.codigo}] ${prod.nombre}`;
-            numerosEl.innerHTML = numerosUnicos.map(num => `
-                <span class="bg-blue-900 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">${num}</span>
-            `).join('');
+            numerosEl.innerHTML = numerosUnicos.length > 0
+                ? numerosUnicos.map(num => `<span class="bg-blue-900 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">${num}</span>`).join('')
+                : `<span class="text-xs text-gray-500">Sin pedidos en historial</span>`;
 
             listaEl.innerHTML = aparicionesOrdenadas.map(ap => `
                 <div class="p-2 flex justify-between items-center gap-2">
@@ -1526,14 +1562,19 @@
             `).join('');
 
             panel.classList.remove('hidden');
+            if (hacerScroll) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
-        function cerrarDetalleProducto() {
-            productoSeleccionadoRanking = null;
+        function cerrarDetalleProducto(limpiarSeleccion = true) {
+            if (limpiarSeleccion) {
+                productoSeleccionadoRanking = null;
+                document.querySelectorAll('#tabla-ranking-productos tr').forEach(tr => {
+                    tr.classList.remove('bg-blue-100', 'ring-1', 'ring-inset', 'ring-blue-400');
+                });
+            }
             const panel = document.getElementById('detalle-pedidos-producto');
             if (panel) panel.classList.add('hidden');
-            document.querySelectorAll('#tabla-ranking-productos tr').forEach(tr => {
-                tr.classList.remove('bg-blue-100', 'ring-1', 'ring-inset', 'ring-blue-400');
-            });
         }
         function poblarSelectorSemanasExportar() {
             const select = document.getElementById('select-semana-exportar');
