@@ -173,7 +173,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Ranking De Productos</h2>
-                    <p class="text-xs text-gray-500">Toca un producto para ver en qué números de pedido del historial va.</p>
+                    <p class="text-xs text-gray-500">Toca un producto o busca con la lupa para ver en qué números de pedido del historial va.</p>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="ordenarRanking('unidades')" class="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-md shadow hover:bg-blue-700">Unidades</button>
@@ -199,7 +199,20 @@
                     <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-gray-100 text-gray-600 text-sm">
-                                <th class="p-2 border">Producto</th>
+                                <th class="p-2 border">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span>Producto</span>
+                                        <button type="button" onclick="toggleBuscadorRankingProducto()" class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded px-2 py-0.5 text-xs transition-colors" title="Buscar producto">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                    <div id="contenedor-buscador-ranking-prod" class="hidden mt-2 relative">
+                                        <input type="text" id="input-buscar-ranking-prod" placeholder="Escribir código o nombre..." class="uppercase-input w-full p-1.5 pr-7 border border-blue-300 rounded bg-white text-xs font-normal text-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="filtrarRankingProductos()">
+                                        <button type="button" onclick="limpiarYcerrarBuscadorRankingProducto()" class="absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 text-xs px-1" title="Limpiar y cerrar búsqueda">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </th>
                                 <th class="p-2 border text-right">Unidades Vendidas</th>
                                 <th class="p-2 border text-right">Valor Total (L.)</th>
                             </tr>
@@ -540,6 +553,7 @@
         let incidenciaPedidoActualId = null;
         let ordenRankingSemanaTipo = 'unidades';
         let productoSeleccionadoRanking = null;
+        let filtroRankingProductoTexto = "";
 
         function guardarBorrador() {
             localStorage.setItem('app_ventas_ch_borrador_cliente', JSON.stringify(pedidoActualCliente));
@@ -1424,10 +1438,45 @@
             ordenRankingTipo = tipo;
             renderResumenProducto();
         }
+        function toggleBuscadorRankingProducto() {
+            const cont = document.getElementById('contenedor-buscador-ranking-prod');
+            const input = document.getElementById('input-buscar-ranking-prod');
+            if (!cont || !input) return;
+            let estaOculto = cont.classList.contains('hidden');
+            if (estaOculto) {
+                cont.classList.remove('hidden');
+                input.focus();
+            } else {
+                limpiarYcerrarBuscadorRankingProducto();
+            }
+        }
+        function limpiarYcerrarBuscadorRankingProducto() {
+            const cont = document.getElementById('contenedor-buscador-ranking-prod');
+            const input = document.getElementById('input-buscar-ranking-prod');
+            filtroRankingProductoTexto = "";
+            if (input) input.value = "";
+            if (cont) cont.classList.add('hidden');
+            renderResumenProducto();
+        }
+        function filtrarRankingProductos() {
+            const input = document.getElementById('input-buscar-ranking-prod');
+            filtroRankingProductoTexto = input ? input.value.toUpperCase().trim() : "";
+            renderResumenProducto();
+            if (filtroRankingProductoTexto) {
+                let rankingFiltrado = obtenerRankingProductosData();
+                if (rankingFiltrado.length === 1) {
+                    let unico = rankingFiltrado[0];
+                    if (String(productoSeleccionadoRanking) !== String(unico.codigo)) {
+                        productoSeleccionadoRanking = unico.codigo;
+                        mostrarDetalleProducto(unico);
+                    }
+                }
+            }
+        }
         function recolectarPedidosParaRankingProducto() {
             return [...historialPedidos];
         }
-        function renderResumenProducto() {
+        function obtenerRankingProductosData() {
             let mapaProductos = {};
             let fuentePedidos = recolectarPedidosParaRankingProducto();
             fuentePedidos.forEach(p => {
@@ -1460,16 +1509,29 @@
                 });
             });
             let rankingArray = Object.values(mapaProductos);
+            if (filtroRankingProductoTexto) {
+                rankingArray = rankingArray.filter(r =>
+                    String(r.codigo).toUpperCase().includes(filtroRankingProductoTexto) ||
+                    String(r.nombre).toUpperCase().includes(filtroRankingProductoTexto)
+                );
+            }
             if(ordenRankingTipo === 'unidades') {
                 rankingArray.sort((a, b) => b.unidades - a.unidades);
             } else {
                 rankingArray.sort((a, b) => b.valor - a.valor);
             }
+            return rankingArray;
+        }
+        function renderResumenProducto() {
+            let rankingArray = obtenerRankingProductosData();
             const tbody = document.getElementById('tabla-ranking-productos');
             if(!tbody) return;
             if(rankingArray.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Sin datos de ventas en el historial</td></tr>`;
-                cerrarDetalleProducto(false);
+                let msg = filtroRankingProductoTexto
+                    ? `No se encontraron productos para "${filtroRankingProductoTexto}"`
+                    : "Sin datos de ventas en el historial";
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">${msg}</td></tr>`;
+                if (!filtroRankingProductoTexto) cerrarDetalleProducto(false);
                 return;
             }
             tbody.innerHTML = rankingArray.map(r => {
@@ -1488,7 +1550,7 @@
                 let prodActual = rankingArray.find(item => String(item.codigo) === String(productoSeleccionadoRanking));
                 if (prodActual) {
                     mostrarDetalleProducto(prodActual);
-                } else {
+                } else if (!filtroRankingProductoTexto) {
                     cerrarDetalleProducto(false);
                 }
             }
